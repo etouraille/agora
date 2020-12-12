@@ -1,13 +1,18 @@
 import React , { useEffect , useState, useCallback} from 'react';
 import { useParams } from "react-router";
 import http from "../http/http";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, removeUser } from "../redux/slice/readyForVoteSlice";
 
-const Invite = () => {
+const Invite = ({id}) => {
 
-    const { id } = useParams();
     const [invitedUsers , setInvitedUsers ] = useState([]);
     const [users, setUsers] = useState([]);
     const [ reload , setReload ] = useState( false );
+
+    const dispatch = useDispatch();
+
+    const user = useSelector(state => state.login.user );
 
     useEffect(() => {
         if( reload ) {
@@ -46,7 +51,19 @@ const Invite = () => {
             id : id,
             email : email
         }).then( (data) =>{
+            dispatch(addUser({ id  : id , user : email , invitedBy : user }));
             setReload(true);
+        }, error => { console.log( error )})
+    }, [user ])
+
+    const uninvite = useCallback((email) => {
+        http.post('/api/uninvite', {
+            id : id,
+            email : email
+        }).then( (data) =>{
+            dispatch(removeUser({id : id , user : email }));
+            setReload(true);
+            users.push(email );
         }, error => { console.log( error )})
     })
 
@@ -57,7 +74,10 @@ const Invite = () => {
             <h1>Membres invités</h1>
             <ul className="list-group">
                 {invitedUsers.map((user, index ) => {
-                    return <li className="list-group-item" key={index}>{user}</li>
+                    return (<li className="list-group-item" key={index}>{user}
+                        <button className="btn btn-danger float-right" onClick={() => uninvite(user)}>Désinviter</button>
+
+                    </li>)
                 })}
             </ul>
             <br/>
@@ -66,7 +86,7 @@ const Invite = () => {
                 {users.map((user, index ) => {
                     return (
                         <li className="list-group-item" key={index}>{user}
-                            <button className="btn btn-primary float-right" onClick={() => invite(user)}>Ajouter</button>
+                            <button className="btn btn-primary float-right" onClick={() => invite(user)}>Inviter</button>
                         </li>
                     )
                 })}

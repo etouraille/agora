@@ -2,7 +2,7 @@ import React, { useState , useEffect } from 'react';
 import { Formik, Form , ErrorMessage, Field } from 'formik'
 import http from "../http/http";
 import Quill from 'quill';
-
+import history from "../utils/history";
 
 const Document = () => {
 
@@ -31,6 +31,7 @@ const Document = () => {
                 values['body'] = JSON.stringify(body);
                 http.post('/api/document', values).then((data) => {
                     console.log(data);
+                    history.push('/documentedit/' + data.data.id);
                     setSubmitting(false);
                 }, error => {
                     console.log(error);
@@ -39,7 +40,6 @@ const Document = () => {
             }}
             validate={ (values  )=> {
                 let errors = {};
-                console.log( body );
                 if( body.length === 0 ) {
                     errors.body = 'Le corps ne peut être vide';
                 }
@@ -47,7 +47,6 @@ const Document = () => {
                 if( ! values.title ) {
                     errors.title = 'Le titre est obligatoire';
                 }
-                console.log( errors );
                 return errors;
             }}
         >

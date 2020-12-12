@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import rangy  from 'rangy';
 
 
 const useSelection = (quill) => {
@@ -10,11 +9,8 @@ const useSelection = (quill) => {
 
     const mouseup = useCallback((evt ) => {
         if( quill ) {
-            console.log( quill );
             const range = quill.getSelection(false);
-            console.log ( range );
             if( range ) {
-                console.log(range);
                 setSelection(quill.getContents(range.index, range.length));
             }
         }

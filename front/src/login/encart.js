@@ -21,7 +21,7 @@ const Encart = () =>{
 
         http.get('/api/ping').then(
             data => {
-                dispatch( login({ token  : localStorage.getItem('token') }));
+                dispatch( login({ token  : localStorage.getItem('token'), user: data.data.user  }));
             },
             error => {
                 dispatch( logout());

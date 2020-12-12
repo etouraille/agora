@@ -12,13 +12,14 @@ const create = ( req, res ) => {
     try {
         const query = 'MATCH (user: User ) WHERE user.login = $email ' +
         ' MERGE (user)-[r:CREATE]->(document : Document {title : $title , body : $body , id : $id })-[s:CREATE_BY]->(user)' +
-        ' RETURN document'
+        ' MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user)' +
+        'RETURN document'
         const result = session.run(
             query,
-            {title : title , body : body , email: username , id : uuid()});
+            {title : title , body : body , email: username , id : uuid(), me : username });
 
         result.then( data => {
-            res.json( data.records[0].get(0));
+            res.json( data.records[0].get(0).properties );
             res.end();
             session.close();
             driver.close();
@@ -42,8 +43,9 @@ const get = ( req, res ) => {
 
     try {
         const query = 'MATCH (document:Document) WHERE document.id = $id' +
-            ' OPTIONAL MATCH (document)-[r:HAS_CHILDREN]->(children : Document )  ' +
-            ' RETURN document, children';
+            ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  ' +
+            ' OPTIONAL MATCH (document)-[parentRelation:HAS_PARENT]->(parent : Document)' +
+            ' RETURN document, children, relation, parent, parentRelation ';
         let result = session.run(query, {id : id });
         result.then(data => {
             if( data.records[0]) {
@@ -51,8 +53,10 @@ const get = ( req, res ) => {
                 data.records.map((elem, index ) =>{
                     tab['document'] = elem.get(0).properties;
                     if(elem.get(1)) {
-                        tab['children'].push( elem.get(1).properties );
+                        tab['children'].push( {child  : elem.get(1).properties , link :  elem.get(2).properties });
                     }
+                    tab['parent'] = elem.get(3) ? elem.get(3).properties : null;
+                    tab['parentLink'] = elem.get(4) ?  elem.get(4).properties: null;
                 })
                 res.json(tab);
                 res.end();

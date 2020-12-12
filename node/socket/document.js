@@ -100,6 +100,7 @@ shareDBServer.use('commit', ( request, next ) => {
     }
     let newOps = [];
     if( request.op.op  && data ) {
+        console.log( JSON.stringify(request.op.op));
         const delta = new Delta( data );
         const res = delta.compose(request.op.op );
         ops[id] = res;

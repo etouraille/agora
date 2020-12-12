@@ -31,7 +31,7 @@ const Login = () => {
                             localStorage.setItem( 'token', data.data.token );
                             console.log( 'history');
                             history.push("/home");
-                            dispatch(login({token : data.data.token }));
+                            dispatch(login({token : data.data.token , user : data.data.user}));
                         } else {
                             dispatch(logout());
                         }

@@ -6,11 +6,10 @@ const documents = ( req, res ) => {
 
     const email = res.username;
 
-    console.log( email );
-
     try {
-        const query = 'MATCH (user:User)-[r:CREATE]->(document:Document ) WHERE user.login = $email RETURN document';
-        const result = session.run(query, {email : email })
+        const query = 'MATCH (document:Document ) ' +
+            'RETURN document';
+        const result = session.run(query )
         result.then( data => {
             const singleResult = data.records[0];
             const ret = [];

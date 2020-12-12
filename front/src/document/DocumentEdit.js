@@ -6,6 +6,9 @@ import Quill from 'quill';
 import 'quill/dist/quill.bubble.css';
 import Sharedb from 'sharedb/lib/client';
 import richText from 'rich-text';
+import http from "../http/http";
+import Invite from "../invite/Invite";
+import ReadyForVote from "../vote/ReadyForVote";
 Sharedb.types.register(richText.type);
 
 // Connecting to our socket server
@@ -20,6 +23,7 @@ const DocumentEdit = () => {
     const { id } = useParams();
     const [ editor, setEditor] = useState( null );
     const [ focusChanged , setFocusChanged ] = useState( false );
+    const [ showInvite , setShowInvite ] = useState( false );
     const options = {
         theme: 'snow',
     };
@@ -115,10 +119,42 @@ const DocumentEdit = () => {
         };
     }, [id ]);
 
+    useEffect(() => {
+        http.get('/api/document/' + id ).then(data => {
+            const quill = new Quill('#hiddenEditor');
+            if( data.data.parent ) {
+                quill.setContents(JSON.parse(data.data.parent.body));
+                const before = quill.getContents(0, data.data.parentLink.index);
+                const after = quill.getContents(data.data.parentLink.index + data.data.parentLink.length, quill.getLength());
+
+                const beforequill = new Quill("#before", {readonly: true});
+                beforequill.setContents(before);
+
+                const afterquill = new Quill("#after", {readonly: true});
+                afterquill.setContents(after);
+            }
+
+        })
+    }, [id])
+
     return (
         <div>
-            <div className="form-group">
-                <div id="editor"></div>
+            <div id="hiddenEditor" style={{ display : 'none'}}></div>
+            <div id="before"></div>
+            <div className="row">
+                <div className="form-group col-sm-10">
+                    <div id="editor"></div>
+                </div>
+                <div className="col-sm">
+                    <ReadyForVote id={id}></ReadyForVote>
+                </div>
+            </div>
+            <div id="after"></div>
+            <div>
+                <div style={{ display : showInvite ? 'block' : 'none' }} >
+                    <Invite  id={id}></Invite>
+                </div>
+                <button className="btn btn-primary" onClick={() => { setShowInvite(!showInvite)}}>Invite</button>
             </div>
         </div>
     )

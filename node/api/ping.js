@@ -1,5 +1,5 @@
 const ping = ( req, res ) => {
-    res.json({ ping : 'ok '});
+    res.json({ ping : 'ok ', user: res.username });
     res.end();
 
 }

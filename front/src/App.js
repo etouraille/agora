@@ -6,7 +6,7 @@ import DocumentList from "./document/List";
 import Document from './document/Document';
 import DocumentEdit from "./document/DocumentEdit";
 import DocumentView from "./document/DocumentView";
-import Invite from "./invite/Invite";
+import InviteNavigate from "./invite/InviteNavigate";
 import {
     Switch,
     Route,
@@ -55,7 +55,7 @@ export default function App() {
                             <Document></Document>
                         </Route>
                         <Route path="/invite/:id">
-                            <Invite></Invite>
+                            <InviteNavigate></InviteNavigate>
                         </Route>
                     </Switch>
                 </div>

@@ -1,5 +1,6 @@
 const getDriver = require('./../neo/driver');
 
+
 const invite = ( req, res ) => {
 
     const { id , email } = req.body;
@@ -8,13 +9,37 @@ const invite = ( req, res ) => {
     const session = driver.session();
     const query = 'MATCH (user: User ) WHERE user.login = $email ' +
         'MATCH ( document : Document ) WHERE document.id = $id ' +
-        'MERGE (document)-[r:FOR_EDIT_BY { invited : $me }]->(user)';
+        'MERGE (document)-[r:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(user)';
 
     let result = session.run( query , {id : id , email : email, me : res.username });
     result.then(data => {
         res.json({id : id , email : email }).end();
     }, error => {
         res.json(500, {reason : error });
+    }).finally(() => {
+        session.close();
+        driver.close();
+    })
+
+}
+
+const uninvite = ( req, res ) => {
+
+    const { id , email } = req.body;
+
+    const driver = getDriver();
+    const session = driver.session();
+    const query = 'MATCH ( document : Document )-[r:FOR_EDIT_BY]->(user:User) ' +
+        ' WHERE user.login = $email ' +
+        ' AND document.id = $id ' +
+        ' AND r.invited = $me ' +
+        'DELETE r ';
+
+    let result = session.run( query , { id , email , me : res.username});
+    result.then( data => {
+        return res.json(data).end();
+    }, error => {
+        return res.json(500, { reason : error }).end();
     }).finally(() => {
         session.close();
         driver.close();
@@ -49,4 +74,5 @@ const getInvitedUsers = (req , res ) => {
 module.exports = {
     invite,
     getInvitedUsers,
+    uninvite,
 }
