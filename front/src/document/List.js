@@ -19,12 +19,7 @@ const DocumentList = () => {
             }, error => {
                 console.log(error);
             });
-        http.get('/api/subscribed-doc').then( data => {
-            console.log ( data.data );
-            dispatch(init({data : data.data }));
-        }, error => {
-           console.log( error );
-        })
+
 
     }, []);
 

@@ -43,7 +43,6 @@ const DocumentEdit = () => {
         console.log( connection );
         if( focusChanged && connection ) {
             socket.onopen = () => {
-                console.log ( 'save');
                 connection.send({a: 'hs', id: 'save-' + id});
             }
         }
@@ -52,7 +51,6 @@ const DocumentEdit = () => {
 
     useEffect(() => {
         if(editor) {
-            console.log('effect ');
             window.addEventListener('mousemove', mouseMouve)
         }
         return () => {

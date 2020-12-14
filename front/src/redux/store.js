@@ -4,8 +4,10 @@ import { editMenuSlice} from "./slice/editMenuSlice";
 import { readyForVoteSlice } from "./slice/readyForVoteSlice";
 import { voteSlice } from "./slice/voteSlice";
 import { subscribedDocsSlice } from "./slice/subscribedDocsSlice";
+import { amendSlice } from "./slice/amendSlice";
 
 const rootReducer = combineReducers({
+    amend : amendSlice.reducer,
     editMenu : editMenuSlice.reducer,
     login : loginSlice.reducer,
     readyForVote : readyForVoteSlice.reducer,

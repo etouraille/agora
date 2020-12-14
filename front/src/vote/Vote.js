@@ -1,32 +1,23 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect } from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import http from "../http/http";
-import { forIt, againstIt } from "../redux/slice/voteSlice";
+import { forIt, againstIt, init , reset } from "../redux/slice/voteSlice";
+import voteFilter from "../redux/filter/voteFilter";
+import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 
-const Vote = ({ id }) => {
+const Vote = ({ id , reload }) => {
 
     const dispatch = useDispatch();
 
     const user = useSelector( state => state.login.user );
 
-    // on peut voter quand le texte a été modifié suffisament et par tout les participants
-    const canVote = useSelector( state => {
-        let can = false;
-        state.readyForVote.forEach( (elem, i ) => {
-            if( elem.id === id ) {
-                let count = 0;
-                elem.data.forEach( (r, j ) => {
-                    if( r.readyForVote === true ) {
-                        count ++;
-                    }
-                })
-                if( elem.data.length === count ) {
-                    can = true;
-                }
-            }
-        })
-        return can;
-    })
+    const result = useSelector( voteFilter(id));
+
+    // on peut voter quand le texte a été modifié suffisament
+    // et par tout les participants
+    // et qu'on est inscrit au texte ou a son parent
+
+    const readyForVote = useSelector( readyForVoteSubscribedFilter(id));
 
     const vote = useSelector( state => {
         let ret = null;
@@ -34,7 +25,7 @@ const Vote = ({ id }) => {
             state.vote.forEach((elem, i) => {
                 if (elem.id === id) {
                     elem.votes.forEach((v, j) => {
-                        if (v.user === user) {
+                        if (v.user === user && v.against !== null ) {
                             ret = !v.against;
                         }
                     })
@@ -44,6 +35,15 @@ const Vote = ({ id }) => {
         return ret;
     })
 
+    useEffect(() => {
+        if( reload ) {
+            http.get('/api/vote/voters/' + id ).then( data => {
+                dispatch( init({ id : id , data : data.data }));
+            }, error => {
+                console.log( error );
+            })
+        }
+    }, [])
 
     const voteForIt = useCallback(() => {
         if( id && user ) {
@@ -65,12 +65,29 @@ const Vote = ({ id }) => {
         }
     }, [id , user ]);
 
+    const resetVote = () => {
+        if( id ) {
+            http.delete('/api/vote/' + id ).then(data => {
+                dispatch( reset({ id : id }))
+            }, error => {
+                console.log(error);
+            })
+        }
+    }
+
     return(
-        <div style={{ display : canVote ? 'block' : 'none'}}>
+        <div style={{ display : readyForVote.isReadyForVote && readyForVote.hasSubscribed ? 'block' : 'none'}}>
             {(vote === null) ? <div>
                 <button className="btn btn-success" onClick={voteForIt}>Pour</button>
                 <button className="btn btn-danger" onClick={voteAgainstIt}>Contre</button>
             </div>: <div>A voté { vote  ? <strong>Pour</strong> : <strong>Contre</strong>}</div>  }
+            { result !== null ? <ul>
+                    <li>Pour {result.forIt}</li>
+                    <li>Contre {result.againstIt}</li>
+                    <li>Abstention {result.abstention}</li>
+                    <li>Participants {result.total}</li>
+                    <li><button className="btn btn-sm btn-danger" onClick={resetVote}>Reset</button></li>
+            </ul>:<></>}
         </div>
     )
 }

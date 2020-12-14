@@ -6,31 +6,25 @@ const documents = ( req, res ) => {
 
     const email = res.username;
 
-    try {
-        const query = 'MATCH (document:Document ) ' +
-            'RETURN document';
-        const result = session.run(query )
-        result.then( data => {
-            const singleResult = data.records[0];
-            const ret = [];
-            data.records.map( (doc, index ) => {
-                ret.push(doc.get(0).properties);
-            })
-
-
-            res.json( ret );
-            res.end();
-            session.close();
-            driver.close();
-        }, error => {
-            res.json( 500, {reason : error });
-            res.end();
-            session.close();
-            driver.close();
+    const query = 'MATCH (d:Document ) ' +
+        'WHERE NOT (d)-[:HAS_PARENT]->(:Document) ' +
+        'AND NOT (:Document)-[:HAS_ARCHIVE]->(d) ' +
+        'RETURN d';
+    const result = session.run(query )
+    result.then( data => {
+        const ret = [];
+        data.records.map( (doc, index ) => {
+            ret.push(doc.get(0).properties);
         })
-    } finally {
-
-    }
+        res.json( ret );
+        res.end();
+    }, error => {
+        res.json( 500, {reason : error });
+        res.end();
+    }).finally(() => {
+        session.close();
+        driver.close();
+    })
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 import Login from './Login';
 import SubscribeForm from './subscribe/SubscribeForm';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Encart from "./login/encart";
 import DocumentList from "./document/List";
 import Document from './document/Document';
@@ -12,8 +12,24 @@ import {
     Route,
     Link
 } from 'react-router-dom';
+import http from "./http/http";
+import {init} from "./redux/slice/subscribedDocsSlice";
+import {useDispatch} from "react-redux";
 
 export default function App() {
+
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        http.get('/api/subscribed-doc').then( data => {
+            console.log ( data.data );
+            dispatch(init({data : data.data }));
+        }, error => {
+            console.log( error );
+        })
+    }, [])
+
     return (
 
             <div>

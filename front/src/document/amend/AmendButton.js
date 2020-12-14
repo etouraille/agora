@@ -2,6 +2,9 @@ import React, {useCallback, useState} from 'react';
 import {Modal} from "react-bootstrap";
 import Quill from "quill";
 import http from "../../http/http";
+import {useDispatch} from "react-redux";
+import { sub } from "../../redux/slice/subscribedDocsSlice";
+import {add } from "./../../redux/slice/amendSlice";
 
 const AmendButton = ({id, editor, document, reload }) => {
 
@@ -57,6 +60,8 @@ const AmendButton = ({id, editor, document, reload }) => {
         quillAfter.setContents(after);
     }
 
+    const dispatch = useDispatch();
+
     const confirmAmend = ( evt ) => {
         setModalIsOpen(false);
         http.post('/api/amend', {
@@ -66,6 +71,8 @@ const AmendButton = ({id, editor, document, reload }) => {
             length : range.length
         }).then(
             data => {
+                dispatch(sub({id : data.data.id }))
+                dispatch(add({ id: id , child : data.data.id }));
                 reload();
                 //history.push('/document/' + data.data.id );
             },

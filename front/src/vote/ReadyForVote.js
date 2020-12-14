@@ -14,7 +14,6 @@ const ReadyForVote = ({ id }) => {
                 if( elem.id === id ) {
                     elem.data.forEach((r, j) => {
                         if( r.user === user ) {
-                            console.log( r );
                             readyForVote = r.readyForVote;
                         }
                     })

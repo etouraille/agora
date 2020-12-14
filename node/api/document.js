@@ -1,6 +1,7 @@
 const getDriver = require('./../neo/driver');
 
 const {v4 : uuid } = require('uuid');
+const { documentDelete } = require('./../document/documentDelete');
 
 const create = ( req, res ) => {
 
@@ -9,9 +10,12 @@ const create = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
 
-    try {
-        const query = 'MATCH (user: User ) WHERE user.login = $email ' +
-        ' MERGE (user)-[r:CREATE]->(document : Document {title : $title , body : $body , id : $id })-[s:CREATE_BY]->(user)' +
+
+        const query = '' +
+        'MATCH (user: User ) WHERE user.login = $email ' +
+        'MERGE (user)-[r:CREATE]->' +
+        '(document : Document {title : $title , body : $body , id : $id })' +
+        '-[s:CREATE_BY]->(user)' +
         ' MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user)' +
         'RETURN document'
         const result = session.run(
@@ -21,19 +25,19 @@ const create = ( req, res ) => {
         result.then( data => {
             res.json( data.records[0].get(0).properties );
             res.end();
-            session.close();
-            driver.close();
+
         }, error => {
+            console.log( error );
             res.json(500, {reason : error});
             res.end();
+
+        }).finally( () => {
             session.close();
             driver.close();
 
         })
 
-    } finally {
 
-    }
 }
 
 const get = ( req, res ) => {
@@ -43,7 +47,7 @@ const get = ( req, res ) => {
 
     try {
         const query = 'MATCH (document:Document) WHERE document.id = $id' +
-            ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  ' +
+            ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  WHERE NOT EXISTS(relation.voteComplete) ' +
             ' OPTIONAL MATCH (document)-[parentRelation:HAS_PARENT]->(parent : Document)' +
             ' RETURN document, children, relation, parent, parentRelation ';
         let result = session.run(query, {id : id });
@@ -78,7 +82,16 @@ const get = ( req, res ) => {
 
 }
 
+const deleteDocument = ( req, res ) => {
+    documentDelete(req.params.id ).then( result => {
+        return res.json({success : true }).end();
+    }, error => {
+        return res.json(500, {reason : error }).end();
+    })
+}
+
 module.exports = {
     create,
     get,
+    deleteDocument,
 };

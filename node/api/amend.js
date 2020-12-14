@@ -23,13 +23,25 @@ const amend = ( req, res ) => {
             return;
         } else {
 
-            let query = 'MATCH (document:Document) WHERE document.id = $idParent ' +
-                'MERGE (document1 : Document {  body : $selection , id : $id })' +
-                '-[r:HAS_PARENT { index : $index , length : $length }]->(document)-[s:HAS_CHILDREN { index : $index , length : $length }]->(document1)' +
-                ' RETURN document1.id';
+            let query = 'MATCH (document:Document), (u:User) WHERE document.id = $idParent AND u.login = $me' +
+                ' MERGE (child : Document {  body : $selection , id : $id })' +
+                '-[r:HAS_PARENT { index : $index , length : $length }]' +
+                '->(document)-[s:HAS_CHILDREN { index : $index , length : $length }]' +
+                '->(child)' +
+                ' MERGE (child)-[t:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(u)' +
+                ' RETURN child.id';
+
+            console.log( query );
 
 
-            let result = session.run(query, { idParent : id , selection : JSON.stringify(selection) , id : uuid(), index : index , length : length  })
+            let result = session.run(query, {
+                idParent : id ,
+                selection : JSON.stringify(selection) ,
+                id : uuid(),
+                index : index ,
+                length : length,
+                me : res.username,
+            })
             result.then(data => {
                 let singleResult = data.records[0];
                 if(! singleResult ) {
@@ -39,6 +51,7 @@ const amend = ( req, res ) => {
                     return res.json({ id : singleResult.get(0) });
                 }
             }, error => {
+                console.log( error);
                 return res.json(500, {reason : error });
             }).finally(() => {
                 session.close();

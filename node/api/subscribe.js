@@ -45,13 +45,21 @@ const getSubscribedDoc = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = " MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) " +
+        "OPTIONAL MATCH (d)-[s:HAS_CHILDREN]->(c:Document)" +
         "WHERE u.login = $me " +
-        "RETURN d ";
+        "RETURN d , c ";
     let result = session.run( query , {me : res.username });
     result.then( data => {
         let result = [];
         data.records.forEach( elem => {
-            result.push( elem.get(0).properties.id );
+            let id = elem.get(0).properties.id;
+            let id2 = elem.get(1) ? elem.get(1).properties.id : null;
+            if( id && -1 === result.indexOf( id )) {
+                result.push( id );
+            }
+            if( id2 && -1 === result.indexOf( id2)) {
+                result.push( id2 );
+            }
         })
         return res.json(result ).end();
     }, error => {

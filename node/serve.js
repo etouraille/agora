@@ -4,14 +4,16 @@ const cookieParser = require('cookie-parser')
 
 const  { ping } = require('./api/ping');
 const { signIn , subscribe , eachCheckToken } = require('./handlers')
-const { create, get } = require('./api/document');
+const { create, get , deleteDocument } = require('./api/document');
 const { documents } = require('./api/documents')
 const { amend } = require('./api/amend');
 const { getUsers } = require('./api/users');
 const { invite, uninvite,  getInvitedUsers } = require( './api/invite');
-const { readyForVote, getReadyForVote , forIt , againstIt, getVoters } = require('./api/vote');
+const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVote } = require('./api/vote');
+const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc} = require('./api/subscribe')
 const { socketDocument } = require('./socket/document');
+const { trigger } = require('./api/trigger');
 const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -32,6 +34,7 @@ app.get('/api/users', getUsers);
 app.get('/api/documents', documents);
 app.post('/api/document', create);
 app.get('/api/document/:id', get);
+app.delete('/api/document/:id', deleteDocument);
 app.post('/api/amend', amend );
 app.post('/api/invite', invite );
 app.post('/api/uninvite', uninvite );
@@ -43,12 +46,15 @@ app.post('/signin', signIn)
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);
 app.post('/api/vote/for', forIt );
+app.delete('/api/vote/:id', deleteVote);
 app.post('/api/vote/against', againstIt)
 app.get('/api/vote/voters/:id', getVoters);
+app.get('/api/vote-success-on-doc/:id', voteSuccessOnDocument);
 
 app.post('/api/subscribe-doc', subscribeDoc);
 app.post('/api/unsubscribe-doc', unsubscribeDoc);
 app.get('/api/subscribed-doc', getSubscribedDoc);
+app.get('/trigger/:id', trigger );
 
 const WebSocket = require('ws');
 
