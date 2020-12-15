@@ -11,10 +11,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     const dispatch = useDispatch();
 
-    console.log( 'in edit');
-
-    const user = useSelector(state => state.login.user );
-
+    //console.log( 'in edit');
     const canEdit = useSelector( readyForVoteSubscribedFilter(id));
 
     const [x, setX ] = useState(0);
@@ -73,7 +70,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     return (
         <>
-            { (x > 0 && y > 0) ? <div style={{
+            { (x > 0 && y > 0 && display ) ? <div style={{
             position : 'absolute',
             left : x + 'px',
             top : y + 'px' ,
@@ -84,7 +81,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
                 <nav className="nav flex-column nav-fill">
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={edit}>Edit</button> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote id={id}></Vote> : <></>}
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote id={id} forceReload={() => reload()}></Vote> : <></>}
                 </nav>
             </div>
         </div>: <></>}

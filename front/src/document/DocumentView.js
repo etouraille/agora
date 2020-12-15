@@ -20,20 +20,32 @@ import AmendView from "./amend/amendView";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import { init } from './../redux/slice/amendSlice';
 
+import { initWith } from './../redux/slice/editMenuSlice';
+import { init as initDoc } from './../redux/slice/documentSlice';
+import ToggleAmend from "./amend/ToggleAmend";
+import QFactory from "./../quill/QFactory";
 const DocumentView = (props) => {
     const { id } = useParams();
-    const [ document, setDocument ] = useState({document : { title : null, body : null}, children : []});
     const [ editor , setEditor ] = useState( null );
     const [ showAmended , setShowAmended ] = useState( false );
     const [ reload , setReload ] = useState( false );
     const [ leftMenus , setLeftMenus ] = useState([]);
+    const [ count , setCount ] = useState( 0 );
 
-    let quill ;
 
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
     const vote = useSelector(voteFilter(id));
 
     const dispatch = useDispatch();
+
+    const document = useSelector( state => {
+        let res =  state.document.find( elem => elem.id === id );
+        if( res ) {
+            return res.doc;
+        } else {
+            return { document : { title : null, body : null }, children : []};
+        }
+    })
 
     const showAmend = useCallback((evt) => {
         setShowAmended(true);
@@ -41,11 +53,7 @@ const DocumentView = (props) => {
     }, [ document , showAmended ]);
 
 
-    useEffect(() => {
 
-
-
-    }, [ editor, document ]);
 
     const editAmend = useCallback((evt) => {
         if( document.children.length > 0 ) {
@@ -53,22 +61,43 @@ const DocumentView = (props) => {
         }
     }, [document ])
 
+    const setMenuFunc = (doc , quill ) => {
+        let leftMenusTemp = [];
+        if( quill && doc.children.length > 0 ) {
 
+            const sortedChildren = doc.children.sort((elem , elem2) => {
+                return ((elem.link.index  < elem2.link.index) ? -1 : 1);
+            })
+
+            sortedChildren.forEach((elem, index ) => {
+                const [ line, offset ] = quill.getLeaf(elem.link.index + 1) || editor.scroll.line( elem.link.index );
+                if( line && line.parent ) {
+                    const node = line.parent.domNode;
+                    leftMenusTemp.push({node: node, id: elem.child.id});
+                }
+            })
+
+        }
+        setLeftMenus(leftMenusTemp);
+    }
+
+    useEffect(() => {
+        const param = { readOnly : true, toolbar : '#toolbar' };
+        let quill = new Quill('#editor', param )
+        setMenuFunc(document, quill );
+    }, [showAmended])
 
 
     useEffect(() => {
-
-        const param = { readOnly : true, toolbar : '#toolbar' };
-        quill = new Quill('#editor', param );
-        setEditor( quill );
         if( id ) {
             http.get('/api/document/' + id ).then(
                 data => {
-                    setDocument( data.data );
+                    dispatch( initDoc({id : id, data : data.data }));
+                    const param = { readOnly : true, toolbar : '#toolbar' };
+                    let quill = QFactory.get('#editor', param );
+                    setEditor( quill );
                     let delta = new Delta(JSON.parse(data.data.document.body));
-                    console.log( 'RELOAD ================================== RELOAD', data.data );
-                    console.log( 'RELOAD ================================== RELOAD', id  );
-
+                    setCount( count + 1 );
                     let children = [];
 
                     data.data.children.map(( object , index ) =>{
@@ -85,25 +114,14 @@ const DocumentView = (props) => {
                         delta = delta.compose(delt);
                     })
                     dispatch(init({id : id , data : children }));
+                    dispatch(initWith({data: children }));
+
                     quill.setContents( delta );
 
                     const sortedChildren = data.data.children.sort((elem , elem2) => {
                         return ((elem.link.index  < elem2.link.index) ? -1 : 1);
                     })
-
-
-                    if( quill && data.data.children.length > 0 ) {
-                        let leftMenusTemp = [];
-                        sortedChildren.forEach((elem, index ) => {
-                            const [ line, offset ] = quill.getLeaf(elem.link.index + 1) || editor.scroll.line( elem.link.index );
-                            if( line && line.parent ) {
-                                const node = line.parent.domNode;
-                                leftMenusTemp.push({node: node, id: elem.child.id});
-                            }
-                        })
-                        setLeftMenus(leftMenusTemp);
-                    }
-
+                    setMenuFunc(data.data , editor );
                 },error => {
                     console.log( error )
                 })
@@ -127,10 +145,8 @@ const DocumentView = (props) => {
                             id={id}
                             reload={ () => { setReload( !reload )}}
                             document={document}
-                            editor={editor}
                         ></AmendButton> : <></>}
-                        { (document.children.length > 0 && !showAmended) ? <button className="btn btn-primary btn-sm" onClick={showAmend}>Show Ammend</button> : <></> }
-                        { (document.children.length > 0 && showAmended) ? <button className="btn btn-primary btn-sm" onClick={editAmend}>Edit Ammend</button> : <></> }
+                        <ToggleAmend showAmend={showAmended} toggle={() => setShowAmended(!showAmended)}></ToggleAmend>
                     </div>
                     <div id="editor"></div>
                     <Link to={{ pathname : '/document/' + (document.child ? document.child.id : null )}}>Child</Link>
@@ -138,12 +154,12 @@ const DocumentView = (props) => {
                         <button className="btn btn-primary" onClick={() => history.push('/documentedit/'+ id )}>Modifier</button> :
                         <></>
                     }
-                    <Vote id={id} reload={true}></Vote>
+                    <Vote id={id} reload={count}></Vote>
 
                 </div>
                 { showAmended ?
                     <div className="col-sm">
-                        <AmendView document={document}></AmendView>
+                        <AmendView id={id} reload={() => setReload(!reload)} countParent={count}></AmendView>
                     </div>
                     : <></>
                 }

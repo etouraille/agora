@@ -1,18 +1,17 @@
 const getDriver = require('./../neo/driver');
 
-const voteResultFromVoteFor = ( id ) => {
+const voteResultFromDocument = ( id ) => {
     console.log( id );
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH (u:User)-[v:VOTE_FOR]->(d:Document) " +
-        "WHERE ID(v) = $id " +
-        "MATCH (d)-[r:SUBSCRIBED_BY|HAS_PARENT*1..2]->(s:User) " +
+    const query = "MATCH (d:Document)-[r:SUBSCRIBED_BY|HAS_PARENT*1..2]->(s:User) " +
         "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] " +
+        "AND d.id = $id " +
         "OPTIONAL MATCH (s)-[v1:VOTE_FOR]->(d) " +
         "OPTIONAL MATCH (d)-[pr:HAS_PARENT]->(p) " +
         "RETURN s, v1 , d , p , pr ";
 
-    let result = session.run( query , { id : parseInt(id) });
+    let result = session.run( query , { id : id });
     return new Promise( (resolve , reject ) => {
         result.then(data => {
             let ret = [];
@@ -22,6 +21,7 @@ const voteResultFromVoteFor = ( id ) => {
             let documentBody = null;
             let index = null;
             let length = null;
+            let voteComplete = false;
             data.records.forEach( elem => {
                 let vote = {against : null};
                 if(elem.get(0)) {
@@ -41,6 +41,9 @@ const voteResultFromVoteFor = ( id ) => {
                 if( elem.get(4)) {
                     index = elem.get(4).properties.index;
                     length = elem.get(4).properties.length
+                    if(elem.get(4).properties.voteComplete) {
+                        voteComplete = true;
+                    }
                 }
 
 
@@ -51,30 +54,31 @@ const voteResultFromVoteFor = ( id ) => {
             let abstention = ret.reduce((a , elem) => elem.against === null ? a + 1 : a , 0);
             let participants = ret.length;
             let majority = forIt >= ( participants / 2 );
+            let fail = againstIt > ( participants / 2 );
             resolve({
                 againstIt,
                 forIt ,
                 abstention,
                 participants,
                 majority ,
+                fail,
                 id : documentId ,
                 parentId ,
                 documentBody,
                 parentBody,
                 index,
-                length
+                length,
+                voteComplete,
             });
         }, error => {
             reject( error );
         }).finally( () => {
             session.close();
             driver.close();
-            // TODO : check console log
-            console.log( 'close');
         })
     })
 }
 
 module.exports = {
-    voteResultFromVoteFor,
+    voteResultFromDocument,
 }

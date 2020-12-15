@@ -98,13 +98,10 @@ shareDBServer.use('commit', ( request, next ) => {
     if( request.backend.db.docs.documents && request.backend.db.docs.documents[id] ) {
         data = request.backend.db.docs.documents[id].data.ops;
     }
-    let newOps = [];
     if( request.op.op  && data ) {
-        console.log( JSON.stringify(request.op.op));
         const delta = new Delta( data );
         const res = delta.compose(request.op.op );
         ops[id] = res;
-        console.log( ops );
     }
     next();
 });

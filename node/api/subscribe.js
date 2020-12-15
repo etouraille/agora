@@ -44,9 +44,9 @@ const unsubscribeDoc = ( req, res ) => {
 const getSubscribedDoc = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
-    const query = " MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) " +
-        "OPTIONAL MATCH (d)-[s:HAS_CHILDREN]->(c:Document)" +
-        "WHERE u.login = $me " +
+    const query = " MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.login = $me  " +
+        "OPTIONAL MATCH (d)-[s:HAS_CHILDREN]->(c:Document) " +
+        "WHERE NOT EXISTS( s.voteComplete ) " +
         "RETURN d , c ";
     let result = session.run( query , {me : res.username });
     result.then( data => {
@@ -63,6 +63,7 @@ const getSubscribedDoc = (req , res ) => {
         })
         return res.json(result ).end();
     }, error => {
+        console.log( error );
         return res.json(500, {reason : error }).end();
     }).finally(() => {
         session.close();

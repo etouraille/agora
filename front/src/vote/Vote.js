@@ -5,7 +5,7 @@ import { forIt, againstIt, init , reset } from "../redux/slice/voteSlice";
 import voteFilter from "../redux/filter/voteFilter";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 
-const Vote = ({ id , reload }) => {
+const Vote = ({ id , reload , forceReload }) => {
 
     const dispatch = useDispatch();
 
@@ -43,12 +43,15 @@ const Vote = ({ id , reload }) => {
                 console.log( error );
             })
         }
-    }, [])
+    }, [reload])
 
     const voteForIt = useCallback(() => {
         if( id && user ) {
             http.post('/api/vote/for', {id: id}).then(data => {
                 dispatch(forIt({id: id, user: user}));
+                if( data.data.reload ) {
+                    forceReload();
+                }
             }, error => {
                 console.log(error);
             })

@@ -27,9 +27,9 @@ const Invite = ({id}) => {
     }, [ reload ]);
 
     useEffect ( () => {
-        console.log('new users ', invitedUsers );
+        //console.log('new users ', invitedUsers );
         let newUsers = users.filter( user => !invitedUsers.includes( user ));
-        console.log( newUsers );
+        //console.log( newUsers );
         setUsers(newUsers);
     }, [ invitedUsers ]);
 

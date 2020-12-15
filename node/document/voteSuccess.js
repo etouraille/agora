@@ -4,8 +4,9 @@ const { quillMerge } = require('./../quill/quillMerge');
 // on créée un document archive avec l'ancien contenu
 // on remplace le nouveau contenu dans le document parent
 // on desactive le lien entre le parent et le document fils
-const voteSuccess = (id, parentId , parentBody, childBody , index, length  ) => {
-    if( parentId ) {
+const voteSuccess = (id, parentId , parentBody, childBody , index, length , complete ) => {
+    console.log( complete);
+    if( parentId && ! complete ) {
         const driver = getDriver();
         const session = driver.session();
         const query = "MATCH (d:Document) WHERE d.id = $parentId " +
@@ -40,13 +41,15 @@ const voteSuccess = (id, parentId , parentBody, childBody , index, length  ) => 
                         "SET cr.voteComplete = true " +
                         "SET pr.voteComplete = true " +
                         "DELETE vf ";
+                        // TODO : mettre les votes sur l'archive, faire un summary.
                     let result = session.run( query , {
                         parentId : parentId ,
                         id : id ,
                         newBody : JSON.stringify(newParentBody),
                     })
                     result.then(data => {
-                        resolve( true )
+                        console.log( 'updated');
+                        resolve({updated : true });
                     }, error => {
                         console.log( 1, error );
                         reject( error );
@@ -71,7 +74,7 @@ const voteSuccess = (id, parentId , parentBody, childBody , index, length  ) => 
         })
     } else {
         return new Promise( (resolve, reject ) => {
-            resolve ( true );
+            resolve ( {updated : false });
         })
     }
 }

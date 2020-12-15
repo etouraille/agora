@@ -61,7 +61,7 @@ const ReadyForVote = ({ id }) => {
             <ul>
                 {links.map((elem,i ) =>{
                     return (
-                        <li>{elem.user}<strong style={{ display : elem.readyForVote ? 'block' : 'none'}}>Ready for vote</strong></li>
+                        <li key={i}>{elem.user}<strong style={{ display : elem.readyForVote ? 'block' : 'none'}}>Ready for vote</strong></li>
                     )
                 }) }
             </ul>

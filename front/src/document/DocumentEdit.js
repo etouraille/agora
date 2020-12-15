@@ -40,7 +40,7 @@ const DocumentEdit = () => {
     }, [editor , previousFocus]);
 
     useEffect(() => {
-        console.log( connection );
+        //console.log( connection );
         if( focusChanged && connection ) {
             socket.onopen = () => {
                 connection.send({a: 'hs', id: 'save-' + id});
@@ -67,11 +67,8 @@ const DocumentEdit = () => {
 
             const doc = connection.get('documents', id );
 
-            let quill;
-
-            const subscribeDoc = function (err) {
+            doc.subscribe( (err) => {
                 if (err) throw err;
-
 
                 if( ! quill ) {
                     quill = new Quill('#editor', options);
@@ -83,12 +80,10 @@ const DocumentEdit = () => {
                  */
                 if( doc.data ) {
                     quill.setContents(doc.data.ops);
-                } else {
-                    doc.on('create', () => {
-                        console.log( 'created');
-                        doc.subscribe( subscribeDoc );
-                    })
                 }
+                doc.on('create', function( delta) {
+                    quill.setContents(doc.data.ops);
+                })
                 /**
                  * On Text change publishing to our server
                  * so that it can be broadcasted to all other clients
@@ -105,12 +100,12 @@ const DocumentEdit = () => {
                     if (source === quill) return;
                     quill.updateContents(op);
                 });
-            }
 
-            /*
-            */
+            })
 
-            doc.subscribe(subscribeDoc);
+            let quill;
+
+
         }
         return () => {
             connection.close();
@@ -131,7 +126,6 @@ const DocumentEdit = () => {
                 const afterquill = new Quill("#after", {readonly: true});
                 afterquill.setContents(after);
             }
-
         })
     }, [id])
 

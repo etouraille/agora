@@ -5,8 +5,9 @@ import http from "../../http/http";
 import {useDispatch} from "react-redux";
 import { sub } from "../../redux/slice/subscribedDocsSlice";
 import {add } from "./../../redux/slice/amendSlice";
+import QFactory from "../../quill/QFactory";
 
-const AmendButton = ({id, editor, document, reload }) => {
+const AmendButton = ({id , document, reload }) => {
 
     const [ modalIsOpen, setModalIsOpen ] = useState( false );
     const [ before , setBefore ] = useState([]);
@@ -23,7 +24,12 @@ const AmendButton = ({id, editor, document, reload }) => {
     }
 
     const amend = useCallback((evt ) => {
-        if( editor ) {
+        const param = { readOnly : true, toolbar : '#toolbar' };
+        let editor = QFactory.get('#editor', param );
+
+
+        console.log( editor );
+
             evt.preventDefault();
             const somerange = editor.getSelection();
 
@@ -47,9 +53,9 @@ const AmendButton = ({id, editor, document, reload }) => {
 
             }
 
-        }
 
-    }, [editor, document ])
+
+    }, [ document ])
 
     const onEnteredModal = () => {
         const quillBefore = new Quill('#before', {readOnly : true});

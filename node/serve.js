@@ -13,7 +13,6 @@ const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVot
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc} = require('./api/subscribe')
 const { socketDocument } = require('./socket/document');
-const { trigger } = require('./api/trigger');
 const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -54,7 +53,7 @@ app.get('/api/vote-success-on-doc/:id', voteSuccessOnDocument);
 app.post('/api/subscribe-doc', subscribeDoc);
 app.post('/api/unsubscribe-doc', unsubscribeDoc);
 app.get('/api/subscribed-doc', getSubscribedDoc);
-app.get('/trigger/:id', trigger );
+
 
 const WebSocket = require('ws');
 

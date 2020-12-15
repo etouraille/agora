@@ -1,4 +1,6 @@
 const getDriver = require('./../neo/driver');
+const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
+const { voteSuccess } = require('./../document/voteSuccess');
 
 const readyForVote = (req , res ) => {
     const driver = getDriver();
@@ -74,7 +76,28 @@ const forIt = (req, res ) => {
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : res.username });
     result.then( data => {
-        return res.json( data ).end();
+        voteResultFromDocument(id).then( result => {
+            if( result.majority ) {
+                voteSuccess(
+                    result.id,
+                    result.parentId ,
+                    result.parentBody,
+                    result.documentBody,
+                    result.index,
+                    result.length,
+                    result.voteComplete).then( data => {
+                        return res.json({ majority : true , reload : data.updated });
+                }, error => {
+                    return res.json(500, {reason : error });
+                })
+            } else {
+                return res.json({ majority : false, reload : false });
+            }
+        }, error => {
+            console.log(error);
+            return res.json(500, {reason : error });
+        })
+
     }, error => {
         return res.json(500, {reason : error });
     }).finally(() => {
