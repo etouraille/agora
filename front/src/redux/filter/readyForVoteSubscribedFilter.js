@@ -12,7 +12,7 @@ const readyForVoteSubscribedFilter = ( id ) => {
                 isOwner = true;
             }
             if (elem) {
-                isReadyForVote = elem.data.length === elem.data.reduce((a, r) => r.readyForVote ? a + 1 : a, 0);
+                isReadyForVote = elem.data.length === elem.data.reduce((a, r) => r.readyForVote === true ? a + 1 : a, 0);
             }
             hasSubscribed = -1 !== state.subscribedDocs.docs.indexOf(id);
 

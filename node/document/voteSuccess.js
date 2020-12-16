@@ -4,8 +4,7 @@ const { quillMerge } = require('./../quill/quillMerge');
 // on créée un document archive avec l'ancien contenu
 // on remplace le nouveau contenu dans le document parent
 // on desactive le lien entre le parent et le document fils
-const voteSuccess = (id, parentId , parentBody, childBody , index, length , complete ) => {
-    console.log( complete);
+const voteSuccess = (id, parentId , parentBody, childBody , index, length , complete , vote ) => {
     if( parentId && ! complete ) {
         const driver = getDriver();
         const session = driver.session();

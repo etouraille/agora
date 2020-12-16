@@ -24,6 +24,7 @@ import { initWith } from './../redux/slice/editMenuSlice';
 import { init as initDoc } from './../redux/slice/documentSlice';
 import ToggleAmend from "./amend/ToggleAmend";
 import QFactory from "./../quill/QFactory";
+import documentFilter from "../redux/filter/documentFilter";
 const DocumentView = (props) => {
     const { id } = useParams();
     const [ editor , setEditor ] = useState( null );
@@ -53,7 +54,17 @@ const DocumentView = (props) => {
     }, [ document , showAmended ]);
 
 
+    const sortedChildren = useSelector( state => {
+        const doc = documentFilter(id)(state);
+        let ret = doc.children.sort((elem , elem2) => {
+            return ((elem.link.index  < elem2.link.index) ? -1 : 1);
+        })
+        return ret.map(elem => {
+            let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
+            return { ...elem, vote: vote };
+        })
 
+    })
 
     const editAmend = useCallback((evt) => {
         if( document.children.length > 0 ) {
@@ -65,9 +76,6 @@ const DocumentView = (props) => {
         let leftMenusTemp = [];
         if( quill && doc.children.length > 0 ) {
 
-            const sortedChildren = doc.children.sort((elem , elem2) => {
-                return ((elem.link.index  < elem2.link.index) ? -1 : 1);
-            })
 
             sortedChildren.forEach((elem, index ) => {
                 const [ line, offset ] = quill.getLeaf(elem.link.index + 1) || editor.scroll.line( elem.link.index );
@@ -89,6 +97,7 @@ const DocumentView = (props) => {
 
 
     useEffect(() => {
+        let hasSubscribed = readyForVote.hasSubscribed;
         if( id ) {
             http.get('/api/document/' + id ).then(
                 data => {
@@ -111,17 +120,18 @@ const DocumentView = (props) => {
                         return new Delta(res);
                         //console.log( delta );
                     }).forEach((delt) => {
-                        delta = delta.compose(delt);
+                        if( hasSubscribed ) {
+                            delta = delta.compose(delt);
+                        }
                     })
                     dispatch(init({id : id , data : children }));
                     dispatch(initWith({data: children }));
 
                     quill.setContents( delta );
 
-                    const sortedChildren = data.data.children.sort((elem , elem2) => {
-                        return ((elem.link.index  < elem2.link.index) ? -1 : 1);
-                    })
-                    setMenuFunc(data.data , editor );
+                    if( hasSubscribed ) {
+                        setMenuFunc(data.data, editor);
+                    }
                 },error => {
                     console.log( error )
                 })
@@ -146,10 +156,11 @@ const DocumentView = (props) => {
                             reload={ () => { setReload( !reload )}}
                             document={document}
                         ></AmendButton> : <></>}
-                        <ToggleAmend showAmend={showAmended} toggle={() => setShowAmended(!showAmended)}></ToggleAmend>
+                        { readyForVote.hasSubscribed ?
+                            <ToggleAmend showAmend={showAmended} toggle={() => setShowAmended(!showAmended)}></ToggleAmend>
+                            : <></> }
                     </div>
                     <div id="editor"></div>
-                    <Link to={{ pathname : '/document/' + (document.child ? document.child.id : null )}}>Child</Link>
                     {  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
                         <button className="btn btn-primary" onClick={() => history.push('/documentedit/'+ id )}>Modifier</button> :
                         <></>

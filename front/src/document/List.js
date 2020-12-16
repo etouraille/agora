@@ -10,7 +10,7 @@ const DocumentList = () => {
     const dispatch = useDispatch();
 
     const [ documents , setDocuments ] = useState([]);
-    //const [ li, setLi] = useState('');
+    const [ reload, setReload ] = useState(false );
 
     useEffect(() => {
         http.get('/api/documents').then(
@@ -21,16 +21,27 @@ const DocumentList = () => {
             });
 
 
-    }, []);
+    }, [reload ]);
 
+
+    const deleteDocument = (id) => {
+        http.delete('/api/document/' + id ).then( data => {
+            setReload( !reload );
+        }, error => {
+            console.log( error );
+        })
+    }
 
     return (
         <ul>
             { documents.map((doc, index ) => {
               return (
-                  <li key={index}>{doc.title}
-                        <Link to={'/document/' + doc.id }>Display</Link>
-                        <Subscribe id={doc.id}></Subscribe>
+                  <li key={index}>
+                    <Subscribe id={doc.id}></Subscribe>
+                      {doc.title}
+
+                      <Link to={'/document/' + doc.id }>Display</Link>
+                    <button className="btn btn-sm btn-danger" onClick={() => deleteDocument(doc.id)}>Delete</button>
                   </li>
               )
             })}

@@ -55,6 +55,9 @@ const voteResultFromDocument = ( id ) => {
             let participants = ret.length;
             let majority = forIt >= ( participants / 2 );
             let fail = againstIt > ( participants / 2 );
+            let complete = majority || fail;
+
+            let vote = { forIt, againstIt, abstention, participants, success : majority, fail , complete };
             resolve({
                 againstIt,
                 forIt ,
@@ -69,6 +72,7 @@ const voteResultFromDocument = ( id ) => {
                 index,
                 length,
                 voteComplete,
+                vote,
             });
         }, error => {
             reject( error );

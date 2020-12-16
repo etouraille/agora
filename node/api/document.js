@@ -15,8 +15,9 @@ const create = ( req, res ) => {
         'MATCH (user: User ) WHERE user.login = $email ' +
         'MERGE (user)-[r:CREATE]->' +
         '(document : Document {title : $title , body : $body , id : $id })' +
-        '-[s:CREATE_BY]->(user)' +
-        ' MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user)' +
+        '-[s:CREATE_BY]->(user) ' +
+        'MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user) ' +
+        "MERGE (document)-[:SUBSCRIBED_BY]->(user)-[:HAS_SUBSCRIBE_TO]->(document) " +
         'RETURN document'
         const result = session.run(
             query,
@@ -86,6 +87,7 @@ const deleteDocument = ( req, res ) => {
     documentDelete(req.params.id ).then( result => {
         return res.json({success : true }).end();
     }, error => {
+        console.log( error );
         return res.json(500, {reason : error }).end();
     })
 }

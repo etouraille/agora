@@ -7,6 +7,7 @@ import {useSelector} from "react-redux";
 import documentFilter from "../../redux/filter/documentFilter";
 import {createSerializableStateInvariantMiddleware} from "@reduxjs/toolkit";
 import usePrevious from "../../utils/usePrevious";
+import readyForVoteSubscribedFilter from "../../redux/filter/readyForVoteSubscribedFilter";
 
 const AmendView = ({id, reload , countParent }) => {
 
@@ -24,21 +25,46 @@ const AmendView = ({id, reload , countParent }) => {
         reload();
     }
 
+    const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
+
+    const sortedChildren = useSelector( state => {
+        const doc = documentFilter(id)(state);
+        let ret = doc.children.sort((elem , elem2) => {
+            return ((elem.link.index  < elem2.link.index) ? -1 : 1);
+        })
+        return ret.map((elem , i ) => {
+            let childId = elem.child.id;
+            let vote = readyForVoteSubscribedFilter(childId)(state);
+            if(! vote.isReadyForVote && (!vote.isOwner || vote.isReadyForVote )) {
+                let delt = new Delta(JSON.parse(doc.document.body));
+                let body = JSON.stringify(delt.slice(elem.link.index, elem.link.index + elem.link.length));
+                let child = {...ret[i].child  , body : body  };
+                return {...ret[i], child : child , vote : vote}
+            } else {
+                let child = {...ret[i].child };
+                return {...ret[i], child : child , vote : vote}
+
+            }
+        })
+    });
 
     useEffect(() => {
         let nodeAndId = [];
         if(  doc.children  && document.querySelector('#rightEditor') ) {
 
 
+            /*
             const sortedChildren = doc.children.sort((elem , elem2) => {
                 return ((elem.link.index  < elem2.link.index) ? -1 : 1);
             })
+            */
 
 
             const righteditor = new Quill('#rightEditor', {readOnly : true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));
 
+            let hasSubscribed = readyForVote.hasSubscribed;
 
 
             let content = sortedChildren[0] ? source.getContents( 0 , sortedChildren[0].link.index ): new Delta(JSON.parse(doc.document.body));
@@ -70,7 +96,9 @@ const AmendView = ({id, reload , countParent }) => {
                 deltaIndex = emptyQuill.getLength() - 1 - object.link.length;
                 return yellowBackground;
             }).forEach((delta ) => {
-                content = content.compose( delta );
+                if( hasSubscribed ) {
+                    content = content.compose(delta);
+                }
             })
             righteditor.setContents(content);
 

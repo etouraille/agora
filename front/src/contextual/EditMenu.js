@@ -14,6 +14,11 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
     //console.log( 'in edit');
     const canEdit = useSelector( readyForVoteSubscribedFilter(id));
 
+    const canDisplay = useSelector( state => {
+        let vote = readyForVoteSubscribedFilter(id)(state);
+        return vote.hasSubscribed && (( vote.isOwner && ! vote.isReadyForVote) || vote.isReadyForVote);
+    })
+
     const [x, setX ] = useState(0);
     const [y, setY ] = useState(0);
     const [display, setDisplay] = useState( false );
@@ -70,7 +75,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     return (
         <>
-            { (x > 0 && y > 0 && display ) ? <div style={{
+            { (x > 0 && y > 0 && display && canDisplay ) ? <div style={{
             position : 'absolute',
             left : x + 'px',
             top : y + 'px' ,

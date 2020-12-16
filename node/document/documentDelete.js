@@ -5,18 +5,30 @@ const documentDelete = ( id ) => {
     const session = driver.session();
     const query = "MATCH (d:Document) WHERE d.id = $id " +
         "OPTIONAL MATCH (d)-[pr:HAS_PARENT]->(p:Document)-[cr:HAS_CHILDREN]->(d) " +
+        "OPTIONAL MATCH (d)-[hc:HAS_CHILDREN]->(c)-[hp:HAS_PARENT]->(d) "  +
         "OPTIONAL MATCH (d)-[ar:HAS_ARCHIVE]->(a:Document) " +
         "OPTIONAL MATCH (:User)-[vr:VOTE_FOR]->(d) " +
         "OPTIONAL MATCH (d)-[re:FOR_EDIT_BY]->(:User) " +
-        "OPTIONAL MATCH (d)-[cbr:CREATED_B]->(:User) " +
-        "OPTIONAL MATCH (:User)-[cr:CREATE]->(d) " +
+        "OPTIONAL MATCH (d)-[cbr:CREATE_BY]->(:User) " +
+        "OPTIONAL MATCH (:User)-[cre:CREATE]->(d) " +
         "OPTIONAL MATCH (d)-[sbr:SUBSCRIBED_BY]->(:User) " +
         "OPTIONAL MATCH (:User)-[sr:HAS_SUBSCRIBE_TO]->(d) " +
-        "DELETE pr, ar, vr, re, cbr, cr, sbr, sr , a, d ";
+        "DELETE pr, cr, hc, hp, ar, vr, re, cbr, cre, sbr, sr , a, d " +
+        "RETURN c ";
 
     let result = session.run( query, {id});
     return new Promise((resolve ,reject ) => {
         result.then( data => {
+            data.records.forEach( elem => {
+                if( elem.get(0 )) {
+                    let childrenId = elem.get(0).properties.id;
+                    documentDelete(childrenId).then(p => {
+
+                    }, er => {
+                        reject(er);
+                    })
+                }
+            })
             resolve(true );
         }, error => {
             console.log(error);
