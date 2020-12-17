@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  neo:
+    image: neo4j:latest
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - ./neo/data:/data
+      - ./neo/log:/log
+      - ./neo/import:/var/lib/neo4j/import
+      - ./neo/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=neo4j/b1otope
+  node:
+    image: node:latest
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    volumes:
+      - ./../node:/src
+    tty: true
