@@ -77,6 +77,28 @@ const voteSuccess = (id, parentId , parentBody, childBody , index, length , comp
         })
     }
 }
+
+const voteFail = ( documentId ) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (d:Document)-[hp:HAS_PARENT]->(p:Document)-[hc:HAS_CHIDREN]->(d) " +
+        "WHERE d.id = $id " +
+        "SET hp.votComplete = false " +
+        "SET hc.voteComplete = false ";
+    let result = session.run( query , {id :  documentId });
+    return new Promise((resolve, reject ) => {
+        result.then( data => {
+            resolve( true );
+        }, error => {
+            reject( error );
+        }).finally(() => {
+            session.close();
+            driver.close();
+        })
+    })
+}
+
 module.exports = {
     voteSuccess,
+    voteFail,
 }

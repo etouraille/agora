@@ -4,8 +4,8 @@ const voteResult = (documentId ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH(u:User)-[hs:HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..2]->(d:Document) " +
-        "WHERE 'HAS_SUBSCRIBE_TO' in [rel in r | type(rel)] " +
-        "WHERE d.id =  $id " +
+        "WHERE 'HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
+        "AND d.id =  $id " +
         "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(d) " +
         "RETURN u, vf ";
     let result = session.run( query , { id : documentId });
@@ -20,9 +20,9 @@ const voteResult = (documentId ) => {
                 ret.push( vote );
             })
             let participants = ret.length;
-            let forIt = ret.reduce( ( a, elem ) => elem.against === false ? a + 1 : a );
-            let againstIt = ret.reduce( ( a, elem ) => elem.against === true ? a + 1 : a );
-            let abstention = ret.reduce( ( a, elem ) => elem.against === null ? a + 1 : a );
+            let forIt = ret.reduce( ( a, elem ) => (elem.against === false ? a + 1 : a ), 0);
+            let againstIt = ret.reduce( ( a, elem ) => (elem.against === true ? a + 1 : a ), 0);
+            let abstention = ret.reduce( ( a, elem ) => (elem.against === null ? a + 1 : a ), 0);
             let fail = againstIt > ( participants / 2 ) && againstIt > forIt;
             let success = forIt >= ( participants / 2 ) && forIt >= againstIt;
             let complete = fail || success;
@@ -36,6 +36,9 @@ const voteResult = (documentId ) => {
                 complete })
         }, error => {
             reject( error );
+        }).finally( () => {
+            session.close();
+            driver.close();
         })
     })
 }
@@ -59,6 +62,9 @@ const saveComplete = ( documentId , vote ) => {
             resolve( vote );
         }, error => {
             reject( error );
+        }).finally(() => {
+            session.close();
+            driver.close();
         })
     })
 }

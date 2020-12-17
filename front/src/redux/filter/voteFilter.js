@@ -2,8 +2,13 @@ const voteFilter = (id) => {
     return (state ) => {
         //console.log( id );
         let elem = state.vote.find(elem => elem.id === id);
+
         if (elem) {
-            let forIt = elem.votes.reduce((a, current) => current.against === false ? a + 1 : a, 0);
+            let final = elem.votes.find( elem => elem.final )?elem.votes.find( elem => elem.final ).final: null;
+            if( final ) {
+                return { ...final, final : true };
+            }
+            let forIt = elem.votes.reduce((a, current) => (current.against === false ? a + 1 : a), 0);
             let againstIt = elem.votes.reduce((a, current) => (current.against === true  ? a + 1 : a), 0);
             let abstention = elem.votes.reduce((a, current) => (current.against === null ? a + 1 : a), 0);
             let participants = elem.votes.length;
@@ -14,10 +19,11 @@ const voteFilter = (id) => {
                 forIt: forIt,
                 againstIt: againstIt,
                 abstention: abstention,
-                total: participants,
+                participants: participants,
                 majority: majority,
                 fail : fail,
                 complete : complete,
+                final : false,
             }
             //console.log( ret );
             return ret;

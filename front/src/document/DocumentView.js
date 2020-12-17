@@ -25,6 +25,7 @@ import { init as initDoc } from './../redux/slice/documentSlice';
 import ToggleAmend from "./amend/ToggleAmend";
 import QFactory from "./../quill/QFactory";
 import documentFilter from "../redux/filter/documentFilter";
+import hasSubscribedFilter from "../redux/filter/hasSubscribedFilter";
 const DocumentView = (props) => {
     const { id } = useParams();
     const [ editor , setEditor ] = useState( null );
@@ -36,6 +37,7 @@ const DocumentView = (props) => {
 
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
     const vote = useSelector(voteFilter(id));
+    const hasSubscribed = useSelector( hasSubscribedFilter(id));
 
     const dispatch = useDispatch();
 
@@ -96,42 +98,21 @@ const DocumentView = (props) => {
     }, [showAmended])
 
 
+
     useEffect(() => {
-        let hasSubscribed = readyForVote.hasSubscribed;
         if( id ) {
             http.get('/api/document/' + id ).then(
                 data => {
                     dispatch( initDoc({id : id, data : data.data }));
-                    const param = { readOnly : true, toolbar : '#toolbar' };
-                    let quill = QFactory.get('#editor', param );
-                    setEditor( quill );
-                    let delta = new Delta(JSON.parse(data.data.document.body));
                     setCount( count + 1 );
                     let children = [];
 
                     data.data.children.map(( object , index ) =>{
                         children.push( object.child.id );
-                        let link = object.link;
-                         let res = [];
-                         if(link.index ) {
-                             res.push({ retain : link.index });
-                         }
-                         res.push({ retain : link.length , attributes : { background : '#ffc107'}});
-                        return new Delta(res);
-                        //console.log( delta );
-                    }).forEach((delt) => {
-                        if( hasSubscribed ) {
-                            delta = delta.compose(delt);
-                        }
                     })
                     dispatch(init({id : id , data : children }));
                     dispatch(initWith({data: children }));
 
-                    quill.setContents( delta );
-
-                    if( hasSubscribed ) {
-                        setMenuFunc(data.data, editor);
-                    }
                 },error => {
                     console.log( error )
                 })
@@ -139,6 +120,32 @@ const DocumentView = (props) => {
 
     }, [ reload ]);
 
+    useEffect(() => {
+        const param = { readOnly : true, toolbar : '#toolbar' };
+        let quill = QFactory.get('#editor', param );
+        setEditor( quill );
+        let delta = new Delta(JSON.parse(document.document.body));
+
+        document.children.map(( object , index ) =>{
+            let link = object.link;
+            let res = [];
+            if(link.index ) {
+                res.push({ retain : link.index });
+            }
+            res.push({ retain : link.length , attributes : { background : '#ffc107'}});
+            return new Delta(res);
+
+        }).forEach((delt) => {
+            if( hasSubscribed ) {
+                delta = delta.compose(delt);
+            }
+        })
+        quill.setContents( delta );
+        if( hasSubscribed ) {
+            setMenuFunc(document, editor);
+        }
+
+    }, [document, hasSubscribed])
 
 
     return (

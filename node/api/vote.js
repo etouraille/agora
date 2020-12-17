@@ -1,7 +1,7 @@
 const getDriver = require('./../neo/driver');
 const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
-const { voteSuccess } = require('./../document/voteSuccess');
-const { saveComplete } = require('./../document/setVoteComplete')
+const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
+const { saveComplete , voteResult } = require('./../document/setVoteComplete')
 
 const readyForVote = (req , res ) => {
     const driver = getDriver();
@@ -59,7 +59,27 @@ const againstIt = ( req , res ) => {
         "MERGE (u)-[r:VOTE_FOR { against : true}]->(d) RETURN r ";
     let result = session.run( query , { id: id  , me : res.username });
     result.then( data => {
-        return res.json( data ).end();
+        voteResult(id).then( vote => {
+            console.log( vote );
+            if (vote.complete && vote.fail) {
+                // on sauvegarde le resultat du vote dans les différents VOTE_FOR.
+                saveComplete(id, vote).then(data => {
+                    // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
+                    voteFail(id).then(data => {
+                        return res.json({vote: vote, reload: true});
+                    }, error => {
+                        return res.json(500, {reason: error}).end();
+                    })
+                }, error => {
+                    return res.json(500, {reason: error}).end();
+                })
+            } else {
+                return res.json({vote: vote, reload: false});
+            }
+
+        }, error => {
+            return res.json(500, {reason : error }).end();
+        })
     }, error => {
         return res.json(500, {reason : error });
     }).finally(() => {
@@ -140,6 +160,19 @@ const getVoters = ( req, res ) => {
                 vote.user = user;
                 if( elem.get(1)) {
                     vote.against = elem.get(1).properties.against;
+                    let r = elem.get(1).properties;
+                    if( r.complete ) {
+                        let final = {
+                            date: r.complete,
+                            forIt: r.forIt,
+                            againstIt : r.againstIt,
+                            participants : r.participants,
+                            abstention : r.abstention,
+                            success : r.success,
+                            fail : r.fail,
+                        }
+                        vote.final = final;
+                    }
                 } else {
                     vote.against = null;
                 }

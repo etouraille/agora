@@ -49,7 +49,7 @@ const Vote = ({ id , reload , forceReload }) => {
         if( id && user ) {
             http.post('/api/vote/for', {id: id}).then(data => {
                 dispatch(forIt({id: id, user: user}));
-                if( data.data.reload ) {
+                if( data.data.reload && typeof forceReload === 'function') {
                     forceReload();
                 }
             }, error => {
@@ -62,6 +62,9 @@ const Vote = ({ id , reload , forceReload }) => {
         if( id && user ) {
             http.post('/api/vote/against', {id: id}).then(data => {
                 dispatch(againstIt({id: id, user: user}));
+                if( data.data.reload && typeof forceReload === 'function') {
+                    forceReload();
+                }
             }, error => {
                 console.log(error);
             })
@@ -80,15 +83,15 @@ const Vote = ({ id , reload , forceReload }) => {
 
     return(
         <div style={{ display : readyForVote.isReadyForVote && readyForVote.hasSubscribed ? 'block' : 'none'}}>
-            {(vote === null) ? <div>
+            {(vote === null && result && result.final === false ) ? <div>
                 <button className="btn btn-success" onClick={voteForIt}>Pour</button>
                 <button className="btn btn-danger" onClick={voteAgainstIt}>Contre</button>
-            </div>: <div>A voté { vote  ? <strong>Pour</strong> : <strong>Contre</strong>}</div>  }
+            </div>: vote !== null ? <div>A voté { vote  ? <strong>Pour</strong> : <strong>Contre</strong>}</div>: <></>  }
             { result !== null ? <ul>
                     <li>Pour {result.forIt}</li>
                     <li>Contre {result.againstIt}</li>
                     <li>Abstention {result.abstention}</li>
-                    <li>Participants {result.total}</li>
+                    <li>Participants {result.participants }</li>
                     <li><button className="btn btn-sm btn-danger" onClick={resetVote}>Reset</button></li>
             </ul>:<></>}
         </div>
