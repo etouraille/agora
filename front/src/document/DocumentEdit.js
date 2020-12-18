@@ -7,9 +7,13 @@ import 'quill/dist/quill.bubble.css';
 import Sharedb from 'sharedb/lib/client';
 import richText from 'rich-text';
 import http from "../http/http";
-import Invite from "../invite/Invite";
-import ReadyForVote from "../vote/ReadyForVote";
+
+import {initDocumentChange , changed , afterSave} from "../redux/slice/documentChangeSlice";
+import {useDispatch, useSelector} from "react-redux";
+
 Sharedb.types.register(richText.type);
+
+
 
 // Connecting to our socket server
 
@@ -23,11 +27,12 @@ const DocumentEdit = () => {
     const { id } = useParams();
     const [ editor, setEditor] = useState( null );
     const [ focusChanged , setFocusChanged ] = useState( false );
-    const [ showInvite , setShowInvite ] = useState( false );
     const options = {
         theme: 'snow',
     };
     let previousFocus = false;
+
+    const dispatch = useDispatch();
 
     const mouseMouve = useCallback(( evt ) => {
         const focus  = editor.hasFocus();
@@ -39,11 +44,30 @@ const DocumentEdit = () => {
         previousFocus = focus;
     }, [editor , previousFocus]);
 
+    const forSave = useSelector(state => {
+        let elem = state.documentChange.find(elem => elem.id === id );
+        if( elem ) {
+            return elem.forSave;
+        } else {
+            return false;
+        }
+    })
+
+    useEffect(() => {
+        if( forSave && connection ) {
+            socket.onopen = () => {
+                connection.send({a: 'hs', id: 'save-' + id});
+                dispatch(afterSave({id}));
+            }
+        }
+    }, [forSave , connection , id , socket])
+
     useEffect(() => {
         //console.log( connection );
         if( focusChanged && connection ) {
             socket.onopen = () => {
                 connection.send({a: 'hs', id: 'save-' + id});
+                dispatch(afterSave({id}));
             }
         }
     }, [focusChanged , connection, id , socket])
@@ -66,6 +90,8 @@ const DocumentEdit = () => {
             connection.send({a: 'hs', id: id });
 
             const doc = connection.get('documents', id );
+
+            dispatch( initDocumentChange({id}));
 
             doc.subscribe( (err) => {
                 if (err) throw err;
@@ -91,6 +117,7 @@ const DocumentEdit = () => {
                 quill.on('text-change', function (delta, oldDelta, source) {
                     if (source !== 'user') return;
                     doc.submitOp(delta, {source: quill});
+                    dispatch(changed({id}));
                 });
 
                 /** listening to changes in the document
@@ -99,6 +126,7 @@ const DocumentEdit = () => {
                 doc.on('op', function (op, source) {
                     if (source === quill) return;
                     quill.updateContents(op);
+                    dispatch( changed( {id }));
                 });
 
             })
@@ -134,20 +162,11 @@ const DocumentEdit = () => {
             <div id="hiddenEditor" style={{ display : 'none'}}></div>
             <div id="before"></div>
             <div className="row">
-                <div className="form-group col-sm-10">
+                <div className="form-group col-sm-12">
                     <div id="editor"></div>
-                </div>
-                <div className="col-sm">
-                    <ReadyForVote id={id}></ReadyForVote>
                 </div>
             </div>
             <div id="after"></div>
-            <div>
-                <div style={{ display : showInvite ? 'block' : 'none' }} >
-                    <Invite  id={id}></Invite>
-                </div>
-                <button className="btn btn-primary" onClick={() => { setShowInvite(!showInvite)}}>Invite</button>
-            </div>
         </div>
     )
 }

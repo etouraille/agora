@@ -26,20 +26,27 @@ import ToggleAmend from "./amend/ToggleAmend";
 import QFactory from "./../quill/QFactory";
 import documentFilter from "../redux/filter/documentFilter";
 import hasSubscribedFilter from "../redux/filter/hasSubscribedFilter";
+import { initToggleDiff } from "../redux/slice/toggleDiffSlice";
+import { initReload , reload as setReload } from "../redux/slice/reloadDocumentSlice";
+import { initReloadVote  } from "../redux/slice/reloadVoteSlice";
+
 const DocumentView = (props) => {
     const { id } = useParams();
     const [ editor , setEditor ] = useState( null );
-    const [ showAmended , setShowAmended ] = useState( false );
-    const [ reload , setReload ] = useState( false );
     const [ leftMenus , setLeftMenus ] = useState([]);
     const [ count , setCount ] = useState( 0 );
-
 
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
     const vote = useSelector(voteFilter(id));
     const hasSubscribed = useSelector( hasSubscribedFilter(id));
 
     const dispatch = useDispatch();
+
+    const reload = useSelector(state => {
+        let elem = state.reloadDocument.find( elem => elem.id === id );
+        if (elem) return elem.reload;
+        else return false;
+    })
 
     const document = useSelector( state => {
         let res =  state.document.find( elem => elem.id === id );
@@ -50,15 +57,18 @@ const DocumentView = (props) => {
         }
     })
 
-    const showAmend = useCallback((evt) => {
-        setShowAmended(true);
+    const showAmended = useSelector( state => {
+        let elem = state.toggleDiff.find( elem => elem.id === id );
+        if(elem) return elem.display;
+        else return false;
+    })
 
-    }, [ document , showAmended ]);
 
 
     const sortedChildren = useSelector( state => {
         const doc = documentFilter(id)(state);
-        let ret = doc.children.sort((elem , elem2) => {
+        const data = [ ...doc.children ];
+        let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
         })
         return ret.map(elem => {
@@ -68,13 +78,7 @@ const DocumentView = (props) => {
 
     })
 
-    const editAmend = useCallback((evt) => {
-        if( document.children.length > 0 ) {
-            history.push('/documentedit/' + document.children[0].child.id );
-        }
-    }, [document ])
-
-    const setMenuFunc = (doc , quill ) => {
+   const setMenuFunc = (doc , quill ) => {
         let leftMenusTemp = [];
         if( quill && doc.children.length > 0 ) {
 
@@ -112,7 +116,9 @@ const DocumentView = (props) => {
                     })
                     dispatch(init({id : id , data : children }));
                     dispatch(initWith({data: children }));
-
+                    dispatch(initToggleDiff({id : id  }));
+                    dispatch( initReload({id : id }))
+                    dispatch( initReloadVote({id : id }));
                 },error => {
                     console.log( error )
                 })
@@ -157,32 +163,20 @@ const DocumentView = (props) => {
             <h1>{document.document.title}</h1>
             <div className="row">
                 <div className="col-sm">
-                    <div id="toolbar">
-                        { readyForVote.isReadyForVote && readyForVote.hasSubscribed && vote && vote.fail ? <AmendButton
-                            id={id}
-                            reload={ () => { setReload( !reload )}}
-                            document={document}
-                        ></AmendButton> : <></>}
-                        { readyForVote.hasSubscribed ?
-                            <ToggleAmend showAmend={showAmended} toggle={() => setShowAmended(!showAmended)}></ToggleAmend>
-                            : <></> }
-                    </div>
                     <div id="editor"></div>
                     {  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
                         <button className="btn btn-primary" onClick={() => history.push('/documentedit/'+ id )}>Modifier</button> :
                         <></>
                     }
-                    <Vote id={id} reload={count}></Vote>
-
                 </div>
                 { showAmended ?
                     <div className="col-sm">
-                        <AmendView id={id} reload={() => setReload(!reload)} countParent={count}></AmendView>
+                        <AmendView id={id} reload={() => dispatch(setReload({id}))} countParent={count}></AmendView>
                     </div>
                     : <></>
                 }
             </div>
-            <EditMenuList menus={leftMenus} load={true} id={id} reload={() => setReload(! reload )}></EditMenuList>
+            <EditMenuList menus={leftMenus} load={true} id={id} reload={() => dispatch(setReload({id}))}></EditMenuList>
             </div>
 
     )

@@ -12,6 +12,7 @@ const useContext = () => {
     }, [setX, setY]);
 
     const handleClick = useCallback((e) => {
+        e.preventDefault();
         show && setShow( false );
     }, [show]);
 

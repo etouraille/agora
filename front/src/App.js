@@ -15,6 +15,7 @@ import {
 import http from "./http/http";
 import {init} from "./redux/slice/subscribedDocsSlice";
 import {useDispatch} from "react-redux";
+import Barre from "./barre/Barre";
 
 export default function App() {
 
@@ -62,9 +63,11 @@ export default function App() {
                             <DocumentList></DocumentList>
                         </Route>
                         <Route path="/documentedit/:id">
+                            <Barre></Barre>
                             <DocumentEdit></DocumentEdit>
                         </Route>
                         <Route path="/document/:id">
+                            <Barre></Barre>
                             <DocumentView></DocumentView>
                         </Route>
                         <Route path="/document">

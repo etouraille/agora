@@ -1,0 +1,74 @@
+.rightBarre {
+    position : absolute;
+    width : 50px;
+    right : 0px;
+    top : 56px;
+    height: calc(100% - 56px);
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+    background-color: #f8f9fa;
+    box-shadow: -3px 3px 2px grey;
+    transition-property : right;
+    transition-duration : 1s;
+    transition-timing-function: ease;
+    transition-delay : 0s;
+}
+.logo {
+    width : 35px;
+}
+.logo-small {
+    width : 20px;
+    margin-right : 0.5em;
+}
+.barre-elem {
+    padding : 0.5em;
+    height : 45px;
+}
+.amend-barre {
+    left : 3px;
+    position : relative;
+}
+.btn-black {
+    border : 2px solid black !important;
+}
+.left-content {
+    z-index : -1;
+    border : 1px solid black;
+    position: relative;
+    top: -33px;
+    right : 246px;
+    width : 235px;
+    transition-property :visibility, opacity, z-index;
+    transition-duration : 0.5s;
+    transition-timing-function: ease;
+    transition-delay : 0s;
+    box-shadow: -3px 3px 2px grey;
+    visibility: hidden;
+    opacity: 0;
+}
+.left-content-invite {
+    width : 600px;
+    right : 606px;
+    background-color: navajowhite;
+}
+
+.vote-container {
+    padding : 1em;
+}
+.margin-left {
+    margin-left : 0.5em;
+}
+.margin-right {
+    margin-right : 0.5em;
+}
+.small-font {
+    font-size : 0.8em;
+}
+.medium-font {
+    font-size : 0.9em;
+}
+.padding {
+    padding-left :  1em;
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+}

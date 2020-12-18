@@ -29,7 +29,8 @@ const AmendView = ({id, reload , countParent }) => {
 
     const sortedChildren = useSelector( state => {
         const doc = documentFilter(id)(state);
-        let ret = doc.children.sort((elem , elem2) => {
+        let data = [...doc.children];
+        let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
         })
         return ret.map((elem , i ) => {

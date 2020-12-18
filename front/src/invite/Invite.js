@@ -3,7 +3,8 @@ import { useParams } from "react-router";
 import http from "../http/http";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../redux/slice/readyForVoteSlice";
-
+import inviteSvg from './../svg/invite.svg';
+import minusSvg from './../svg/minus.svg';
 const Invite = ({id}) => {
 
     const [invitedUsers , setInvitedUsers ] = useState([]);
@@ -75,7 +76,7 @@ const Invite = ({id}) => {
             <ul className="list-group">
                 {invitedUsers.map((user, index ) => {
                     return (<li className="list-group-item" key={index}>{user}
-                        <button className="btn btn-danger float-right" onClick={() => uninvite(user)}>Désinviter</button>
+                        <button className="btn btn-black float-right" onClick={() => uninvite(user)}><img className="logo-small margin-right" src={minusSvg} />Retirer</button>
 
                     </li>)
                 })}
@@ -86,7 +87,7 @@ const Invite = ({id}) => {
                 {users.map((user, index ) => {
                     return (
                         <li className="list-group-item" key={index}>{user}
-                            <button className="btn btn-primary float-right" onClick={() => invite(user)}>Inviter</button>
+                            <button className="btn btn-black float-right" onClick={() => invite(user)}><img className="logo-small margin-right" src={inviteSvg} /> Inviter</button>
                         </li>
                     )
                 })}

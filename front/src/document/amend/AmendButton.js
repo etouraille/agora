@@ -6,6 +6,7 @@ import {useDispatch} from "react-redux";
 import { sub } from "../../redux/slice/subscribedDocsSlice";
 import {add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
+import junction from './../../svg/junction.svg';
 
 const AmendButton = ({id , document, reload }) => {
 
@@ -28,13 +29,12 @@ const AmendButton = ({id , document, reload }) => {
         let editor = QFactory.get('#editor', param );
 
 
-        console.log( editor );
 
             evt.preventDefault();
             const somerange = editor.getSelection();
 
             let inRange = false;
-            if( document.children.length > 0 ) {
+            if( document.children.length > 0 && somerange ) {
                 document.children.forEach( object => {
                     if( isInRange(somerange, object.link )) {
                         inRange = true;
@@ -91,7 +91,7 @@ const AmendButton = ({id , document, reload }) => {
 
     return (
         <>
-            <button className="btn btn-success btn-sm" onClick={amend}>Amend</button>
+            <img className="logo" src={junction} onClick={amend}></img>
             <Modal
                 show={modalIsOpen}
                 onHide={() => setModalIsOpen(false)}

@@ -2,6 +2,7 @@ import React , {useCallback , useEffect } from 'react';
 import http from "../http/http";
 import { useDispatch,useSelector } from 'react-redux';
 import {init, set } from './../redux/slice/readyForVoteSlice';
+import ok from './../svg/ok.svg';
 const ReadyForVote = ({ id }) => {
 
     const dispatch = useDispatch();
@@ -54,17 +55,16 @@ const ReadyForVote = ({ id }) => {
 
     return (
         <>
-            <div style={{ display : !ready ? 'block': 'none'}}>
-                <button className="btn btn-success" onClick={setReadyForVote}>Set Ready For vote</button>
+            <div className="padding" style={{ display : !ready ? 'block': 'none'}}>
+                <button className="btn btn-black" onClick={setReadyForVote}><img className="logo margin-right" src={ok} />Valider</button>
             </div>
-            <div style={{ display : ready ? 'block': 'none'}}>Ready For Vote </div>
-            <ul>
+            <div>
                 {links.map((elem,i ) =>{
                     return (
-                        <li key={i}>{elem.user}<strong style={{ display : elem.readyForVote ? 'block' : 'none'}}>Ready for vote</strong></li>
+                        <div className="small-font padding" key={i}>{elem.user}{ elem.readyForVote ? <img class="logo-small margin-left" src={ok} /> : <></>}</div>
                     )
                 }) }
-            </ul>
+            </div>
         </>
     )
 }

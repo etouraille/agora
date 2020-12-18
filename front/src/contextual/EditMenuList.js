@@ -7,8 +7,6 @@ import { init as initReadyForVote } from './../redux/slice/readyForVoteSlice';
 import { init as initVote } from './../redux/slice/voteSlice';
 import http from "../http/http";
 import voteFilter from "../redux/filter/voteFilter";
-import { submit } from './../redux/slice/amendSlice';
-import usePrevious from "../utils/usePrevious";
 
 const EditMenuList = ({ menus, id , load , reload , relative }) => {
 
