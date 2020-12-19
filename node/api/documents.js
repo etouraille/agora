@@ -6,15 +6,24 @@ const documents = ( req, res ) => {
 
     const email = res.username;
 
-    const query = 'MATCH (d:Document ) ' +
+    const query = '' +
+        'MATCH (d:Document ) ' +
         'WHERE NOT (d)-[:HAS_PARENT]->(:Document) ' +
         'AND NOT (:Document)-[:HAS_ARCHIVE]->(d) ' +
-        'RETURN d';
+        'MATCH (d)-[r:SUBSCRIBED_BY]->(u:User)' +
+        'RETURN d, u ';
     const result = session.run(query )
     result.then( data => {
         const ret = [];
-        data.records.map( (doc, index ) => {
-            ret.push(doc.get(0).properties);
+        data.records.map( (doc, i ) => {
+            let id = doc.get(0).properties.id;
+            let user = doc.get( 1).properties.login;
+            let index = ret.findIndex( elem => elem.id === id );
+            if( index < 0 ) {
+                ret.push({id : id , document : doc.get(0).properties , users : [user ]});
+            } else {
+                ret[index].users.push( user );
+            }
         })
         res.json( ret );
         res.end();

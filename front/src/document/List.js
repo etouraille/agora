@@ -1,21 +1,26 @@
 import React ,{ useState, useEffect } from "react";
 import http from "../http/http";
 import { Link } from "react-router-dom";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { init} from "../redux/slice/subscribedDocsSlice";
 import Subscribe from "./subscribe/Subscribe";
+import { initDocumentsSubscribe, deleteDoc } from "../redux/slice/documentSubscribeSlice";
 
 const DocumentList = () => {
 
     const dispatch = useDispatch();
 
-    const [ documents , setDocuments ] = useState([]);
     const [ reload, setReload ] = useState(false );
+
+    const documents = useSelector( state => {
+        return state.documentSubscribe.documents;
+    })
 
     useEffect(() => {
         http.get('/api/documents').then(
             data => {
-                setDocuments(data.data);
+                console.log( data.data );
+                dispatch( initDocumentsSubscribe({data: data.data}));
             }, error => {
                 console.log(error);
             });
@@ -27,6 +32,7 @@ const DocumentList = () => {
     const deleteDocument = (id) => {
         http.delete('/api/document/' + id ).then( data => {
             setReload( !reload );
+            dispatch( deleteDoc({id }));
         }, error => {
             console.log( error );
         })
@@ -38,7 +44,7 @@ const DocumentList = () => {
               return (
                   <li key={index}>
                     <Subscribe id={doc.id}></Subscribe>
-                      {doc.title}
+                      {doc.document.title}
 
                       <Link to={'/document/' + doc.id }>Display</Link>
                     <button className="btn btn-sm btn-danger" onClick={() => deleteDocument(doc.id)}>Delete</button>

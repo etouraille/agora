@@ -44,21 +44,42 @@ const unsubscribeDoc = ( req, res ) => {
 const getSubscribedDoc = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
-    const query = " MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.login = $me  " +
-        "OPTIONAL MATCH (d)-[s:HAS_CHILDREN]->(c:Document) " +
-        "WHERE NOT EXISTS( s.voteComplete ) " +
-        "RETURN d , c ";
+    const query = " " +
+        "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.login = $me  " +
+        "OPTIONAL MATCH (d)-[q:SUBSCRIBED_BY]->(someUserD:User) " +
+        "OPTIONAL MATCH (d)-[s:HAS_CHILDREN*1..]->(c:Document) " +
+        "WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) WHEN true THEN 1 ELSE 0 END ) = size(s) " +
+        "OPTIONAL MATCH (c)-[t:HAS_PARENT*1..]->(p:Document)-[:SUBSCRIBED_BY]->(someUserC:User) " +
+        "WHERE reduce(length=0, n in t | length + CASE NOT EXISTS (n.voteComplete) WHEN true THEN 1 ELSE 0 END ) = size(t) " +
+        "RETURN d , c , someUserD , someUserC";
     let result = session.run( query , {me : res.username });
     result.then( data => {
         let result = [];
+        //TODO traitement de la requête pas complet si on est à plus de 1 de profondeur pour HAS_CHILDREN
         data.records.forEach( elem => {
             let id = elem.get(0).properties.id;
+            let title = elem.get(0).properties.title;
             let id2 = elem.get(1) ? elem.get(1).properties.id : null;
-            if( id && -1 === result.indexOf( id )) {
-                result.push( id );
+            let user = elem.get(2) ? elem.get(2).properties.login : null;
+            let user2 = elem.get(3) ? elem.get(3).properties.login : null;
+            let index = null;
+            let index2 = null;
+            console.log( user ); console.log( title );
+            index = result.findIndex( elem => elem.id === id )
+            if( id && -1 === index ) {
+                result.push( { id : id , users : []});
             }
-            if( id2 && -1 === result.indexOf( id2)) {
-                result.push( id2 );
+            index = result.findIndex( elem => elem.id === id )
+            if( index >= 0 && user  ) {
+                result[index].users.push( user );
+            }
+            index2 = result.findIndex( elem => elem.id === id2 )
+            if( id2 && -1 === index2) {
+                result.push( { id : id2 , users : []} );
+            }
+            index2 = result.findIndex( elem => elem.id === id2 )
+            if( index2 >= 0 && user2 ) {
+                result[index2].users.push( user2);
             }
         })
         return res.json(result ).end();

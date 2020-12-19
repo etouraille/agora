@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {Modal} from "react-bootstrap";
 import Quill from "quill";
 import http from "../../http/http";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { sub } from "../../redux/slice/subscribedDocsSlice";
 import {add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
@@ -15,6 +15,8 @@ const AmendButton = ({id , document, reload }) => {
     const [ after , setAfter ] = useState([]);
     const [ current, setCurrent ] = useState( []);
     const [ range , setRange ] = useState( null );
+
+    const user = useSelector( state => state.login.user );
 
     const isInRange = (needle , haystack ) => {
         if(needle.index < haystack.index ) {
@@ -77,7 +79,7 @@ const AmendButton = ({id , document, reload }) => {
             length : range.length
         }).then(
             data => {
-                dispatch(sub({id : data.data.id }))
+                dispatch(sub({id : data.data.id , user: user }));
                 dispatch(add({ id: id , child : data.data.id }));
                 reload();
                 //history.push('/document/' + data.data.id );

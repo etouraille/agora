@@ -22,7 +22,7 @@ const Encart = () => {
     const previousUser = usePrevious(user );
 
     useEffect(() => {
-        if( previousUser !== user ) {
+        if( previousUser !== undefined && previousUser !== user ) {
             http.get('/api/subscribed-doc').then( data => {
                 console.log ( data.data );
                 dispatch(init({data : data.data }));

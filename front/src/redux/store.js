@@ -10,11 +10,13 @@ import {toggleDiffSlice} from "./slice/toggleDiffSlice";
 import {reloadDocumentSlice} from "./slice/reloadDocumentSlice";
 import {reloadVoteSlice} from "./slice/reloadVoteSlice";
 import {documentChangeSlice} from "./slice/documentChangeSlice";
+import {documentSubscribeSlice} from "./slice/documentSubscribeSlice";
 
 const rootReducer = combineReducers({
     amend : amendSlice.reducer,
     document : documentSlice.reducer,
     documentChange : documentChangeSlice.reducer,
+    documentSubscribe : documentSubscribeSlice.reducer,
     editMenu : editMenuSlice.reducer,
     login : loginSlice.reducer,
     readyForVote : readyForVoteSlice.reducer,
