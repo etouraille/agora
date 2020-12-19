@@ -12,6 +12,7 @@ const { invite, uninvite,  getInvitedUsers } = require( './api/invite');
 const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVote } = require('./api/vote');
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc} = require('./api/subscribe')
+const { mercure } = require( './api/mercure');
 const { socketDocument } = require('./socket/document');
 const app = express()
 app.use(bodyParser.json())
@@ -53,6 +54,8 @@ app.get('/api/vote-success-on-doc/:id', voteSuccessOnDocument);
 app.post('/api/subscribe-doc', subscribeDoc);
 app.post('/api/unsubscribe-doc', unsubscribeDoc);
 app.get('/api/subscribed-doc', getSubscribedDoc);
+
+app.get('/api/mercure', mercure );
 
 
 const WebSocket = require('ws');

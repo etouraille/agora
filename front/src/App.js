@@ -16,6 +16,7 @@ import http from "./http/http";
 import {init} from "./redux/slice/subscribedDocsSlice";
 import {useDispatch} from "react-redux";
 import Barre from "./barre/Barre";
+import MercureSubscribe from "./mercure/subscribe";
 
 export default function App() {
 
@@ -23,12 +24,7 @@ export default function App() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        http.get('/api/subscribed-doc').then( data => {
-            console.log ( data.data );
-            dispatch(init({data : data.data }));
-        }, error => {
-            console.log( error );
-        })
+        let mercure = new MercureSubscribe();
     }, [])
 
     return (

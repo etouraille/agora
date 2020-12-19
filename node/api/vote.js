@@ -2,12 +2,14 @@ const getDriver = require('./../neo/driver');
 const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('./../document/setVoteComplete')
+const { voteMercure } = require('./../mercure/vote');
 
 const readyForVote = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
     const { id } = req.body;
     const me = res.username;
+
 
     const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->( u:User) WHERE d.id = $id AND u.login = $me ' +
         'SET r.readyForVote = true RETURN r ';
@@ -59,6 +61,11 @@ const againstIt = ( req , res ) => {
         "MERGE (u)-[r:VOTE_FOR { against : true}]->(d) RETURN r ";
     let result = session.run( query , { id: id  , me : res.username });
     result.then( data => {
+        voteMercure( false, id, res.username).then( result => {
+            console.log( result );
+        } , error => {
+            console.log( error );
+        })
         voteResult(id).then( vote => {
             console.log( vote );
             if (vote.complete && vote.fail) {
@@ -97,6 +104,12 @@ const forIt = (req, res ) => {
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : res.username });
     result.then( data => {
+        voteMercure( true, id, res.username).then( result => {
+            console.log( result );
+        } , error => {
+            console.log( error );
+        })
+
         voteResultFromDocument(id).then( result => {
             if( result.majority ) {
                 voteSuccess(

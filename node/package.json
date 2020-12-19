@@ -16,6 +16,7 @@
     "jsonwebtoken": "^8.5.1",
     "neo4j-driver": "^4.2.1",
     "quill-delta": "^4.2.2",
+    "request": "^2.88.2",
     "rich-text": "^4.1.0",
     "sharedb": "^1.5.2",
     "uuid": "^8.3.1",

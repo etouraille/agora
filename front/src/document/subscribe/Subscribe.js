@@ -12,7 +12,6 @@ const Subscribe = ({ id }) => {
             //console.log ( state.subscribedDocs );
             let ret = false;
             ret =  -1 !== state.subscribedDocs.docs.indexOf( id )
-            //console.log ( ret );
             return ret;
         }
     )
@@ -36,8 +35,8 @@ const Subscribe = ({ id }) => {
     return (
         <>
             { (subscribed) ?
-                <button className="btn btn-danger" onClick={unsubscribe}>Unsubscribe</button> :
-                <button className="btn btn-primary" onClick={subscribe}>Subscribe</button> }
+                <button className="btn btn-danger btn-sm" onClick={unsubscribe}>Unsubscribe</button> :
+                <button className="btn btn-primary btn-sm" onClick={subscribe}>Subscribe</button> }
        </>
     )
 }

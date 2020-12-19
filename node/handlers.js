@@ -67,7 +67,7 @@ const eachCheckToken = (req , res, next ) => {
     if( req.method !== 'OPTIONS' && req.originalUrl.match(/api/)) {
         let auth = req.header('Authorization');
         const regexp = /Bearer (.*)$/;
-        if(auth.match( regexp)[1]) {
+        if(auth && auth.match(regexp) && auth.match( regexp)[1]) {
             let token = auth.match( regexp)[1];
             try {
                 payload = jwt.verify( token, jwtKey);
@@ -96,9 +96,14 @@ const eachCheckToken = (req , res, next ) => {
 
             // Set the new token as the users `token` cookie
             res.setHeader('token', newToken);
+            next()
+        } else {
+            return res.status(401).json( { unauthorised : true });
         }
+    } else {
+        next();
     }
-    next();
+
 }
 
 

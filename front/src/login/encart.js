@@ -1,11 +1,13 @@
 import { useSelector } from "react-redux";
-import React, { useState }from 'react';
+import React, { useState, useEffect } from 'react';
 import jwtDecode from "jwt-decode";
 import http from "../http/http";
 import { useDispatch } from "react-redux";
 import { login, logout } from "../redux/slice/loginSlice";
 import { Link } from 'react-router-dom';
-const Encart = () =>{
+import usePrevious from "../utils/usePrevious";
+import {init} from "../redux/slice/subscribedDocsSlice";
+const Encart = () => {
 
     const dispatch = useDispatch();
 
@@ -13,6 +15,22 @@ const Encart = () =>{
         return state.login.logged
     });
 
+    const user = useSelector( state => {
+        return state.login.user;
+    })
+
+    const previousUser = usePrevious(user );
+
+    useEffect(() => {
+        if( previousUser !== user ) {
+            http.get('/api/subscribed-doc').then( data => {
+                console.log ( data.data );
+                dispatch(init({data : data.data }));
+            }, error => {
+                console.log( error );
+            })
+        }
+    }, [user]);
     const token = useSelector( state =>  state.login.token );
 
     const [selected , setSelected ] = useState( false );
