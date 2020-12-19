@@ -1,7 +1,7 @@
 import React from 'react';
 import http from "../../http/http";
 import { useSelector, useDispatch } from "react-redux";
-import { sub, unsub } from "../../redux/slice/subscribedDocsSlice";
+import { sub, unsub } from "../../redux/slice/subscribedSlice";
 import { subscribeDoc, unsubscribeDoc } from "./../../redux/slice/documentSubscribeSlice";
 const Subscribe = ({ id }) => {
 

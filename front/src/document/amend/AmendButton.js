@@ -3,7 +3,7 @@ import {Modal} from "react-bootstrap";
 import Quill from "quill";
 import http from "../../http/http";
 import {useDispatch, useSelector} from "react-redux";
-import { sub } from "../../redux/slice/subscribedDocsSlice";
+import { sub } from "../../redux/slice/subscribedSlice";
 import {add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';

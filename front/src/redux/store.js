@@ -3,7 +3,7 @@ import { loginSlice } from './slice/loginSlice';
 import { editMenuSlice} from "./slice/editMenuSlice";
 import { readyForVoteSlice } from "./slice/readyForVoteSlice";
 import { voteSlice } from "./slice/voteSlice";
-import { subscribedDocsSlice } from "./slice/subscribedDocsSlice";
+import { subscribedSlice } from "./slice/subscribedSlice";
 import { amendSlice } from "./slice/amendSlice";
 import { documentSlice } from "./slice/documentSlice";
 import {toggleDiffSlice} from "./slice/toggleDiffSlice";
@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
     readyForVote : readyForVoteSlice.reducer,
     reloadDocument : reloadDocumentSlice.reducer,
     reloadVote : reloadVoteSlice.reducer,
-    subscribedDocs : subscribedDocsSlice.reducer,
+    subscribedDocs : subscribedSlice.reducer,
     toggleDiff : toggleDiffSlice.reducer,
     vote : voteSlice.reducer,
 });

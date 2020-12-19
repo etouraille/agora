@@ -2,7 +2,6 @@ import React ,{ useState, useEffect } from "react";
 import http from "../http/http";
 import { Link } from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import { init} from "../redux/slice/subscribedDocsSlice";
 import Subscribe from "./subscribe/Subscribe";
 import { initDocumentsSubscribe, deleteDoc } from "../redux/slice/documentSubscribeSlice";
 

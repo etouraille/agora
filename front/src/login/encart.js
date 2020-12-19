@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { login, logout } from "../redux/slice/loginSlice";
 import { Link } from 'react-router-dom';
 import usePrevious from "../utils/usePrevious";
-import {init} from "../redux/slice/subscribedDocsSlice";
+import {init} from "../redux/slice/subscribedSlice";
 const Encart = () => {
 
     const dispatch = useDispatch();

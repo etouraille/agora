@@ -12,9 +12,7 @@ import {
     Route,
     Link
 } from 'react-router-dom';
-import http from "./http/http";
-import {init} from "./redux/slice/subscribedDocsSlice";
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import Barre from "./barre/Barre";
 import MercureSubscribe from "./mercure/subscribe";
 

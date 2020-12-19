@@ -12,10 +12,8 @@ export const documentSubscribeSlice = createSlice({
         unsubscribeDoc : (state , action ) => {
             let index = state.documents.findIndex( elem => elem.id === action.payload.id );
             if( index >= 0 ) {
-                console.log( index );
                 let i = state.documents[index].users.indexOf( action.payload.user);
                 if( i >=  0 ) {
-                    console.log( i );
                     state.documents[index].users.splice( i, 1 );
                 }
             }
