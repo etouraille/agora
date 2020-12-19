@@ -14,16 +14,9 @@ import {
 } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import Barre from "./barre/Barre";
-import MercureSubscribe from "./mercure/subscribe";
+
 
 export default function App() {
-
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        let mercure = new MercureSubscribe();
-    }, [])
 
     return (
 

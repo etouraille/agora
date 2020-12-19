@@ -2,7 +2,7 @@ const getDriver = require('./../neo/driver');
 const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('./../document/setVoteComplete')
-const { voteMercure } = require('./../mercure/vote');
+const { voteMercure } = require('../mercure/mercure');
 
 const readyForVote = (req , res ) => {
     const driver = getDriver();

@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
     readyForVote : readyForVoteSlice.reducer,
     reloadDocument : reloadDocumentSlice.reducer,
     reloadVote : reloadVoteSlice.reducer,
-    subscribedDocs : subscribedSlice.reducer,
+    subscribed : subscribedSlice.reducer,
     toggleDiff : toggleDiffSlice.reducer,
     vote : voteSlice.reducer,
 });

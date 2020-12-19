@@ -7,6 +7,7 @@ import { login, logout } from "../redux/slice/loginSlice";
 import { Link } from 'react-router-dom';
 import usePrevious from "../utils/usePrevious";
 import {init} from "../redux/slice/subscribedSlice";
+import Subscribe from "./../mercure/subscribe";
 const Encart = () => {
 
     const dispatch = useDispatch();
@@ -19,10 +20,26 @@ const Encart = () => {
         return state.login.user;
     })
 
+
+
+    const subscribed = useSelector( state => state.subscribed.subscribed );
+
+    const mercure = new Subscribe(dispatch);
+
+
+    useEffect ( () => {
+        if( subscribed.length > 0 ) {
+            mercure.setVars( subscribed , user );
+        }
+
+    }, [subscribed, user, mercure ])
+
     const previousUser = usePrevious(user );
 
     useEffect(() => {
         if( previousUser !== undefined && previousUser !== user ) {
+            mercure.close();
+            mercure.init();
             http.get('/api/subscribed-doc').then( data => {
                 console.log ( data.data );
                 dispatch(init({data : data.data }));

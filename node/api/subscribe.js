@@ -1,5 +1,5 @@
 const getDriver = require('./../neo/driver');
-
+const { sendMessage } = require('../mercure/mercure');
 // inscription a un document
 const subscribeDoc = ( req, res ) => {
 
@@ -11,7 +11,14 @@ const subscribeDoc = ( req, res ) => {
     let result = session.run(query, {id : id , me : res.username });
 
     result.then(data => {
-        return res.json(data).end();
+        sendMessage( id , { subject : 'docSubscribe', id , user : res.username }).then(
+            data => {
+                return res.json(data).end();
+            },error => {
+                return res.status(500).json( {reason : error }).end();
+            }
+        )
+
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {
@@ -32,7 +39,12 @@ const unsubscribeDoc = ( req, res ) => {
     let result = session.run(query, {id : id , me : res.username });
 
     result.then(data => {
-        return res.json(data).end();
+        sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username}).then( complete => {
+            return res.json(data).end();
+        },error => {
+            return res.json(500, {reason : error }).end();
+        })
+
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {

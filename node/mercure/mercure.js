@@ -38,6 +38,41 @@ const voteMercure = ( against, id , user ) => {
     })
 
 }
+
+const sendMessage = ( id ,message ) => {
+
+    console.log( 'id du message', id );
+
+    const datas = {
+        topic: 'http://agora.org/document/' + id,
+        data: JSON.stringify( message )
+    };
+    const bearer = jwt.sign(
+        { mercure: { publish: [ datas.topic ] } },
+        publisherJwtKey,
+        {
+            expiresIn: 60, // Bearer expiring in one minute
+            noTimestamp: true // Do not add "issued at" information to avoid error "Token used before issued"
+        }
+    );
+
+    return new Promise( (resolve, reject ) => {
+        request.post(
+            {
+                url: `https://${endpoint}/.well-known/mercure`,
+                auth: {bearer},
+                form: datas
+            },
+            (err, res) => {
+                err ? reject( err ) : resolve(res);
+            }
+        );
+    })
+
+}
+
+
 module.exports = {
     voteMercure,
+    sendMessage,
 }
