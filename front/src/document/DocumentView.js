@@ -75,9 +75,7 @@ const DocumentView = (props) => {
             let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
             return { ...elem, vote: vote };
         })
-        console.log( res );
         return res;
-
     })
 
    const setMenuFunc = (doc , quill ) => {
@@ -94,7 +92,6 @@ const DocumentView = (props) => {
             })
 
         }
-        console.log( leftMenusTemp);
         setLeftMenus(leftMenusTemp);
     }
 
@@ -157,7 +154,6 @@ const DocumentView = (props) => {
         })
         quill.setContents( delta );
         if( hasSubscribed ) {
-            console.log ( 'set menu func ');
             setMenuFunc(document, editor);
         }
 

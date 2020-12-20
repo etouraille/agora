@@ -13,7 +13,6 @@ const voteFilter = (id) => {
             final : null,
         }
         let elem = state.vote.find(elem => elem.id === id);
-
         if (elem) {
             let final = elem.votes.find( elem => elem.final )?elem.votes.find( elem => elem.final ).final: null;
             if( final ) {

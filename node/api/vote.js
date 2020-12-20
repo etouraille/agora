@@ -17,7 +17,8 @@ const isReadyForVote = (id) => {
             data.records.forEach( elem => {
                 ret.push( elem.get(0).properties.readyForVote);
             })
-            resolve( ret.length === ret.reduce( (a , elem ) => (elem === true ? a + 1 : a ), 0) );
+            let res = ret.length === ret.reduce((a , elem ) => (elem === true ? a + 1 : a ), 0);
+            resolve( res );
         }, error => {
             reject( error );
         })
@@ -32,16 +33,21 @@ const readyForVote = (req , res ) => {
 
 
     const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->( u:User) WHERE d.id = $id AND u.login = $me ' +
-        'SET r.readyForVote = true RETURN r ';
+        'OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Parent)' +
+        'SET r.readyForVote = true ' +
+        'RETURN r, p ';
     let result = session.run( query , {id : id , me : me  });
     result.then( data => {
+        sendMessage( id , {id, user : me , subject : 'setReadyForVote'});
+        let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
         isReadyForVote(id).then( (isReady) => {
             if( isReady ) {
-                sendMessage(id , { id,user : me , subject : 'reloadDocument'});
+                sendMessage(parentId ,{ id, parentId : me , subject : 'reloadDocument'});
             }
         })
         res.json({ user : me }).end();
     }, error => {
+        console.log( error );
         res.json(500, {reason : error });
     }).finally(() => {
             session.close();

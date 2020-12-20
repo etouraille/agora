@@ -29,7 +29,6 @@ const Encart = () => {
 
     useEffect ( () => {
         if( subscribed.length > 0 && user ) {
-            console.log( 'setVars');
             mercure.setVars( subscribed , user );
         }
 
@@ -40,9 +39,8 @@ const Encart = () => {
     useEffect(() => {
         if( previousUser !== undefined && previousUser !== user ) {
             mercure.close();
-            mercure.init();
+            mercure.init(user);
             http.get('/api/subscribed-doc').then( data => {
-                console.log ( data.data );
                 dispatch(init({data : data.data }));
             }, error => {
                 console.log( error );

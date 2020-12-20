@@ -53,9 +53,9 @@ export const voteSlice = createSlice({
                 index = state.length - 1;
             }
             let j = state[index].votes.findIndex(elem => elem.user === action.payload.user );
-            if( j < 0 ) {
+            if( j < 0 && action.payload.user ) {
                 state[index].votes.push({ user : action.payload.user , against : false });
-            } else {
+            } else if (action.payload.user ) {
                 state[index].votes[j].against = false;
             }
         },
@@ -66,9 +66,9 @@ export const voteSlice = createSlice({
                 index = state.length - 1;
             }
             let j = state[index].votes.findIndex(elem => elem.user === action.payload.user );
-            if( j < 0 ) {
+            if( j < 0 && action.payload.user ) {
                 state[index].votes.push({ user : action.payload.user , against : true });
-            } else {
+            } else if (action.payload.user) {
                 state[index].votes[j].against = true;
             }
         },
