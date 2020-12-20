@@ -1,7 +1,6 @@
 const getDriver = require('./../neo/driver');
 
 const voteResultFromDocument = ( id ) => {
-    console.log( id );
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (d:Document)-[r:SUBSCRIBED_BY|HAS_PARENT*1..2]->(s:User) " +

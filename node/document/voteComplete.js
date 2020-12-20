@@ -69,7 +69,7 @@ const saveComplete = ( documentId , vote ) => {
     })
 }
 
-const setVoteComplete = ( documentId ) => {
+const setVoteComplete = (documentId ) => {
     return new Promise( ( resolve , reject ) => {
         voteResult(documentId).then( vote => {
             if( vote.complete ) {
@@ -87,8 +87,33 @@ const setVoteComplete = ( documentId ) => {
     })
 }
 
+const voteIsComplete = (id) => {
+    let driver = getDriver();
+    let session = driver.session();
+    let query = "" +
+        "MATCH (:User)-[r:VOTE_FOR]->(d:Document) " +
+        "WHERE d.id = $id AND EXISTS(r.complete) " +
+        "RETURN r ";
+    let result = session.run( query , {id });
+    return new Promise( (resolve , reject ) => {
+        result.then( data => {
+            if( data.records.length > 0) {
+                resolve( true );
+            } else {
+                resolve( false );
+            }
+        }, error => {
+            reject( error );
+        }).finally(() => {
+            session.close();
+            driver.close();
+        })
+    })
+}
+
 module.exports = {
     voteResult,
     setVoteComplete,
     saveComplete,
+    voteIsComplete,
 };

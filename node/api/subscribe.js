@@ -1,5 +1,6 @@
 const getDriver = require('./../neo/driver');
 const { sendMessage } = require('../mercure/mercure');
+const { processSubscribe ,processUnsubscribe } = require( '../document/subscribe');
 // inscription a un document
 const subscribeDoc = ( req, res ) => {
 
@@ -10,15 +11,19 @@ const subscribeDoc = ( req, res ) => {
         "MERGE (d)-[r:SUBSCRIBED_BY]->(u)-[s:HAS_SUBSCRIBE_TO]->(d) ";
     let result = session.run(query, {id : id , me : res.username });
 
-    result.then(data => {
-        sendMessage( id , { subject : 'docSubscribe', id , user : res.username }).then(
-            data => {
-                return res.json(data).end();
-            },error => {
-                return res.status(500).json( {reason : error }).end();
-            }
-        )
+    processSubscribe(id, res.username);
 
+    sendMessage( id , { subject : 'docSubscribe', id , user : res.username }).then(
+        data => {
+
+        },error => {
+            console.log( error );
+        }
+    )
+
+
+    result.then(data => {
+        return res.json(data).end();
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {
@@ -38,19 +43,21 @@ const unsubscribeDoc = ( req, res ) => {
         "DELETE r , s ";
     let result = session.run(query, {id : id , me : res.username });
 
-    result.then(data => {
-        sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username}).then( complete => {
-            return res.json(data).end();
-        },error => {
-            return res.json(500, {reason : error }).end();
-        })
+    processUnsubscribe(id, res.username );
 
+    result.then(data => {
+       return res.json(data).end();
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {
         session.close();
         driver.close();
     });
+    sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username}).then( complete => {
+
+    },error => {
+        console.log( error );
+    })
 }
 //recupère tout les documents auquel j'ai soucrit
 const getSubscribedDoc = (req , res ) => {

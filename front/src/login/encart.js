@@ -28,7 +28,8 @@ const Encart = () => {
 
 
     useEffect ( () => {
-        if( subscribed.length > 0 ) {
+        if( subscribed.length > 0 && user ) {
+            console.log( 'setVars');
             mercure.setVars( subscribed , user );
         }
 

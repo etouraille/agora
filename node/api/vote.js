@@ -1,7 +1,7 @@
 const getDriver = require('./../neo/driver');
 const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
-const { saveComplete , voteResult } = require('./../document/setVoteComplete')
+const { saveComplete , voteResult } = require('../document/voteComplete')
 const { voteMercure } = require('../mercure/mercure');
 
 const readyForVote = (req , res ) => {
@@ -110,19 +110,12 @@ const forIt = (req, res ) => {
             console.log( error );
         })
 
-        voteResultFromDocument(id).then( result => {
-            if( result.majority ) {
-                voteSuccess(
-                    result.id,
-                    result.parentId ,
-                    result.parentBody,
-                    result.documentBody,
-                    result.index,
-                    result.length,
-                    result.voteComplete,
-                    result.vote,
-                    ).then( data => {
-                        saveComplete(id, result.vote).then( vote => {
+
+
+        voteResult(id).then( vote => {
+            if( vote.success ) {
+                voteSuccess(id).then( data => {
+                        saveComplete(id, vote).then( vote => {
                             return res.json({ majority : true , reload : data.updated });
                         }, error => {
                             return res.json(500, {reason : error });

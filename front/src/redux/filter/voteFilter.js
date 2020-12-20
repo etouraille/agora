@@ -17,7 +17,8 @@ const voteFilter = (id) => {
         if (elem) {
             let final = elem.votes.find( elem => elem.final )?elem.votes.find( elem => elem.final ).final: null;
             if( final ) {
-                ret =  { ...final, final : true };
+                ret =  { ...final, final : true , complete : true };
+                return ret;
             }
             let forIt = elem.votes.reduce((a, current) => (current.against === false ? a + 1 : a), 0);
             let againstIt = elem.votes.reduce((a, current) => (current.against === true  ? a + 1 : a), 0);
@@ -31,7 +32,7 @@ const voteFilter = (id) => {
                 againstIt: againstIt,
                 abstention: abstention,
                 participants: participants,
-                majority: majority,
+                success: majority,
                 fail : fail,
                 complete : complete,
                 final : false,

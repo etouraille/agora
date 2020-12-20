@@ -17,7 +17,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     const canDisplay = useSelector( state => {
         let vote = readyForVoteSubscribedFilter(id)(state);
-        console.log( id );
+        console.log( id , vote );
         return vote.hasSubscribed && (( vote.isOwner && ! vote.isReadyForVote) || vote.isReadyForVote);
     })
 
