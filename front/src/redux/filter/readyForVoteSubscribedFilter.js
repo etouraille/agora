@@ -15,7 +15,6 @@ const readyForVoteSubscribedFilter = ( id ) => {
                 isReadyForVote = elem.data.length === elem.data.reduce((a, r) => r.readyForVote === true ? a + 1 : a, 0);
             }
             hasSubscribed = -1 !== state.subscribed.subscribed.indexOf(id);
-
         }
         let ret = {isOwner, isReadyForVote, hasSubscribed};
         return ret;

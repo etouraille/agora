@@ -67,14 +67,14 @@ const getSubscribedDoc = (req , res ) => {
         data.records.forEach( elem => {
             let id = elem.get(0).properties.id;
             let id2 = elem.get(1) ? elem.get(1).properties.id : null;
-            let result = [];
-            index = result.indexOf( id )
+            let title = elem.get(0).properties.title;
+            let index = result.indexOf( id )
             if( id && -1 === index ) {
                 result.push( id );
             }
-            index2 = result.indexOf( id2 )
+            let index2 = result.indexOf( id2 )
             if( id2 && -1 === index2) {
-                result.push( id );
+                result.push( id2 );
             }
         })
         return res.json(result ).end();

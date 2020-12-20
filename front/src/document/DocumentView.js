@@ -148,6 +148,7 @@ const DocumentView = (props) => {
         })
         quill.setContents( delta );
         if( hasSubscribed ) {
+            console.log ( 'set menu func ');
             setMenuFunc(document, editor);
         }
 
