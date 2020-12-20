@@ -1,5 +1,7 @@
 const getDriver = require('./../neo/driver');
 
+const {sendMessage} = require('./../mercure/mercure');
+
 const { v4 : uuid } = require('uuid');
 
 const amend = ( req, res ) => {
@@ -31,9 +33,6 @@ const amend = ( req, res ) => {
                 ' MERGE (child)-[t:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(u)' +
                 ' RETURN child.id';
 
-            console.log( query );
-
-
             let result = session.run(query, {
                 idParent : id ,
                 selection : JSON.stringify(selection) ,
@@ -47,7 +46,8 @@ const amend = ( req, res ) => {
                 if(! singleResult ) {
                     return res.json(500, {reason : 'Nothing persist'}).end();
                 } else {
-                    console.log( singleResult.get(0));
+
+                    sendMessage(id , { id , user : res.username , subject : 'reloadDocument'});
                     return res.json({ id : singleResult.get(0) });
                 }
             }, error => {

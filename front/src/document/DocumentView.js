@@ -71,10 +71,12 @@ const DocumentView = (props) => {
         let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
         })
-        return ret.map(elem => {
+        let res = ret.map(elem => {
             let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
             return { ...elem, vote: vote };
         })
+        console.log( res );
+        return res;
 
     })
 
@@ -92,6 +94,7 @@ const DocumentView = (props) => {
             })
 
         }
+        console.log( leftMenusTemp);
         setLeftMenus(leftMenusTemp);
     }
 
@@ -105,13 +108,19 @@ const DocumentView = (props) => {
 
     useEffect(() => {
         if( id ) {
+            console.log( 'RELOAD DOCUMENT ==========');
             http.get('/api/document/' + id ).then(
                 data => {
                     dispatch( initDoc({id : id, data : data.data }));
                     setCount( count + 1 );
                     let children = [];
 
-                    data.data.children.map(( object , index ) =>{
+                    const res  = [ ...data.data.children ];
+                    let ret = res.sort((elem , elem2) => {
+                        return ((elem.link.index  < elem2.link.index) ? -1 : 1);
+                    })
+
+                    ret.map(( object , index ) =>{
                         children.push( object.child.id );
                     })
                     dispatch(init({id : id , data : children }));
@@ -152,7 +161,7 @@ const DocumentView = (props) => {
             setMenuFunc(document, editor);
         }
 
-    }, [document, hasSubscribed])
+    }, [document, hasSubscribed, reload ])
 
 
     return (

@@ -56,18 +56,18 @@ const sendMessage = ( id ,message ) => {
         }
     );
 
-    return new Promise( (resolve, reject ) => {
-        request.post(
-            {
-                url: `https://${endpoint}/.well-known/mercure`,
-                auth: {bearer},
-                form: datas
-            },
-            (err, res) => {
-                err ? reject( err ) : resolve(res);
-            }
-        );
-    })
+
+    request.post(
+        {
+            url: `https://${endpoint}/.well-known/mercure`,
+            auth: {bearer},
+            form: datas
+        },
+        (err, res) => {
+            err ? console.log( err) : null;
+        }
+    );
+
 
 }
 

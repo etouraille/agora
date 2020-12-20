@@ -40,7 +40,7 @@ const AmendView = ({id, reload , countParent }) => {
                 let delt = new Delta(JSON.parse(doc.document.body));
                 let body = JSON.stringify(delt.slice(elem.link.index, elem.link.index + elem.link.length));
                 let child = {...ret[i].child  , body : body  };
-                return {...ret[i], child : child , vote : vote}
+                return {...ret[i], child : child , vote : vote }
             } else {
                 let child = {...ret[i].child };
                 return {...ret[i], child : child , vote : vote}
@@ -72,9 +72,12 @@ const AmendView = ({id, reload , countParent }) => {
 
             let deltaIndex = 0;
 
+            console.log( sortedChildren );
+
             sortedChildren.map( (object , i ) => {
 
                 let current = JSON.parse( object.child.body );
+                console.log ( current );
                 let afterIndex  = object.link.length + object.link.index;
                 let afterLength = source.getLength() - ( object.link.index + object.link.length);
                 if(sortedChildren[i+1]) {

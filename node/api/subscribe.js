@@ -13,13 +13,7 @@ const subscribeDoc = ( req, res ) => {
 
     processSubscribe(id, res.username);
 
-    sendMessage( id , { subject : 'docSubscribe', id , user : res.username }).then(
-        data => {
-
-        },error => {
-            console.log( error );
-        }
-    )
+    sendMessage( id , { subject : 'docSubscribe', id , user : res.username });
 
 
     result.then(data => {
@@ -53,11 +47,7 @@ const unsubscribeDoc = ( req, res ) => {
         session.close();
         driver.close();
     });
-    sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username}).then( complete => {
-
-    },error => {
-        console.log( error );
-    })
+    sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username});
 }
 //recupère tout les documents auquel j'ai soucrit
 const getSubscribedDoc = (req , res ) => {

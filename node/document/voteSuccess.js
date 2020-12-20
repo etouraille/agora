@@ -1,6 +1,6 @@
 const getDriver = require('./../neo/driver');
 const {v4 : uuid } = require('uuid');
-const { quillMerge } = require('./../quill/quillMerge');
+const { quillMerge , mergeApply } = require('./../quill/quillMerge');
 // on créée un document archive avec l'ancien contenu
 // on remplace le nouveau contenu dans le document parent
 // on desactive le lien entre le parent et le document fils
@@ -47,23 +47,7 @@ const voteSuccess = (id ) => {
                         })
 
                         result.then(data => {
-
-                            const newParentBody = quillMerge(parentBody, childBody, index, length);
-                            let query = "" +
-                                "MATCH ( p:Document )-[cr:HAS_CHILDREN]->(c:Document)-[pr:HAS_PARENT]->(d) " +
-                                "WHERE p.id = $parentId AND c.id = $id " +
-                                "OPTIONAL MATCH (:User)-[vf:VOTE_FOR]->(p) " +
-                                "SET p.body = $newBody " +
-                                "SET cr.voteComplete = true " +
-                                "SET pr.voteComplete = true " +
-                                "DELETE vf ";
-                            // TODO : mettre les votes sur l'archive, faire un summary.
-                            let result = session.run(query, {
-                                parentId: parentId,
-                                id: id,
-                                newBody: JSON.stringify(newParentBody),
-                            })
-                            result.then(data => {
+                            mergeApply(parentId , id ).then(data => {
                                 console.log('updated');
                                 resolve({updated: true, parentId });
                             }, error => {

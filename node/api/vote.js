@@ -4,6 +4,26 @@ const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
 const { sendMessage } = require('../mercure/mercure');
 
+const isReadyForVote = (id) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH( d:Document)-[r:FOR_EDIT_BY]->(u:User) " +
+        "WHERE d.id = $id " +
+        "RETURN r ";
+    let result = session.run( query , {id});
+    return new Promise( (resolve, reject ) => {
+        result.then(data => {
+            let ret = [];
+            data.records.forEach( elem => {
+                ret.push( elem.get(0).properties.readyForVote);
+            })
+            resolve( ret.length === ret.reduce( (a , elem ) => (elem === true ? a + 1 : a ), 0) );
+        }, error => {
+            reject( error );
+        })
+    })
+}
+
 const readyForVote = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
@@ -15,6 +35,11 @@ const readyForVote = (req , res ) => {
         'SET r.readyForVote = true RETURN r ';
     let result = session.run( query , {id : id , me : me  });
     result.then( data => {
+        isReadyForVote(id).then( (isReady) => {
+            if( isReady ) {
+                sendMessage(id , { id,user : me , subject : 'reloadDocument'});
+            }
+        })
         res.json({ user : me }).end();
     }, error => {
         res.json(500, {reason : error });
@@ -63,11 +88,7 @@ const againstIt = ( req , res ) => {
     let result = session.run( query , { id: id  , me : user });
     result.then( data => {
 
-        sendMessage(id , {id, user, subject : 'voteAgainst'}).then( () => {
-
-        }, error => {
-            console.log( error );
-        })
+        sendMessage(id , {id, user, subject : 'voteAgainst'});
 
         voteResult(id).then( vote => {
             console.log( vote );
@@ -76,11 +97,7 @@ const againstIt = ( req , res ) => {
                 saveComplete(id, vote).then(data => {
                     // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
                     voteFail(id).then(data => {
-                        sendMessage(id, {id , user , subject : 'voteComplete'}).then( () => {
-
-                        }, error => {
-                            console.log( error );
-                        })
+                        sendMessage(id, {id , user , subject : 'voteComplete'});
                         return res.json({vote: vote, reload: true});
                     }, error => {
                         return res.json(500, {reason: error}).end();
@@ -112,11 +129,7 @@ const forIt = (req, res ) => {
     const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : user });
-    sendMessage( id , {id, user , subject : 'voteFor'}).then( () => {
-
-    }, error => {
-        console.log( error );
-    })
+    sendMessage( id , {id, user , subject : 'voteFor'});
     result.then( data => {
         voteResult(id).then( vote => {
             if( vote.success ) {
@@ -125,18 +138,10 @@ const forIt = (req, res ) => {
                         sendMessage(data.parentId , {
                             id : data.parentId ,
                             user,
-                            subject : 'reloadDocument'}).then( () => {
-
-                        }, error => {
-                            console.log ( error );
-                        })
+                            subject : 'reloadDocument'});
                     }
                     saveComplete(id, vote).then( vote => {
-                        sendMessage( id , { id , user , subject : 'voteComplete'}).then( data => {
-
-                        }, error => {
-                            console.log( error );
-                        })
+                        sendMessage( id , { id , user , subject : 'voteComplete'});
                         return res.json({ majority : true , reload : data.updated });
                     }, error => {
                         return res.json(500, {reason : error });
