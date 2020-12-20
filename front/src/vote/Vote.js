@@ -63,6 +63,10 @@ const Vote = ({ id , forceReload }) => {
                 dispatch(forIt({id: id, user: user}));
                 if( data.data.reload && typeof forceReload === 'function') {
                     forceReload();
+                    console.log( data.data );
+                    if( data.data.parentId ) {
+                        dispatch(reloadVote({id: data.data.parentId}));
+                    }
                 }
                 if( data.data.reload) {
                     dispatch(reloadVote({id}))

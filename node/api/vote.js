@@ -142,7 +142,7 @@ const forIt = (req, res ) => {
                     }
                     saveComplete(id, vote).then( vote => {
                         sendMessage( id , { id , user , subject : 'voteComplete'});
-                        return res.json({ majority : true , reload : data.updated });
+                        return res.json({ majority : true , reload : data.updated , parentId : data.parentId });
                     }, error => {
                         return res.json(500, {reason : error });
                     })
