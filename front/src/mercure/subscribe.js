@@ -4,7 +4,7 @@ import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 import { subscribeDoc, unsubscribeDoc } from "./../redux/slice/documentSubscribeSlice";
 import {useDispatch} from "react-redux";
 import {reload as reloadDocument } from "./../redux/slice/reloadDocumentSlice";
-import { addVoter, removeVoter } from "./../redux/slice/voteSlice";
+import { addVoter, removeVoter , forIt , againstIt } from "./../redux/slice/voteSlice";
 import { reloadVote } from "./../redux/slice/reloadVoteSlice";
 
 import store from "../redux/store";
@@ -79,6 +79,16 @@ class  MercureSubscribe {
             if (message.subject === "voteComplete") {
                 if (user !== this.me) {
                     store.dispatch(reloadVote({id}));
+                }
+            }
+            if (message.subject === "voteFor") {
+                if (user !== this.me) {
+                    store.dispatch(forIt({id}));
+                }
+            }
+            if (message.subject === "voteAgainst") {
+                if (user !== this.me) {
+                    store.dispatch(againstIt({id}));
                 }
             }
         }

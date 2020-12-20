@@ -2,7 +2,7 @@ const getDriver = require('./../neo/driver');
 const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
-const { voteMercure } = require('../mercure/mercure');
+const { sendMessage } = require('../mercure/mercure');
 
 const readyForVote = (req , res ) => {
     const driver = getDriver();
@@ -57,15 +57,18 @@ const againstIt = ( req , res ) => {
     const {id } = req.body;
     const driver = getDriver();
     const session = driver.session();
+    let user = res.username;
     const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : true}]->(d) RETURN r ";
-    let result = session.run( query , { id: id  , me : res.username });
+    let result = session.run( query , { id: id  , me : user });
     result.then( data => {
-        voteMercure( false, id, res.username).then( result => {
-            console.log( result );
-        } , error => {
+
+        sendMessage(id , {id, user, subject : 'voteAgainst'}).then( () => {
+
+        }, error => {
             console.log( error );
         })
+
         voteResult(id).then( vote => {
             console.log( vote );
             if (vote.complete && vote.fail) {
@@ -73,6 +76,11 @@ const againstIt = ( req , res ) => {
                 saveComplete(id, vote).then(data => {
                     // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
                     voteFail(id).then(data => {
+                        sendMessage(id, {id , user , subject : 'voteComplete'}).then( () => {
+
+                        }, error => {
+                            console.log( error );
+                        })
                         return res.json({vote: vote, reload: true});
                     }, error => {
                         return res.json(500, {reason: error}).end();
@@ -100,26 +108,39 @@ const forIt = (req, res ) => {
     const { id } = req.body;
     const driver = getDriver();
     const session = driver.session();
+    let user = res.username;
     const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
-    let result = session.run( query , { id: id  , me : res.username });
+    let result = session.run( query , { id: id  , me : user });
+    sendMessage( id , {id, user , subject : 'voteFor'}).then( () => {
+
+    }, error => {
+        console.log( error );
+    })
     result.then( data => {
-        voteMercure( true, id, res.username).then( result => {
-            console.log( result );
-        } , error => {
-            console.log( error );
-        })
-
-
-
         voteResult(id).then( vote => {
             if( vote.success ) {
                 voteSuccess(id).then( data => {
-                        saveComplete(id, vote).then( vote => {
-                            return res.json({ majority : true , reload : data.updated });
+                    if( data.updated) {
+                        sendMessage(data.parentId , {
+                            id : data.parentId ,
+                            user,
+                            subject : 'reloadDocument'}).then( () => {
+
                         }, error => {
-                            return res.json(500, {reason : error });
+                            console.log ( error );
                         })
+                    }
+                    saveComplete(id, vote).then( vote => {
+                        sendMessage( id , { id , user , subject : 'voteComplete'}).then( data => {
+
+                        }, error => {
+                            console.log( error );
+                        })
+                        return res.json({ majority : true , reload : data.updated });
+                    }, error => {
+                        return res.json(500, {reason : error });
+                    })
 
                 }, error => {
                     return res.json(500, {reason : error });
