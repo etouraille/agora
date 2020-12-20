@@ -7,7 +7,7 @@ import {reload as reloadDocument } from "./../redux/slice/reloadDocumentSlice";
 import { addVoter, removeVoter , forIt , againstIt } from "./../redux/slice/voteSlice";
 import { reloadVote } from "./../redux/slice/reloadVoteSlice";
 import { set as setReadyForVote } from './../redux/slice/readyForVoteSlice';
-
+import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
 import store from "../redux/store";
 
 class  MercureSubscribe {
@@ -94,6 +94,11 @@ class  MercureSubscribe {
             if (message.subject === "setReadyForVote") {
                 if (user !== me) {
                     store.dispatch(setReadyForVote({id, user , readyForVote : true }));
+                }
+            }
+            if (message.subject === "hasSubscribe") {
+                if (user !== me) {
+                    store.dispatch(subscribeDocument({id }));
                 }
             }
         }

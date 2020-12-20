@@ -33,16 +33,19 @@ const amend = ( req, res ) => {
                 ' MERGE (child)-[t:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(u)' +
                 ' RETURN child.id';
 
+            let childId = uuid();
+
             let result = session.run(query, {
                 idParent : id ,
                 selection : JSON.stringify(selection) ,
-                id : uuid(),
+                id : childId,
                 index : index ,
                 length : length,
                 me : res.username,
             })
             result.then(data => {
                 let singleResult = data.records[0];
+                sendMessage(childId , {id : childId , user : res.username , subject : 'hasSubscribe'});
                 if(! singleResult ) {
                     return res.json(500, {reason : 'Nothing persist'}).end();
                 } else {
