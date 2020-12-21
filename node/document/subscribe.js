@@ -10,7 +10,7 @@ const getLinkedDocuments = (id) => {
     const query = "" +
         "MATCH (d:Document) WHERE d.id = $id " +
         "MATCH (d)-[s:HAS_CHILDREN*1..]->(c:Document) " +
-        "WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) WHEN true THEN 1 ELSE 0 END ) = size(s) " +
+        "WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) OR hasChildren.voteComplete = false WHEN true THEN 1 ELSE 0 END ) = size(s) " +
         "RETURN c "
     let result = session.run( query , {id});
     return new Promise( ( resolve , reject ) => {

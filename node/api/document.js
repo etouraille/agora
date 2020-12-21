@@ -48,7 +48,8 @@ const get = ( req, res ) => {
 
     try {
         const query = 'MATCH (document:Document) WHERE document.id = $id' +
-            ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  WHERE NOT EXISTS(relation.voteComplete) ' +
+            ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  ' +
+            ' WHERE NOT EXISTS(relation.voteComplete) OR relation.voteComplete = false  ' +
             ' OPTIONAL MATCH (document)-[parentRelation:HAS_PARENT]->(parent : Document)' +
             ' RETURN document, children, relation, parent, parentRelation ';
         let result = session.run(query, {id : id });

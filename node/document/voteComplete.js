@@ -3,7 +3,7 @@ const getDriver = require('./../neo/driver');
 const voteResult = (documentId ) => {
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH(u:User)-[hs:HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..2]->(d:Document) " +
+    const query = "MATCH(u:User)-[hs:HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..]->(d:Document) " +
         "WHERE 'HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
         "AND d.id =  $id " +
         "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(d) " +

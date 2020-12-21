@@ -53,14 +53,6 @@ const AmendView = ({id, reload , countParent }) => {
         let nodeAndId = [];
         if(  doc.children  && document.querySelector('#rightEditor') ) {
 
-
-            /*
-            const sortedChildren = doc.children.sort((elem , elem2) => {
-                return ((elem.link.index  < elem2.link.index) ? -1 : 1);
-            })
-            */
-
-
             const righteditor = new Quill('#rightEditor', {readOnly : true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));
@@ -72,12 +64,9 @@ const AmendView = ({id, reload , countParent }) => {
 
             let deltaIndex = 0;
 
-            console.log( sortedChildren );
-
             sortedChildren.map( (object , i ) => {
 
                 let current = JSON.parse( object.child.body );
-                console.log ( current );
                 let afterIndex  = object.link.length + object.link.index;
                 let afterLength = source.getLength() - ( object.link.index + object.link.length);
                 if(sortedChildren[i+1]) {

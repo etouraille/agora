@@ -7,7 +7,6 @@ const readyForVoteSubscribedFilter = ( id ) => {
 
         if( user ) {
             let elem = state.readyForVote.find(elem => elem.id === id);
-            //console.log( elem );
             if (user && elem && elem.data.find(elem => elem.user === user)) {
                 isOwner = true;
             }

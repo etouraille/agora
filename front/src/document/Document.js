@@ -3,10 +3,14 @@ import { Formik, Form , ErrorMessage, Field } from 'formik'
 import http from "../http/http";
 import Quill from 'quill';
 import history from "../utils/history";
+import { sub } from "../redux/slice/subscribedSlice";
+import {useDispatch} from "react-redux";
 
 const Document = () => {
 
     const [body , setBody ] = useState([]);
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const quill = new Quill('#quill', {
@@ -30,8 +34,9 @@ const Document = () => {
             onSubmit={( values , {setSubmitting}) => {
                 values['body'] = JSON.stringify(body);
                 http.post('/api/document', values).then((data) => {
-                    console.log(data);
                     history.push('/documentedit/' + data.data.id);
+                    dispatch(sub({id : data.data.id }));
+                    //TODO : new subscription to mercure
                     setSubmitting(false);
                 }, error => {
                     console.log(error);

@@ -60,7 +60,6 @@ class  MercureSubscribe {
             }
             if (message.subject === "reloadDocument") {
                 if (user !== me) {
-                    console.log( 'RELOAD DOCUMENT MESSAGE');
                     store.dispatch(reloadDocument({id}));
                     store.dispatch(reloadVote({id}));
                 }

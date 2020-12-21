@@ -36,6 +36,8 @@ const ReadyForVote = ({ id }) => {
 
     const setReadyForVote = () => {
         http.put('api/ready-for-vote', { id : id }).then( data => {
+            console.log( 'ready for vote ', id );
+            console.log ( data.data.user );
             dispatch( set ({id : id , user : data.data.user , readyForVote : true }))
         }, error => {
             console.log(error );

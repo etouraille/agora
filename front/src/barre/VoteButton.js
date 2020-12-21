@@ -3,7 +3,7 @@ import vote from "../svg/vote.svg";
 import { useParams } from "react-router";
 import {useDispatch, useSelector} from "react-redux";
 import { toggleDiff } from "../redux/slice/toggleDiffSlice";
-import canDisplayVoteFilter from "../redux/filter/canDisplayFoteFilter";
+import canDisplayVoteFilter from "../redux/filter/canDisplayVoteFilter";
 import Vote from "../vote/Vote";
 
 const VoteButton = ({id}) => {

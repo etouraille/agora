@@ -7,13 +7,17 @@ import history from "../utils/history";
 import Vote from "../vote/Vote";
 import http from "../http/http";
 import editSvg from './../svg/edit.svg';
+import docSvg from './../svg/doc.svg';
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
+import voteFilter from "../redux/filter/voteFilter";
 const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     const dispatch = useDispatch();
 
     //console.log( 'in edit');
     const canEdit = useSelector( readyForVoteSubscribedFilter(id));
+
+    const vote = useSelector( voteFilter(id ));
 
     const canDisplay = useSelector( state => {
         let vote = readyForVoteSubscribedFilter(id)(state);
@@ -73,6 +77,10 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
         })
     }
 
+    const goToDoc = () => {
+        history.push('/document/' + id )
+    }
+
 
     return (
         <>
@@ -88,6 +96,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <img className="logo" src={editSvg} onClick={edit} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
                     { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote id={id} forceReload={() => reload()}></Vote> : <></>}
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <img className="logo" src={docSvg} onClick={goToDoc} /> : <></> }
                 </nav>
             </div>
         </div>: <></>}

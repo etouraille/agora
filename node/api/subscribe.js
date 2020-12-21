@@ -56,7 +56,7 @@ const getSubscribedDoc = (req , res ) => {
     const query = " " +
         "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.login = $me  " +
         "OPTIONAL MATCH (d)-[s:HAS_CHILDREN*1..]->(c:Document) " +
-        "WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) WHEN true THEN 1 ELSE 0 END ) = size(s) " +
+        "WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) OR hasChildren.voteComplete = false WHEN true THEN 1 ELSE 0 END ) = size(s) " +
         "RETURN d , c ";
     let result = session.run( query , {me : res.username });
     result.then( data => {

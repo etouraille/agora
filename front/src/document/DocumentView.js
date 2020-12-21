@@ -130,7 +130,7 @@ const DocumentView = (props) => {
                 })
         }
 
-    }, [ reload ]);
+    }, [ reload , id ]);
 
     useEffect(() => {
         const param = { readOnly : true, toolbar : '#toolbar' };

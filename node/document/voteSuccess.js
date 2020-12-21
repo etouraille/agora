@@ -41,7 +41,7 @@ const voteSuccess = (id ) => {
                         let result = session.run(query, {
                             parentId,
                             body: docParent.body,
-                            title: docParent.title,
+                            title: docParent.title?docParent.title:'',
                             uid: uuid(),
                             rank,
                         })
@@ -96,7 +96,7 @@ const voteFail = ( documentId ) => {
     const session = driver.session();
     const query = "MATCH (d:Document)-[hp:HAS_PARENT]->(p:Document)-[hc:HAS_CHILDREN]->(d) " +
         "WHERE d.id = $id " +
-        "SET hp.votComplete = false " +
+        "SET hp.voteComplete = false " +
         "SET hc.voteComplete = false ";
     let result = session.run( query , {id :  documentId });
     return new Promise((resolve, reject ) => {

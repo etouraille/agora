@@ -1,5 +1,4 @@
 const getDriver = require('./../neo/driver');
-const { voteResultFromDocument } = require('./../document/voteResultFromDocument');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
 const { sendMessage } = require('../mercure/mercure');
@@ -32,8 +31,9 @@ const readyForVote = (req , res ) => {
     const me = res.username;
 
 
-    const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->( u:User) WHERE d.id = $id AND u.login = $me ' +
-        'OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Parent)' +
+    const query = '' +
+        'MATCH (d:Document)-[r:FOR_EDIT_BY]->( u:User) WHERE d.id = $id AND u.login = $me ' +
+        'OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Document) ' +
         'SET r.readyForVote = true ' +
         'RETURN r, p ';
     let result = session.run( query , {id : id , me : me  });
@@ -42,7 +42,7 @@ const readyForVote = (req , res ) => {
         let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
         isReadyForVote(id).then( (isReady) => {
             if( isReady ) {
-                sendMessage(parentId ,{ id, parentId : me , subject : 'reloadDocument'});
+                sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
             }
         })
         res.json({ user : me }).end();
@@ -180,7 +180,7 @@ const getVoters = ( req, res ) => {
     const query = "" +
         "MATCH (d:Document)" +
         "WHERE d.id = $id " +
-        "MATCH (d)-[r:SUBSCRIBED_BY|HAS_PARENT*1..2]->(u:User) " +
+        "MATCH (d)-[r:SUBSCRIBED_BY|HAS_PARENT*1..]->(u:User) " +
         "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)]" +
         "OPTIONAL MATCH (u)-[v:VOTE_FOR]->(d) " +
         "RETURN u,v ";

@@ -18,21 +18,6 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
 
     let partialForChange = [];
 
-    useSelector( state => {
-
-        let amend = state.amend.find(elem => elem.id === id );
-        if( amend ) {
-            amend.children.forEach( elem  => {
-                let vote = voteFilter(elem.id) (state);
-                if( vote && vote.complete ) {
-                    //reload(elem.id);
-                }
-            })
-        }
-    })
-
-
-
     const [ iter , setIter ] = useState( []);
 
 
@@ -71,6 +56,10 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
                     console.log( error);
                 })
             });
+        }
+
+        return () => {
+
         }
     }, [load , menus ])
 

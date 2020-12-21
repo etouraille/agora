@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import canDisplayVoteFilter from "../redux/filter/canDisplayFoteFilter";
+import canDisplayVoteFilter from "../redux/filter/canDisplayVoteFilter";
 import invite from "../svg/invite.svg";
 import Vote from "../vote/Vote";
 import Invite from "../invite/Invite";
