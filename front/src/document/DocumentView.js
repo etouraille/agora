@@ -189,7 +189,7 @@ const DocumentView = (props) => {
                     : <></>
                 }
             </div>
-            <After document={document} id={id}></After>
+            <After document={document} id={id} count={count}></After>
             <EditMenuList menus={leftMenus} load={true} id={id} reload={() => dispatch(setReload({id}))}></EditMenuList>
             </div>
 

@@ -26,7 +26,6 @@ const Before = ({ document, id , count }) => {
         const param = {readOnly: true, toolbar: '#toolbar'};
         let quill = QFactory.get('#beforeElem', param);
 
-        console.log( document.parent );
 
         if( document.parent && document.parent.document ) {
             let elems = [];
