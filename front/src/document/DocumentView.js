@@ -29,6 +29,8 @@ import hasSubscribedFilter from "../redux/filter/hasSubscribedFilter";
 import { initToggleDiff } from "../redux/slice/toggleDiffSlice";
 import { initReload , reload as setReload } from "../redux/slice/reloadDocumentSlice";
 import { initReloadVote  } from "../redux/slice/reloadVoteSlice";
+import Before from "./parent/Before";
+import After from "./parent/After";
 
 const DocumentView = (props) => {
     const { id } = useParams();
@@ -159,6 +161,9 @@ const DocumentView = (props) => {
 
     }, [document, hasSubscribed, reload ])
 
+    const prev = useCallback(( id ) => {
+        history.push('/document/' + document.parent.document.id );
+    }, [document]);
 
     return (
         <div>
@@ -166,6 +171,8 @@ const DocumentView = (props) => {
             <div style={{ display : 'none'}} id="source"></div>
             <ContextMenu menu={() => { return (<MenuSelectText id={id}></MenuSelectText>);
             }} />
+            <Before document={document} id={id} count={count}></Before>
+            {document.parent && document.parent.document ? <button className="btn btn-black" onClick={prev}>Précédent</button> : <></> }
             <h1>{document.document.title}</h1>
             <div className="row">
                 <div className="col-sm">
@@ -182,6 +189,7 @@ const DocumentView = (props) => {
                     : <></>
                 }
             </div>
+            <After document={document} id={id}></After>
             <EditMenuList menus={leftMenus} load={true} id={id} reload={() => dispatch(setReload({id}))}></EditMenuList>
             </div>
 

@@ -93,10 +93,10 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
             <div className="caret down" onMouseEnter={enterCaret} ></div>
             <div className="menu-container" style={{ display : displayList ? 'block' : 'none', width : '400px'}} onMouseLeave={outList}>
                 <nav className="nav flex-column nav-fill">
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <img className="logo" src={docSvg} onClick={goToDoc} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <img className="logo" src={editSvg} onClick={edit} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
                     { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote id={id} forceReload={() => reload()}></Vote> : <></>}
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <img className="logo" src={docSvg} onClick={goToDoc} /> : <></> }
                 </nav>
             </div>
         </div>: <></>}

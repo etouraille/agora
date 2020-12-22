@@ -1,6 +1,6 @@
 const getDriver = require('./../neo/driver');
 const {v4 : uuid } = require('uuid');
-const { quillMerge , mergeApply } = require('./../quill/quillMerge');
+const { mergeApply } = require('./../quill/quillMerge');
 // on créée un document archive avec l'ancien contenu
 // on remplace le nouveau contenu dans le document parent
 // on desactive le lien entre le parent et le document fils
