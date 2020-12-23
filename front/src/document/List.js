@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import Subscribe from "./subscribe/Subscribe";
 import { initDocumentsSubscribe, deleteDoc } from "../redux/slice/documentSubscribeSlice";
+import Search from "./search/Search";
 
 const DocumentList = () => {
 
@@ -39,6 +40,7 @@ const DocumentList = () => {
 
     return (
         <ul>
+            <Search></Search>
             { documents.map((doc, index ) => {
               return (
                   <li key={index}>

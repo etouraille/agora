@@ -13,6 +13,9 @@ const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVot
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc} = require('./api/subscribe')
 const { mercure } = require( './api/mercure');
+const { search } = require( './api/search');
+const { test } = require('./api/test');
+const { elasticRoute } = require('./api/elastic');
 const { socketDocument } = require('./socket/document');
 const app = express()
 app.use(bodyParser.json())
@@ -56,6 +59,9 @@ app.post('/api/unsubscribe-doc', unsubscribeDoc);
 app.get('/api/subscribed-doc', getSubscribedDoc);
 
 app.get('/api/mercure', mercure );
+app.post('/api/search', search );
+app.get('/test', test );
+app.get('/elastic/:id', elasticRoute );
 
 
 const WebSocket = require('ws');

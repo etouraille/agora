@@ -2,6 +2,7 @@ const getDriver = require('./../neo/driver');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
 const { sendMessage } = require('../mercure/mercure');
+const { onVoteFailOrSuccess,onReadyForVoteComplete} = require('./../document/elasticProcess')
 
 const isReadyForVote = (id) => {
     const driver = getDriver();
@@ -43,6 +44,7 @@ const readyForVote = (req , res ) => {
         isReadyForVote(id).then( (isReady) => {
             if( isReady ) {
                 sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
+                onReadyForVoteComplete(id);
             }
         })
         res.json({ user : me }).end();
@@ -104,6 +106,7 @@ const againstIt = ( req , res ) => {
                     // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
                     voteFail(id).then(data => {
                         sendMessage(id, {id , user , subject : 'voteComplete'});
+                        onVoteFailOrSuccess(id);
                         return res.json({vote: vote, reload: true});
                     }, error => {
                         return res.json(500, {reason: error}).end();
@@ -148,6 +151,7 @@ const forIt = (req, res ) => {
                     }
                     saveComplete(id, vote).then( vote => {
                         sendMessage( id , { id , user , subject : 'voteComplete'});
+                        onVoteFailOrSuccess(id);
                         return res.json({ majority : true , reload : data.updated , parentId : data.parentId });
                     }, error => {
                         return res.json(500, {reason : error });

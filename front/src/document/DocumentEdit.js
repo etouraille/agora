@@ -143,10 +143,10 @@ const DocumentEdit = () => {
     useEffect(() => {
         http.get('/api/document/' + id ).then(data => {
             const quill = new Quill('#hiddenEditor');
-            if( data.data.parent ) {
-                quill.setContents(JSON.parse(data.data.parent.body));
-                const before = quill.getContents(0, data.data.parentLink.index);
-                const after = quill.getContents(data.data.parentLink.index + data.data.parentLink.length, quill.getLength());
+            if( data.data.parent && data.data.parent.document  ) {
+                quill.setContents(JSON.parse(data.data.parent.document.body));
+                const before = quill.getContents(0, data.data.parent.link.index);
+                const after = quill.getContents(data.data.parent.link.index + data.data.parent.link.length, quill.getLength());
 
                 const beforequill = new Quill("#before", {readonly: true});
                 beforequill.setContents(before);
