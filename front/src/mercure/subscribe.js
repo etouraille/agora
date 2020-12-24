@@ -12,23 +12,24 @@ import store from "../redux/store";
 
 class  MercureSubscribe {
 
-
-
-
-    constructor() {
-        this.me = null;
-        this.documentIds = [];
-        this.eventSource = null;
+    setEventSource (es) {
+        //console.log( es );
+        this.eventSource = es;
     }
 
-    init (me) {
+    init (me, subscribedDoc ) {
         let self = this;
         const EventSource =  EventSourcePolyfill;
         http.get('/api/mercure').then( response => {
+            self.close();
             const url = new URL('https://flibus.team/.well-known/mercure');
-            url.searchParams.append('topic', 'http://agora.org/document/{id}');
+            subscribedDoc.forEach( id => {
+                url.searchParams.append('topic', 'http://agora.org/document/' + id );
+            })
+            url.searchParams.append('topic', 'http://agora.org/subscribe');
             self.eventSource = new EventSource(url, { headers  : { Authorization :"Bearer " + response.data.token } });
             self.eventSource.onmessage = this.onMessage(me);
+            this.setEventSource(self.eventSource);
         },error => {
             console.log( error);
         })
@@ -96,6 +97,13 @@ class  MercureSubscribe {
                 }
             }
             if (message.subject === "hasSubscribe") {
+                // pour l'amend
+                // TODO en verité n'a souscrit que s'il a souscrit aux parents.
+                // peut se jouer dans le sujet du message qu'on envoie
+                // que s'il est sur le parent ultime...
+                // et permet de ne souscrire qu'au parent
+                // mais pour le front on a quand même besoin de souscrire
+                // aux enfants.
                 if (user !== me) {
                     store.dispatch(subscribeDocument({id }));
                 }
@@ -105,7 +113,6 @@ class  MercureSubscribe {
 
     close() {
         if( this.eventSource ) {
-            console.log( 'CLOSE EVENT SOURCE =====================');
             this.eventSource.close();
         }
     }

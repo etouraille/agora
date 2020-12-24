@@ -3,6 +3,7 @@ import http from "../../http/http";
 import { useSelector, useDispatch } from "react-redux";
 import { sub, unsub } from "../../redux/slice/subscribedSlice";
 import { subscribeDoc, unsubscribeDoc } from "./../../redux/slice/documentSubscribeSlice";
+import {reload} from "../../redux/slice/reloadDocumentSlice";
 const Subscribe = ({ id }) => {
 
     const dispatch = useDispatch();
@@ -34,8 +35,13 @@ const Subscribe = ({ id }) => {
         http.post('/api/subscribe-doc', { id : id }).then( data => {
             // subscribe des id
             dispatch( sub({ id : id }))
+            data.data.forEach( childrenId  => {
+                dispatch( sub({ id : childrenId }))
+
+            })
             // subscribe associé au document.
             dispatch( subscribeDoc({id , user }))
+            dispatch(reload({id}));
         }, error => {
             console.log( error );
         })
@@ -43,8 +49,13 @@ const Subscribe = ({ id }) => {
 
     const unsubscribe = () => {
         http.post('/api/unsubscribe-doc', { id : id }).then( data => {
-            dispatch( unsub( { id : id }))
+            dispatch( unsub( { id : id }));
+            data.data.forEach( childrenId => {
+                dispatch( unsub({ id : childrenId }))
+
+            })
             dispatch( unsubscribeDoc( {id , user }));
+            dispatch(reload({id}));
         }, error => {
             console.log( error );
         })

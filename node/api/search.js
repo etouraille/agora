@@ -4,73 +4,51 @@ const elastic = require( './../elastic/search')
 const search = ( req, res ) => {
 
     const { data } = req.body;
-    console.log( data );
-
-    elastic.search({
-        index : 'document',
-        body: {
-            query: {
-                nested: {
-                    path: "quotations",
-                    query: {
-                        bool: {
-                            must: [
-                                { match: {"quotations.value": data}},
-                                //{match: {"quotations.value": "these"}}
-                            ]
-                        }
+    let matches = data.split(' ').filter( elem =>  elem );
+    console.log( matches );
+    let somematches = matches.map( data => {
+        console.log( data );
+        return { match : {"quotations.value":  data }};
+    })
+    let must = [];
+    let someothermatch = matches.map( data => {
+        return { match : { title : data }}
+    })
+    if( someothermatch.length > 0 ) {
+        must.push({
+            nested: {
+                path: "quotations",
+                query: {
+                    bool: {
+                        must: somematches,
                     }
                 }
             }
-        }
-    }).then( result => {
-        return res.json( result.body.hits.hits ).end();
-    },error => {
-        return res.status(500).json( error ).end();
-    })
+        })
+    }
+    must = must.concat(someothermatch);
 
+    console.log( must );
 
-    /*
-    const driver = getDriver();
-    const session = driver.session();
-    const query = "MATCH(d:Document )" +
-        "WHERE d.body =~ '(?im).*" + data + ".*' " +
-        "AND NOT (:Document)-[:HAS_ARCHIVE]->(d) " +
-        "OPTIONAL MATCH  (d)-[r:HAS_PARENT*1..]->(p:Document) " +
-        "OPTIONAL MATCH (p)-[:HAS_PARENT]->(gp:Document)" +
-        "RETURN d, p , gp , size(r) as N " +
-        "ORDER BY N DESC ";
-    let result = session.run( query );
-    result.then(data => {
-        let ret = [];
-        data.records.forEach( ( elem ) => {
-            let doc = elem.get(0).properties;
-            let parent = elem.get(1)? elem.get(1).properties : null;
-            let grandParent = elem.get(2)? elem.get(2).properties : null;
-            let id;
-            if(! grandParent && !parent ) {
-                id = doc.id;
-            } else if ( parent && !grandParent && parent.id !== doc.id ) {
-                id = parent.id;
-
-            } else {
-                id = null;
-            }
-            if( id ) {
-                let index = ret.findIndex(elem => elem.id === id);
-                if (index === -1) {
-                    ret.push({id: id, title: parent ? parent.title : doc.title});
+    if( must.length > 0 ) {
+        elastic.search({
+            index: 'document',
+            body: {
+                query: {
+                    bool: {
+                        should: must
+                        //must : someothermatch,
+                    }
                 }
             }
-        });
-        return res.json(ret).end();
-    }, error => {
-        return res.status(500).json({reason: error }).end();
-    }).finally(() => {
-        session.close();
-        driver.close();
-    })
-     */
+        }).then(result => {
+            return res.json(result.body.hits.hits.map(elem => elem._source)).end();
+        }, error => {
+            return res.status(500).json(error).end();
+        })
+    } else {
+        return res.json([]).end();
+    }
 }
 
 module.exports = {

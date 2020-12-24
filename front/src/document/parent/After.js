@@ -20,8 +20,6 @@ const After = ({ document, id , count }) => {
         const param = {readOnly: true, toolbar: '#toolbar'};
         let quill = QFactory.get('#afterElem', param);
 
-        console.log( document.parent );
-
         if( document.parent && document.parent.document ) {
             let elems = [];
             recurse( document.parent, elems );

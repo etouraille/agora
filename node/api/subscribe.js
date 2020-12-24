@@ -1,6 +1,6 @@
 const getDriver = require('./../neo/driver');
 const { sendMessage } = require('../mercure/mercure');
-const { processSubscribe ,processUnsubscribe } = require( '../document/subscribe');
+const { processSubscribe ,processUnsubscribe , getLinkedDocuments } = require( '../document/subscribe');
 // inscription a un document
 const subscribeDoc = ( req, res ) => {
 
@@ -13,11 +13,18 @@ const subscribeDoc = ( req, res ) => {
 
     processSubscribe(id, res.username);
 
-    sendMessage( id , { subject : 'docSubscribe', id , user : res.username });
+    sendMessage( id , { subject : 'docSubscribe', id , user : res.username }, true);
 
 
     result.then(data => {
-        return res.json(data).end();
+
+        getLinkedDocuments( id ).then( ids => {
+            return res.json(ids).end();
+        }, error => {
+            return res.status(500).json({reason : error }).end();
+        })
+
+
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {
@@ -40,14 +47,21 @@ const unsubscribeDoc = ( req, res ) => {
     processUnsubscribe(id, res.username );
 
     result.then(data => {
-       return res.json(data).end();
+
+        getLinkedDocuments(id).then( ids => {
+            return res.json(ids).end();
+        }, error => {
+            return res.status( 500).json( {reason : error }).end();
+        })
+
+
     }, error => {
         return res.json(500, {reason : error }).end();
     }).finally(() => {
         session.close();
         driver.close();
     });
-    sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username});
+    sendMessage(id, { subject : 'docUnsubscribe', id , user : res.username}, true);
 }
 //recupère tout les documents auquel j'ai soucrit
 const getSubscribedDoc = (req , res ) => {
@@ -84,8 +98,39 @@ const getSubscribedDoc = (req , res ) => {
     })
 }
 
+const getSubscribedForDocument = ( req, res ) => {
+    let id = req.params.id;
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (d:Document)" +
+        "WHERE d.id = $id " +
+        "OPTIONAL MATCH (d)-[:SUBSCRIBED_BY]->(u:User) " +
+        "RETURN d, u ";
+
+    let result = session.run( query , {id});
+    result.then( data => {
+        let ret = { id };
+        data.records.forEach( elem => {
+            let doc = elem.get(0).properties;
+            let user = elem.get(1) ? elem.get(1).properties.login : null;
+            if( ! ret.document  ) {
+                ret.document = doc;
+                ret.users = [];
+            }
+            if( user ) {
+                ret.users.push( user );
+            }
+        })
+        return res.json( ret ).end();
+    }, error => {
+        console.log( error );
+        return res.status(500).json( { reason : error }).end();
+    })
+}
+
 module.exports = {
     subscribeDoc,
     unsubscribeDoc,
     getSubscribedDoc,
+    getSubscribedForDocument
 }

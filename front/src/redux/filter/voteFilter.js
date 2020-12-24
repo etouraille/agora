@@ -38,6 +38,7 @@ const voteFilter = (id) => {
             }
             //console.log( ret );
         }
+        //console.log( ret );
         return ret;
     }
 }

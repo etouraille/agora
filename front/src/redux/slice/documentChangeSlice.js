@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = [];
-
+/*
+Gestion du document en mode edit
+* */
 export const documentChangeSlice = createSlice({
-    name : 'toggleDiff',
+    name : 'documentChange',
     initialState,
     reducers : {
         initDocumentChange : (state, action ) => {

@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = [];
 
 export const reloadDocumentSlice = createSlice({
-    name : 'toggleDiff',
+    name : 'reloadDocument',
     initialState,
     reducers : {
         initReload : (state, action ) => {

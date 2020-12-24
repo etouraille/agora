@@ -19,13 +19,10 @@ const DocumentList = () => {
     useEffect(() => {
         http.get('/api/documents').then(
             data => {
-                console.log( data.data );
                 dispatch( initDocumentsSubscribe({data: data.data}));
             }, error => {
                 console.log(error);
             });
-
-
     }, [reload ]);
 
 

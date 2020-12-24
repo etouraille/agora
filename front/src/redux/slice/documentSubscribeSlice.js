@@ -9,6 +9,12 @@ export const documentSubscribeSlice = createSlice({
         initDocumentsSubscribe : ( state, action ) => {
             state.documents = action.payload.data;
         },
+        initForOneDocument : (state, action ) => {
+            let index = state.documents.findIndex( elem => elem.id === action.payload.id );
+            if( index < 0 ) {
+                state.documents.push( action.payload.data );
+            }
+        },
         unsubscribeDoc : (state , action ) => {
             let index = state.documents.findIndex( elem => elem.id === action.payload.id );
             if( index >= 0 ) {
@@ -26,11 +32,12 @@ export const documentSubscribeSlice = createSlice({
             }
         },
         deleteDoc : ( state , action ) => {
+            console.log( 5 );
             let index = state.documents.findIndex( elem => elem.id === action.payload.id );
             state.documents.splice(index, 1 );
         }
     }
 });
 export default documentSubscribeSlice.reducer
-export const { initDocumentsSubscribe , subscribeDoc, unsubscribeDoc , deleteDoc } = documentSubscribeSlice.actions
+export const { initDocumentsSubscribe , subscribeDoc, unsubscribeDoc , deleteDoc , initForOneDocument} = documentSubscribeSlice.actions
 

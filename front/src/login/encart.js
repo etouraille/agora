@@ -1,13 +1,13 @@
-import { useSelector } from "react-redux";
 import React, { useState, useEffect } from 'react';
+import { useSelector , useDispatch } from "react-redux";
 import jwtDecode from "jwt-decode";
 import http from "../http/http";
-import { useDispatch } from "react-redux";
 import { login, logout } from "../redux/slice/loginSlice";
 import { Link } from 'react-router-dom';
 import usePrevious from "../utils/usePrevious";
 import {init} from "../redux/slice/subscribedSlice";
 import Subscribe from "./../mercure/subscribe";
+import documentSubscribeFilters from "../redux/filter/documentSubscribeFilters";
 const Encart = () => {
 
     const dispatch = useDispatch();
@@ -21,30 +21,43 @@ const Encart = () => {
     })
 
 
+    const subscribedDoc = useSelector( documentSubscribeFilters);
 
-    const subscribed = useSelector( state => state.subscribed.subscribed );
+    const mercure = new Subscribe();
 
-    const mercure = new Subscribe(dispatch);
+    useEffect(() => {
+        http.get('/api/ping').then(
+            data => {
+                dispatch( login({ token  : localStorage.getItem('token'), user: data.data.user  }));
+            },
+            error => {
+                dispatch( logout());
+            });
+    }, [])
 
 
-    useEffect ( () => {
-        if( subscribed.length > 0 && user ) {
-            mercure.setVars( subscribed , user );
+    useEffect( ()=> {
+        mercure.init(user, subscribedDoc );
+
+        return () => {
+            mercure.close();
         }
 
-    }, [subscribed, user, mercure ])
+    }, [subscribedDoc])
 
     const previousUser = usePrevious(user );
 
     useEffect(() => {
         if( previousUser !== undefined && previousUser !== user ) {
-            mercure.close();
-            mercure.init(user);
+            mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 dispatch(init({data : data.data }));
             }, error => {
                 console.log( error );
             })
+        }
+        return () => {
+            mercure.close();
         }
     }, [user]);
     const token = useSelector( state =>  state.login.token );
@@ -52,15 +65,6 @@ const Encart = () => {
     const [selected , setSelected ] = useState( false );
 
     const Logged = () => {
-
-        http.get('/api/ping').then(
-            data => {
-                dispatch( login({ token  : localStorage.getItem('token'), user: data.data.user  }));
-            },
-            error => {
-                dispatch( logout());
-        });
-
 
         const logged = on ?
         <div>

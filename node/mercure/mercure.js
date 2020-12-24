@@ -1,30 +1,28 @@
-
+const { findParent } = require( './../document/findParent');
 const jwt = require('jsonwebtoken');
 const request = require('request');
 
 const endpoint = 'flibus.team';
 const publisherJwtKey = 'changeIt';
 
-const voteMercure = ( against, id , user ) => {
+const sendMessage = ( id ,message , isSubscribe = false ) => {
 
-    const datas = {
-        topic: 'http://agora.org/votes/' + id,
-        data: JSON.stringify({
-            against,
-            id,
-            user
-        })
-    };
-    const bearer = jwt.sign(
-        { mercure: { publish: [ datas.topic ] } },
-        publisherJwtKey,
-        {
-            expiresIn: 60, // Bearer expiring in one minute
-            noTimestamp: true // Do not add "issued at" information to avoid error "Token used before issued"
-        }
-    );
+    findParent(id).then( parentId => {
 
-    return new Promise( (resolve, reject ) => {
+        const datas = {
+            topic: isSubscribe ? 'http://agora.org/subscribe' : 'http://agora.org/document/' + parentId,
+            data: JSON.stringify(message)
+        };
+        const bearer = jwt.sign(
+            {mercure: {publish: [datas.topic]}},
+            publisherJwtKey,
+            {
+                expiresIn: 60, // Bearer expiring in one minute
+                noTimestamp: true // Do not add "issued at" information to avoid error "Token used before issued"
+            }
+        );
+
+
         request.post(
             {
                 url: `https://${endpoint}/.well-known/mercure`,
@@ -32,47 +30,16 @@ const voteMercure = ( against, id , user ) => {
                 form: datas
             },
             (err, res) => {
-                err ? reject( err ) : resolve(res);
+                err ? console.log(err) : null;
             }
         );
+    }, error => {
+        console.log( error );
     })
-
-}
-
-const sendMessage = ( id ,message ) => {
-
-    console.log( 'id du message', id );
-
-    const datas = {
-        topic: 'http://agora.org/document/' + id,
-        data: JSON.stringify( message )
-    };
-    const bearer = jwt.sign(
-        { mercure: { publish: [ datas.topic ] } },
-        publisherJwtKey,
-        {
-            expiresIn: 60, // Bearer expiring in one minute
-            noTimestamp: true // Do not add "issued at" information to avoid error "Token used before issued"
-        }
-    );
-
-
-    request.post(
-        {
-            url: `https://${endpoint}/.well-known/mercure`,
-            auth: {bearer},
-            form: datas
-        },
-        (err, res) => {
-            err ? console.log( err) : null;
-        }
-    );
-
 
 }
 
 
 module.exports = {
-    voteMercure,
     sendMessage,
 }

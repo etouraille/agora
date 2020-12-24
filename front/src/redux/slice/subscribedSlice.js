@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = { subscribed : []};
-//TODO revoir le fonctionnement et le titre
-// tout compte fait on n'a besoin que de l'id.
 export const subscribedSlice = createSlice({
     name : 'subscribed',
     initialState,

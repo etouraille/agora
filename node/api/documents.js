@@ -7,12 +7,13 @@ const documents = ( req, res ) => {
     const email = res.username;
 
     const query = '' +
-        'MATCH (d:Document ) ' +
-        'WHERE NOT (d)-[:HAS_PARENT]->(:Document) ' +
+        'MATCH (d:Document )-[:SUBSCRIBED_BY]->(m:User)' +
+        'WHERE NOT (d)-[:HAS_PARENT]->(:Document) AND m.login = $email ' +
         'AND NOT (:Document)-[:HAS_ARCHIVE]->(d) ' +
         'MATCH (d)-[r:SUBSCRIBED_BY]->(u:User)' +
         'RETURN d, u ';
-    const result = session.run(query )
+
+    const result = session.run(query, {email})
     result.then( data => {
         const ret = [];
         data.records.map( (doc, i ) => {
@@ -28,6 +29,7 @@ const documents = ( req, res ) => {
         res.json( ret );
         res.end();
     }, error => {
+        console.log( error);
         res.json( 500, {reason : error });
         res.end();
     }).finally(() => {

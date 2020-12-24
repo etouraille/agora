@@ -8,6 +8,8 @@ import {useParams} from "react-router";
 import ReadyForVoteBarre from "./ReadyForVoteBarre";
 import InviteBarre from "./InviteBarre";
 import SaveDocument from "./SaveDocument";
+import Documents from "./Documents";
+import SubscribeBarre from "./SubscribeBarre";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
@@ -38,7 +40,9 @@ const Barre = () => {
             <div className="rightBarre" style={{ right : right }}>
                 { page === 'document' ? <DiffButton></DiffButton> : <></> }
                 { page === 'document' ? <AmendButtonBarre></AmendButtonBarre> : <></> }
-                { page === 'document' ? <VoteButton id={id}></VoteButton> : <></> }
+                { page === 'document' ? <VoteButton id={id}></VoteButton> : <></>}
+                { page === 'document' || page === 'documentedit' ? <Documents ></Documents> : <></> }
+                { page === 'document' ? <SubscribeBarre></SubscribeBarre> : <></>}
                 { page === 'documentedit' ? <ReadyForVoteBarre></ReadyForVoteBarre> : <></> }
                 { page === 'documentedit' ? <InviteBarre></InviteBarre> : <></> }
                 { page === 'documentedit' ? <SaveDocument></SaveDocument> : <></> }
