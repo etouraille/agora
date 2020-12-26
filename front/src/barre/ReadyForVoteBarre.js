@@ -1,10 +1,14 @@
-import React , {useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import diff from "../svg/diff.svg";
 import ok from '../svg/positive-vote.svg'
 import {useParams} from "react-router";
 import ReadyForVote from "../vote/ReadyForVote";
-
+import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
+import barreToggleFilter from "../redux/filter/barreToggleFilter";
+import {useDispatch, useSelector} from "react-redux";
 const ReadyForVoteBarre = () => {
+
+    const toggleName = 'rfv';
 
     const [ visibility , setVisibility ] = useState( 'hidden');
     const [ opacity , setOpacity ] = useState( 0);
@@ -13,9 +17,16 @@ const ReadyForVoteBarre = () => {
 
     const { id } = useParams();
 
-    const toggle = () => {
+    const dispatch = useDispatch();
 
-        if( visibility === 'hidden') {
+    useEffect( () => {
+        dispatch(initOne({id : toggleName }));
+    }, [])
+
+    const display = useSelector(barreToggleFilter(toggleName));
+
+    useEffect(() => {
+        if( display) {
             setVisibility('visible');
             setOpacity(1);
             setZIndex(1000);
@@ -25,7 +36,10 @@ const ReadyForVoteBarre = () => {
             setZIndex(-1 );
 
         }
+    }, [display])
 
+    const toggle = () => {
+        dispatch(toggleBarre({id : toggleName}));
     }
 
     return (

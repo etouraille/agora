@@ -38,7 +38,6 @@ const Encart = () => {
 
     useEffect( ()=> {
         mercure.init(user, subscribedDoc );
-
         return () => {
             mercure.close();
         }

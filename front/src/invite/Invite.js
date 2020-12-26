@@ -10,22 +10,25 @@ const Invite = ({id}) => {
     const [invitedUsers , setInvitedUsers ] = useState([]);
     const [users, setUsers] = useState([]);
     const [ reload , setReload ] = useState( false );
+    const [creator, setCreator ] = useState ( false );
 
     const dispatch = useDispatch();
 
     const user = useSelector(state => state.login.user );
 
     useEffect(() => {
-        if( reload ) {
+        if( reload && user ) {
             http.get('/api/invited/' + id).then(data => {
-                setInvitedUsers(data.data.map((user) => user.login));
+                let isCreator = data.data.find( elem => elem.meIsCreator);
+                if( isCreator ) setCreator( true);
+                setInvitedUsers(data.data.filter( elem => elem.login !== user ).map((user) => user.login));
                 setReload( false );
             }, error => {
                 console.log(error);
                 setReload( false );
             })
         }
-    }, [ reload ]);
+    }, [ reload , user ]);
 
     useEffect ( () => {
         //console.log('new users ', invitedUsers );
@@ -37,7 +40,7 @@ const Invite = ({id}) => {
 
     useEffect(() => {
         http.get('/api/users').then( (data) => {
-            setUsers(data.data.map((user) => user.login ) );
+            setUsers(data.data.map((user) => user.login ).filter( elem => elem !== user ));
             setReload (true);
         }, error => {
             console.log( error);
@@ -76,8 +79,7 @@ const Invite = ({id}) => {
             <ul className="list-group">
                 {invitedUsers.map((user, index ) => {
                     return (<li className="list-group-item" key={index}>{user}
-                        <button className="btn btn-black float-right" onClick={() => uninvite(user)}><img className="logo-small margin-right" src={minusSvg} />Retirer</button>
-
+                        { creator ? <button className="btn btn-black float-right" onClick={() => uninvite(user)}><img className="logo-small margin-right" src={minusSvg} />Retirer</button> : <></> }
                     </li>)
                 })}
             </ul>

@@ -8,7 +8,7 @@ import {add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
 
-const AmendButton = ({id , document, reload }) => {
+const AmendButton = ({id , document, reload , onClick }) => {
 
     const [ modalIsOpen, setModalIsOpen ] = useState( false );
     const [ before , setBefore ] = useState([]);
@@ -27,6 +27,10 @@ const AmendButton = ({id , document, reload }) => {
     }
 
     const amend = useCallback((evt ) => {
+        if( typeof onClick === 'function') {
+            onClick();
+        }
+
         const param = { readOnly : true, toolbar : '#toolbar' };
         let editor = QFactory.get('#editor', param );
 

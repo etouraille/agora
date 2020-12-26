@@ -10,9 +10,12 @@ const documentSubscribeFilters = (state ) => {
                     ret.push(id);
                 }
             })
+            return ret;
+        } else {
+            return null;
         }
         //console.log( ret);
-        return ret;
+
 
 }
 export default documentSubscribeFilters;

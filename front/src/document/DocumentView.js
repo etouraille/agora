@@ -3,18 +3,11 @@ import http from "../http/http";
 import history from "../utils/history";
 import { useParams } from "react-router";
 import ContextMenu from "../contextual/ContextMenu";
-import TextSelector from 'text-selection-react';
 import MenuSelectText from "../contextual/MenuSelectText";
-import EditMenu from '../contextual/EditMenu';
-import useSelection from "../contextual/useSelection";
-import { Link } from 'react-router-dom';
 import Delta  from 'quill-delta'
 import Quill from 'quill';
-import $ from 'jquery';
 import EditMenuList from "../contextual/EditMenuList";
 import {useDispatch, useSelector} from "react-redux";
-import Vote from "../vote/Vote";
-import AmendButton from "./amend/AmendButton";
 import voteFilter from "../redux/filter/voteFilter";
 import AmendView from "./amend/amendView";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
@@ -22,7 +15,6 @@ import { init } from './../redux/slice/amendSlice';
 
 import { initWith } from './../redux/slice/editMenuSlice';
 import { init as initDoc } from './../redux/slice/documentSlice';
-import ToggleAmend from "./amend/ToggleAmend";
 import QFactory from "./../quill/QFactory";
 import documentFilter from "../redux/filter/documentFilter";
 import hasSubscribedFilter from "../redux/filter/hasSubscribedFilter";
@@ -165,6 +157,11 @@ const DocumentView = (props) => {
         history.push('/document/' + document.parent.document.id );
     }, [document]);
 
+    const edit = () => {
+        console.log('edit');
+        history.push('/documentedit/'+ id );
+    }
+
     return (
         <div>
             <div style={{ display : 'none'}} id="emptyQuill"></div>
@@ -177,10 +174,12 @@ const DocumentView = (props) => {
             <div className="row">
                 <div className="col-sm">
                     <div id="editor"></div>
-                    {  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
-                        <button className="btn btn-primary" onClick={() => history.push('/documentedit/'+ id )}>Modifier</button> :
+                    <br />
+                    <br />
+                    <div>{  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
+                        <button type="button" className="btn btn-primary" onClick={edit}>Modifier</button> :
                         <></>
-                    }
+                    }</div>
                 </div>
                 { showAmended ?
                     <div className="col-sm">

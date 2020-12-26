@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import Barre from "./barre/Barre";
+import Search from "./document/search/Search";
 
 
 export default function App() {
@@ -47,7 +48,8 @@ export default function App() {
                             <Home></Home>
                         </Route>
                         <Route path="/documents">
-                            <DocumentList></DocumentList>
+                            <Barre></Barre>
+                            <Search></Search>
                         </Route>
                         <Route path="/documentedit/:id">
                             <Barre></Barre>

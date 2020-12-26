@@ -35,13 +35,16 @@ const DocumentList = () => {
         })
     }
 
+    const reloadFunc = () => {
+        setReload( !reload );
+    }
+
     return (
         <ul>
-            <Search></Search>
             { documents.map((doc, index ) => {
               return (
                   <li key={index}>
-                    <Subscribe id={doc.id}></Subscribe>
+                    <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>
                       {doc.document.title}
 
                       <Link to={'/document/' + doc.id }>Display</Link>

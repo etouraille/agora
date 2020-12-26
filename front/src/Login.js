@@ -24,7 +24,9 @@ const Login = () => {
                 }
                 return errors;
             }}
-            onSubmit={(values , { setSubmitting }) => {
+            onReset={values => {}}
+            onSubmit={(values , { setSubmitting , resetForm }) => {
+                let mounted = true;
                 http.post('/signin', { username : values.email, password : values.password })
                     .then( data => {
                         if( data.data.token ) {
@@ -37,6 +39,9 @@ const Login = () => {
                         }
                         setSubmitting(false);
                     }).catch(error => console.log( error ));
+
+                    resetForm({ values : ''});
+
             }}>
             {({ isSubmitting }) => (
                 <Form>

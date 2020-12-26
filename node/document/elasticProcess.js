@@ -9,7 +9,7 @@ const onReadyForVoteComplete = ( id ) => {
         if ( parentId === id ) {
             documentGet(id).then(doc => {
                 addNewDoc(doc).then( resolve => {
-                    console.log( resolve)
+                    //console.log( resolve)
                 }, error => {
                     console.log( error );
                 });

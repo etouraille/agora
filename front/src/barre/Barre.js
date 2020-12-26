@@ -10,6 +10,7 @@ import InviteBarre from "./InviteBarre";
 import SaveDocument from "./SaveDocument";
 import Documents from "./Documents";
 import SubscribeBarre from "./SubscribeBarre";
+import {useDispatch} from "react-redux";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
@@ -20,20 +21,29 @@ const Barre = () => {
         setRight('-50px');
     }
 
-
+    const dispatch = useDispatch();
     useEffect( () => {
         //console.log( routeFromHref() );
+        let mounted = true;
         history.listen((location, action ) => {
-            if( location.pathname.match(/\/document\/(.*)$/)) {
-                setPage( 'document');
-            }
-            if( location.pathname.match(/\/documentedit\/(.*)$/)) {
-                setPage( 'documentedit');
+            if( mounted ) {
+                if( location.pathname.match(/\/document\/(.*)$/)) {
+                    setPage( 'document');
+                }
+                if( location.pathname.match(/\/documentedit\/(.*)$/)) {
+                    setPage( 'documentedit');
+
+                }
+                if( location.pathname.match(/\/documents$/)) {
+                    setPage( 'documents');
+                }
             }
         })
         history.push( routeFromHref());
 
-    }, [])
+        return () => { mounted = false; }
+
+    }, [id])
 
     return (
         <div>
@@ -41,7 +51,7 @@ const Barre = () => {
                 { page === 'document' ? <DiffButton></DiffButton> : <></> }
                 { page === 'document' ? <AmendButtonBarre></AmendButtonBarre> : <></> }
                 { page === 'document' ? <VoteButton id={id}></VoteButton> : <></>}
-                { page === 'document' || page === 'documentedit' ? <Documents ></Documents> : <></> }
+                { page === 'document' || page === 'documentedit' || page === 'documents'? <Documents ></Documents> : <></> }
                 { page === 'document' ? <SubscribeBarre></SubscribeBarre> : <></>}
                 { page === 'documentedit' ? <ReadyForVoteBarre></ReadyForVoteBarre> : <></> }
                 { page === 'documentedit' ? <InviteBarre></InviteBarre> : <></> }

@@ -23,9 +23,11 @@ class  MercureSubscribe {
         http.get('/api/mercure').then( response => {
             self.close();
             const url = new URL('https://flibus.team/.well-known/mercure');
-            subscribedDoc.forEach( id => {
-                url.searchParams.append('topic', 'http://agora.org/document/' + id );
-            })
+            if( subscribedDoc) {
+                subscribedDoc.forEach(id => {
+                    url.searchParams.append('topic', 'http://agora.org/document/' + id);
+                })
+            }
             url.searchParams.append('topic', 'http://agora.org/subscribe');
             self.eventSource = new EventSource(url, { headers  : { Authorization :"Bearer " + response.data.token } });
             self.eventSource.onmessage = this.onMessage(me);

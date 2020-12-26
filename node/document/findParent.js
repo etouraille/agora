@@ -13,13 +13,18 @@ const findParent = ( id ) => {
     let result = session.run( query , {id});
     return new Promise( (resolve, reject ) => {
         result.then(data => {
-            let d = data.records[0].get(0).properties;
-            let p = data.records[0].get(1) ? data.records[0].get(1).properties : null;
-            let n = data.records[0].get(2) ? data.records[0].get(2).low : 0;
-            if (n === 0) {
-                resolve(d.id);
+
+            let d = data.records[0]?data.records[0].get(0).properties:null;
+            if( ! d  ) {
+                reject('No document For id : ' + id );
             } else {
-                resolve(p.id)
+                let p = data.records[0].get(1) ? data.records[0].get(1).properties : null;
+                let n = data.records[0].get(2) ? data.records[0].get(2).low : 0;
+                if (n === 0) {
+                    resolve(d.id);
+                } else {
+                    resolve(p.id)
+                }
             }
         }, error => {
             reject(error);

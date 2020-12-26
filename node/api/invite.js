@@ -52,15 +52,22 @@ const getInvitedUsers = (req , res ) => {
 
      const driver = getDriver();
      const session = driver.session();
-     const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User)' +
-         ' WHERE d.id = $id RETURN u, r ';
-     let result = session.run( query , { id : id });
+     const query = '' +
+         ' MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User)' +
+         ' WHERE d.id = $id ' +
+         ' OPTIONAL MATCH (d)-[cb:CREATE_BY]->(me:User) ' +
+         ' WHERE me.login = $me' +
+         ' RETURN u, r , cb';
+     let result = session.run( query , { id : id , me : res.username });
      result.then( (data ) => {
          let json = [];
          data.records.map( ( elem ) => {
-             if( elem.get(0)) {
-                 json.push( elem.get(0).properties);
+             let ret = {};
+             ret.login = elem.get(0).properties.login;
+             if( elem.get(2)) {
+                 ret.meIsCreator = true;
              }
+             json.push( ret );
          })
          res.json(json).end();
      }, error => {

@@ -6,12 +6,15 @@ const documents = ( req, res ) => {
 
     const email = res.username;
 
-    const query = '' +
-        'MATCH (d:Document )-[:SUBSCRIBED_BY]->(m:User)' +
+    let  query = '' +
+        'MATCH (d:Document )-[:SUBSCRIBED_BY]->(m:User), (d)-[:SUBSCRIBED_BY]->(u:User ) ' +
         'WHERE NOT (d)-[:HAS_PARENT]->(:Document) AND m.login = $email ' +
         'AND NOT (:Document)-[:HAS_ARCHIVE]->(d) ' +
-        'MATCH (d)-[r:SUBSCRIBED_BY]->(u:User)' +
-        'RETURN d, u ';
+        'RETURN d , u ' +
+        'UNION  MATCH (d:Document)-[:FOR_EDIT_BY]->(m:User),  (d)-[r:SUBSCRIBED_BY]->(u:User)' +
+        'WHERE m.login = $email ' +
+        'RETURN d, u';
+
 
     const result = session.run(query, {email})
     result.then( data => {

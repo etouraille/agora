@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import canDisplayVoteFilter from "../redux/filter/canDisplayVoteFilter";
 import invite from "../svg/invite.svg";
-import Vote from "../vote/Vote";
 import Invite from "../invite/Invite";
 import {useParams} from "react-router";
+import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
+import barreToggleFilter from "../redux/filter/barreToggleFilter";
 
 const InviteBarre = () => {
     const [ visibility, setVisibility ] = useState( 'hidden');
@@ -14,22 +14,30 @@ const InviteBarre = () => {
     const { id } = useParams();
     const canDisplay = true;
 
-
+    const toggleName = 'invite';
 
     const dispatch = useDispatch();
 
-    const toggle = () => {
-        if(visibility === 'hidden') {
+    useEffect(() => {
+        dispatch(initOne({id : toggleName}));
+    }, [])
+
+    const display = useSelector(barreToggleFilter(toggleName));
+
+    useEffect(() => {
+        if( display) {
             setVisibility('visible');
             setOpacity(1);
             setZIndex(1000);
-        }
-        else{
+        } else {
             setVisibility('hidden');
             setOpacity(0);
             setZIndex(-1 );
-
         }
+    }, [display])
+
+    const toggle = () => {
+        dispatch( toggleBarre({ id : toggleName}));
     }
 
     return (

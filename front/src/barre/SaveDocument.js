@@ -10,6 +10,8 @@ const SaveDocument = () => {
 
     const dispatch = useDispatch();
 
+    const toggleName = 'save';
+
     const canDisplay = useSelector(state => {
         let elem = state.documentChange.find(elem => elem.id === id);
         if (elem) {

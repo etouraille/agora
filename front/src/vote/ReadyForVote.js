@@ -36,8 +36,6 @@ const ReadyForVote = ({ id }) => {
 
     const setReadyForVote = () => {
         http.put('api/ready-for-vote', { id : id }).then( data => {
-            console.log( 'ready for vote ', id );
-            console.log ( data.data.user );
             dispatch( set ({id : id , user : data.data.user , readyForVote : true }))
         }, error => {
             console.log(error );
@@ -63,7 +61,9 @@ const ReadyForVote = ({ id }) => {
             <div>
                 {links.map((elem,i ) =>{
                     return (
-                        <div className="small-font padding" key={i}>{elem.user}{ elem.readyForVote ? <img class="logo-small margin-left" src={ok} /> : <></>}</div>
+                        <div className="small-font padding" key={i}>{elem.user}
+                            { elem.readyForVote ? <img className="logo-small margin-left" src={ok} /> : <></>}
+                        </div>
                     )
                 }) }
             </div>

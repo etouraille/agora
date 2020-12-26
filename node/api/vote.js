@@ -43,7 +43,7 @@ const readyForVote = (req , res ) => {
         let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
         isReadyForVote(id).then( (isReady) => {
             if( isReady ) {
-                sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
+                if ( parentId ) sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
                 onReadyForVoteComplete(id);
             }
         })

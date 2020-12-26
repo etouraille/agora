@@ -3,9 +3,11 @@ import subscribe from "../svg/subscribe.svg";
 import {useParams} from "react-router";
 import Subscribe from "../document/subscribe/Subscribe";
 import http from "../http/http";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {initForOneDocument} from '../redux/slice/documentSubscribeSlice';
 import { reload } from "../redux/slice/reloadDocumentSlice";
+import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
+import barreToggleFilter from "../redux/filter/barreToggleFilter";
 
 const SubscribeBarre = () => {
 
@@ -20,21 +22,30 @@ const SubscribeBarre = () => {
 
     const dispatch = useDispatch();
 
+    const toggleName = 'subscribe';
 
-    const toggle = () => {
-        if(right === '0px') {
+    useEffect(() => {
+        dispatch( initOne({id : toggleName}));
+    }, [])
+
+    const display = useSelector(barreToggleFilter(toggleName));
+
+    useEffect(() => {
+        if( display ) {
             setRight('200px');
             setVisibility('visible');
             setOpacity(1);
             setZIndex(1000);
-        }
-        else{
+        } else {
             setRight('0px');
             setVisibility('hidden');
             setOpacity(0);
             setZIndex(-1 );
-
         }
+    }, [display ])
+
+    const toggle = () => {
+        dispatch(toggleBarre({id : toggleName}));
     }
 
 
