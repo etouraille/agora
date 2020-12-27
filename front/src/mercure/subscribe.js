@@ -9,6 +9,7 @@ import { reloadVote } from "./../redux/slice/reloadVoteSlice";
 import { set as setReadyForVote } from './../redux/slice/readyForVoteSlice';
 import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
 import store from "../redux/store";
+import config from '../config/config';
 
 class  MercureSubscribe {
 
@@ -30,7 +31,7 @@ class  MercureSubscribe {
         const EventSource =  EventSourcePolyfill;
         http.get('/api/mercure').then( response => {
             //self.close();
-            const url = new URL('https://flibus.team/.well-known/mercure');
+            const url = new URL(config.mercure);
             if( subscribedDoc) {
                 subscribedDoc.forEach(id => {
                     url.searchParams.append('topic', 'http://agora.org/document/' + id);

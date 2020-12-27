@@ -2,10 +2,10 @@ import history from "../utils/history";
 import { logout } from "../redux/slice/loginSlice";
 import store from "../redux/store";
 const axios = require('axios').default;
-
+import config from '../config/config';
 
 const http = axios.create({
-    baseURL : 'http://localhost:8000/',
+    baseURL : config.api,
     headers : { 'Content-Type': 'application/json' }
 });
 
