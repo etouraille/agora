@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken')
 const getDriver = require('./neo/driver');
+const config  = require('./config');
 
-const jwtKey = 'la vie des mouettes'
-const jwtExpirySeconds = 6000;
+const jwtKey = config.jwtKey
+const jwtExpirySeconds = config.jwtExpirySeconds;
 
 const subscribe = (req , res ) => {
 

@@ -1,9 +1,10 @@
 const { findParent } = require( './../document/findParent');
 const jwt = require('jsonwebtoken');
 const request = require('request');
+const config = require('./../config');
 
-const endpoint = 'flibus.team';
-const publisherJwtKey = 'changeIt';
+const endpoint = config.mercureEndpoint;
+const publisherJwtKey = config.mercureToken;
 
 const sendMessage = ( id ,message , isSubscribe = false ) => {
 
