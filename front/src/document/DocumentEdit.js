@@ -10,6 +10,8 @@ import http from "../http/http";
 
 import {initDocumentChange , changed , afterSave} from "../redux/slice/documentChangeSlice";
 import {useDispatch, useSelector} from "react-redux";
+import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
+import history from "../utils/history";
 
 Sharedb.types.register(richText.type);
 
@@ -34,6 +36,10 @@ const DocumentEdit = () => {
 
     const dispatch = useDispatch();
 
+    const user = useSelector(state => state.login.user );
+
+    const rfv = useSelector( readyForVoteSubscribedFilter(id));
+
     const mouseMouve = useCallback(( evt ) => {
         const focus  = editor.hasFocus();
         if( focus === previousFocus ) {
@@ -54,9 +60,15 @@ const DocumentEdit = () => {
     })
 
     useEffect(() => {
+        if( rfv.isReadyForVote ) {
+            history.push('/403');
+        }
+    }, [id , rfv ]);
+
+    useEffect(() => {
         if( forSave && connection ) {
             socket.onopen = () => {
-                connection.send({a: 'hs', id: 'save-' + id});
+                connection.send({a: 'hs', id: 'save-' + id + '---' + user });
                 dispatch(afterSave({id}));
             }
         }
@@ -66,11 +78,11 @@ const DocumentEdit = () => {
         //console.log( connection );
         if( focusChanged && connection ) {
             socket.onopen = () => {
-                connection.send({a: 'hs', id: 'save-' + id});
+                connection.send({a: 'hs', id: 'save-' + id + '---' + user });
                 dispatch(afterSave({id}));
             }
         }
-    }, [focusChanged , connection, id , socket])
+    }, [focusChanged , connection, id , socket ])
 
 
     useEffect(() => {
@@ -156,6 +168,8 @@ const DocumentEdit = () => {
             }
         })
     }, [id])
+
+
 
     return (
         <div>

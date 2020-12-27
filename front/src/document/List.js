@@ -6,7 +6,7 @@ import Subscribe from "./subscribe/Subscribe";
 import { initDocumentsSubscribe, deleteDoc } from "../redux/slice/documentSubscribeSlice";
 import Search from "./search/Search";
 
-const DocumentList = () => {
+const DocumentList = ({ onClick }) => {
 
     const dispatch = useDispatch();
 
@@ -39,6 +39,12 @@ const DocumentList = () => {
         setReload( !reload );
     }
 
+    const toggle = () => {
+        if( typeof onClick === 'function') {
+            onClick();
+        }
+    }
+
     return (
         <ul>
             { documents.map((doc, index ) => {
@@ -47,7 +53,7 @@ const DocumentList = () => {
                     <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>
                       {doc.document.title}
 
-                      <Link to={'/document/' + doc.id }>Display</Link>
+                      <Link onClick={toggle} to={'/document/' + doc.id }>Display</Link>
                     <button className="btn btn-sm btn-danger" onClick={() => deleteDocument(doc.id)}>Delete</button>
                   </li>
               )

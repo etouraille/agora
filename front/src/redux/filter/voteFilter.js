@@ -14,7 +14,10 @@ const voteFilter = (id) => {
         }
         let elem = state.vote.find(elem => elem.id === id);
         if (elem) {
-            let final = elem.votes.find( elem => elem.final )?elem.votes.find( elem => elem.final ).final: null;
+            let final;
+            if (elem.votes ){
+                final = elem.votes.find( elem => elem.final )?elem.votes.find( elem => elem.final ).final: null;
+            }
             if( final ) {
                 ret =  { ...final, final : true , complete : true };
                 return ret;

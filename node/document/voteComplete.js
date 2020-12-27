@@ -12,10 +12,22 @@ const voteResult = (documentId ) => {
     return new Promise((resolve, reject) => {
         result.then(data => {
             let ret = [];
+            let final = false;
             data.records.forEach( elem  => {
                 let vote = { against : null };
                 if( elem.get(1)) {
                     vote.against = elem.get(1).properties.against;
+                    if( elem.get(1).properties.complete ) {
+                        final = {
+                            participants : elem.get(1).properties.participants,
+                            forIt : elem.get(1).properties.forIt,
+                            againstIt : elem.get(1).properties.againstIt,
+                            abstention : elem.get(1).properties.abstention,
+                            fail : elem.get(1).properties.fail,
+                            success : elem.get(1).properties.success,
+                            complete : elem.get(1).properties.complete,
+                        }
+                    }
                 }
                 ret.push( vote );
             })
@@ -33,7 +45,9 @@ const voteResult = (documentId ) => {
                 abstention,
                 fail,
                 success ,
-                complete })
+                complete,
+                final,
+            })
         }, error => {
             reject( error );
         }).finally( () => {

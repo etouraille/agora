@@ -8,6 +8,9 @@ import usePrevious from "../utils/usePrevious";
 import {init} from "../redux/slice/subscribedSlice";
 import Subscribe from "./../mercure/subscribe";
 import documentSubscribeFilters from "../redux/filter/documentSubscribeFilters";
+
+import _ from 'lodash'
+
 const Encart = () => {
 
     const dispatch = useDispatch();
@@ -20,10 +23,9 @@ const Encart = () => {
         return state.login.user;
     })
 
+    const  mercure  = new Subscribe();
 
     const subscribedDoc = useSelector( documentSubscribeFilters);
-
-    const mercure = new Subscribe();
 
     useEffect(() => {
         http.get('/api/ping').then(
@@ -33,11 +35,26 @@ const Encart = () => {
             error => {
                 dispatch( logout());
             });
+
     }, [])
 
 
+    useEffect(() => {
+        window.onbeforeunload = () => {
+            mercure.closeAll();
+        }
+    }, [])
+
+    const previousSD = usePrevious(subscribedDoc);
+
     useEffect( ()=> {
-        mercure.init(user, subscribedDoc );
+        //console.log( previousUser, subscribedDoc , _.isEqual( previousSD, subscribedDoc) )
+        if( ! _.isEqual( previousSD ? previousSD.sort() : null,  subscribedDoc ? subscribedDoc.sort(): null)) {
+            //console.log ( subscribedDoc );
+            //TODO : uncomment mercure.init(user, subscribedDoc);
+            //console.log( subscribedDoc );
+            //console.log( 'init =============')
+        }
         return () => {
             mercure.close();
         }
@@ -48,12 +65,13 @@ const Encart = () => {
 
     useEffect(() => {
         if( previousUser !== undefined && previousUser !== user ) {
-            mercure.init(user, subscribedDoc );
+            //TODO uncoment mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 dispatch(init({data : data.data }));
             }, error => {
                 console.log( error );
             })
+            // TODO subscribe doc.
         }
         return () => {
             mercure.close();

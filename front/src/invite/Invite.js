@@ -17,17 +17,21 @@ const Invite = ({id}) => {
     const user = useSelector(state => state.login.user );
 
     useEffect(() => {
+        let mounted = true;
         if( reload && user ) {
             http.get('/api/invited/' + id).then(data => {
-                let isCreator = data.data.find( elem => elem.meIsCreator);
-                if( isCreator ) setCreator( true);
-                setInvitedUsers(data.data.filter( elem => elem.login !== user ).map((user) => user.login));
-                setReload( false );
+                if( mounted ) {
+                    let isCreator = data.data.find(elem => elem.meIsCreator);
+                    if (isCreator) setCreator(true);
+                    setInvitedUsers(data.data.filter(elem => elem.login !== user).map((user) => user.login));
+                    setReload(false);
+                }
             }, error => {
                 console.log(error);
                 setReload( false );
             })
         }
+        return () => { mounted = false }
     }, [ reload , user ]);
 
     useEffect ( () => {
@@ -39,12 +43,17 @@ const Invite = ({id}) => {
 
 
     useEffect(() => {
+        let mounted = true;
         http.get('/api/users').then( (data) => {
-            setUsers(data.data.map((user) => user.login ).filter( elem => elem !== user ));
-            setReload (true);
+            if( mounted ) {
+                setUsers(data.data.map((user) => user.login).filter(elem => elem !== user));
+                setReload(true);
+            }
         }, error => {
             console.log( error);
         })
+
+        return () => { mounted = false }
 
 
     }, [id])

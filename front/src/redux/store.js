@@ -13,6 +13,7 @@ import {documentChangeSlice} from "./slice/documentChangeSlice";
 import {documentSubscribeSlice} from "./slice/documentSubscribeSlice";
 import {barreToggleSlice} from "./slice/barreToggleSlice";
 
+
 const rootReducer = combineReducers({
     amend : amendSlice.reducer,
     barreToggle : barreToggleSlice.reducer,

@@ -15,6 +15,7 @@ import {
 import { useDispatch } from "react-redux";
 import Barre from "./barre/Barre";
 import Search from "./document/search/Search";
+import _403 from "./403";
 
 
 export default function App() {
@@ -64,6 +65,9 @@ export default function App() {
                         </Route>
                         <Route path="/invite/:id">
                             <InviteNavigate></InviteNavigate>
+                        </Route>
+                        <Route path="/403">
+                            <_403></_403>
                         </Route>
                     </Switch>
                 </div>

@@ -49,7 +49,7 @@ const Documents = () => {
             { canDisplay ? <div className="barre-elem">
                 <img onClick={toggle} className="logo " src={folder} alt="Amend"/>
                 <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content left-content-invite">
-                    <DocumentList></DocumentList>
+                    <DocumentList onClick={toggle}></DocumentList>
                 </div>
             </div> : <></> }
         </>

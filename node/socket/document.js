@@ -1,6 +1,6 @@
 
 const getDriver = require('./../neo/driver');
-
+const { readyForVote } = require('./../vote/readyForVote');
 const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 const ShareDB = require('sharedb');
 
@@ -49,9 +49,17 @@ const socketDocument = (ws) => {
     ws.onmessage = ( message ) => {
         const data = JSON.parse( message.data );
         if( data.a === 'hs' && data.id && data.id.match(/save/)) {
-            const id = data.id.match(/save-(.*)$/)[1];
-            if (id) {
-                save(id);
+            const id = data.id.match(/save-(.*)---(.*)$/)[1];
+            const user = data.id.match(/save-(.*)---(.*)$/)[2];
+            if (id && user ) {
+                readyForVote(id, user ).then(rfv => {
+                    console.log( rfv  , '=================');
+                    if (rfv.isOwner &&  ! rfv.isReadyForVote ) {
+                        save(id);
+                        console.log( 'saved======================' );
+                    }
+                })
+
             }
         }
         if(data.a === 'hs' && data.id && ! data.id.match(/save/)) {

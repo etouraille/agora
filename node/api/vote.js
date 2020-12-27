@@ -99,7 +99,6 @@ const againstIt = ( req , res ) => {
         sendMessage(id , {id, user, subject : 'voteAgainst'});
 
         voteResult(id).then( vote => {
-            console.log( vote );
             if (vote.complete && vote.fail) {
                 // on sauvegarde le resultat du vote dans les différents VOTE_FOR.
                 saveComplete(id, vote).then(data => {

@@ -16,7 +16,6 @@ const amend = ( req, res ) => {
     const query = 'MATCH (document:Document) WHERE document.id = $id RETURN document';
     let result = session.run(query, {id: id});
     result.then(data => {
-        console.log( data.records );
         let singleRecord = data.records[0];
         if (!singleRecord) {
             res.json(500, {reason: 'No record for id : ' + id}).end();
