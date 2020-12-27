@@ -13,7 +13,8 @@ const documentDelete = ( id ) => {
         "OPTIONAL MATCH (:User)-[cre:CREATE]->(d) " +
         "OPTIONAL MATCH (d)-[sbr:SUBSCRIBED_BY]->(:User) " +
         "OPTIONAL MATCH (:User)-[sr:HAS_SUBSCRIBE_TO]->(d) " +
-        "DELETE pr, cr, hc, hp, ar, vr, re, cbr, cre, sbr, sr , a, d " +
+        "OPTIONAL MATCH (:User)-[has_notif:HAS_NOTIFICATION]->(notification:Notification)-[notify_on:NOTIFY_ON]->(d)" +
+        "DELETE has_notif , notify_on, notification, pr, cr, hc, hp, ar, vr, re, cbr, cre, sbr, sr , a, d " +
         "RETURN c ";
 
     let result = session.run( query, {id});

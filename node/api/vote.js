@@ -3,7 +3,7 @@ const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
 const { sendMessage } = require('../mercure/mercure');
 const { onVoteFailOrSuccess,onReadyForVoteComplete} = require('./../document/elasticProcess')
-
+const { sendNotificationReadyForVote, sendNotificationVoteSuccess, sendNotificationVoteFail } = require('./../notification/notification')
 const isReadyForVote = (id) => {
     const driver = getDriver();
     const session = driver.session();
@@ -45,6 +45,7 @@ const readyForVote = (req , res ) => {
             if( isReady ) {
                 if ( parentId ) sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
                 onReadyForVoteComplete(id);
+                sendNotificationReadyForVote(id, me );
             }
         })
         res.json({ user : me }).end();
@@ -106,6 +107,7 @@ const againstIt = ( req , res ) => {
                     voteFail(id).then(data => {
                         sendMessage(id, {id , user , subject : 'voteComplete'});
                         onVoteFailOrSuccess(id);
+                        sendNotificationVoteFail(id, user );
                         return res.json({vote: vote, reload: true});
                     }, error => {
                         return res.json(500, {reason: error}).end();
@@ -151,6 +153,7 @@ const forIt = (req, res ) => {
                     saveComplete(id, vote).then( vote => {
                         sendMessage( id , { id , user , subject : 'voteComplete'});
                         onVoteFailOrSuccess(id);
+                        sendNotificationVoteSuccess(id , me );
                         return res.json({ majority : true , reload : data.updated , parentId : data.parentId });
                     }, error => {
                         return res.json(500, {reason : error });

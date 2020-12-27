@@ -30,9 +30,29 @@ const findParent = ( id ) => {
             reject(error);
         })
     })
+}
 
+const findFirstParent = (id) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (d:Document)-[r:HAS_PARENT]->( p:Document )" +
+        " WHERE d.id = $id " +
+        "RETURN p ";
+    const result = session.run( query , {id});
+    return new Promise( (resolve, reject ) => {
+        result.then( data => {
+            let parentId = null;
+            if(data.records[0]) {
+                parentId = data.records[0].get(0).properties.id;
+            }
+            resolve( parentId );
+        }, error => {
+            reject( error );
+        })
+    })
 }
 
 module.exports = {
     findParent,
+    findFirstParent,
 }

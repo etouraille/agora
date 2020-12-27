@@ -15,8 +15,11 @@ const NotifItem = ({ notification }) => {
 
     const html = () => {
 
-        if (type === 'invite') {
+        if ( type === 'invite' ) {
             body = body.replace(regexp, '<a href="http://localhost:3000/documentedit/' + id + '">Edit</a>');
+        }
+        if ( type === 'rfv' || type === 'voteSuccess' || type === 'voteFail' ) {
+            body = body.replace(regexp, '<a href="http://localhost:3000/document/' + id + '">Edit</a>');
         }
         return { __html : body };
     }

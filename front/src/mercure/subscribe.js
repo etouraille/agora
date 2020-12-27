@@ -120,7 +120,7 @@ class  MercureSubscribe {
                 }
             }
             if( message.subject === 'notification' ) {
-                if( user !== me ) {
+                if( user === me ) {
                     store.dispatch( addNotification({ id, user , notification : message.notification }))
                 }
             }
