@@ -13,7 +13,6 @@ const SubscribeBarre = () => {
 
     let canDisplay = true;
 
-    const [ right , setRight ] = useState( '0px');
     const [ visibility, setVisibility ] = useState( 'hidden');
     const [ opacity, setOpacity] = useState( 0);
     const [zIndex , setZIndex ] = useState( -1 );
@@ -32,12 +31,10 @@ const SubscribeBarre = () => {
 
     useEffect(() => {
         if( display ) {
-            setRight('200px');
             setVisibility('visible');
             setOpacity(1);
             setZIndex(1000);
         } else {
-            setRight('0px');
             setVisibility('hidden');
             setOpacity(0);
             setZIndex(-1 );

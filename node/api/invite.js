@@ -1,5 +1,5 @@
 const getDriver = require('./../neo/driver');
-
+const { sendInvite } = require('./../notification/notification')
 
 const invite = ( req, res ) => {
 
@@ -13,6 +13,7 @@ const invite = ( req, res ) => {
 
     let result = session.run( query , {id : id , email : email, me : res.username });
     result.then(data => {
+        sendInvite(id, email, res.username );
         res.json({id : id , email : email }).end();
     }, error => {
         res.json(500, {reason : error });
@@ -32,8 +33,11 @@ const uninvite = ( req, res ) => {
     const query = 'MATCH ( document : Document )-[r:FOR_EDIT_BY]->(user:User) ' +
         ' WHERE user.login = $email ' +
         ' AND document.id = $id ' +
-        ' AND r.invited = $me ' +
+       // ' AND r.invited = $me ' +
         'DELETE r ';
+
+    // TODO : check if user is owner of the document to enable supression also.
+
 
     let result = session.run( query , { id , email , me : res.username});
     result.then( data => {

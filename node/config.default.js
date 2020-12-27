@@ -4,4 +4,4 @@ const config = {
     jwtKey : 'la vie des mouettes',
     jwtExpirySeconds : 6000,
 }
-export default config;
+module.exports = config;

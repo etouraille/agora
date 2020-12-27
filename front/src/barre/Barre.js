@@ -11,6 +11,7 @@ import SaveDocument from "./SaveDocument";
 import Documents from "./Documents";
 import SubscribeBarre from "./SubscribeBarre";
 import {useDispatch} from "react-redux";
+import Notif from "./Notif";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
@@ -48,6 +49,7 @@ const Barre = () => {
     return (
         <div>
             <div className="rightBarre" style={{ right : right }}>
+                { page === 'document' || page === 'documentedit' || page === 'documents'? <Notif></Notif> : <></> }
                 { page === 'document' ? <DiffButton></DiffButton> : <></> }
                 { page === 'document' ? <AmendButtonBarre></AmendButtonBarre> : <></> }
                 { page === 'document' ? <VoteButton id={id}></VoteButton> : <></>}

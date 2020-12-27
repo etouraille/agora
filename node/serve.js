@@ -25,6 +25,7 @@ const { mercure } = require( './api/mercure');
 const { search } = require( './api/search');
 const { test } = require('./api/test');
 const { elasticRoute } = require('./api/elastic');
+const { clear, notificationGet } = require('./api/notification');
 const { socketDocument } = require('./socket/document');
 const app = express()
 app.use(bodyParser.json())
@@ -72,8 +73,10 @@ app.get('/api/subscribed-doc', getSubscribedDoc);
 app.get('/api/subscribed-doc/:id', getSubscribedForDocument);
 app.get('/api/mercure', mercure );
 app.post('/api/search', search );
-app.get('/test', test );
-app.get('/elastic/:id', elasticRoute );
+app.post('/api/notification/clear', clear );
+app.get('/api/notification', notificationGet );
+//app.get('/test', test );
+//app.get('/elastic/:id', elasticRoute );
 
 
 const WebSocket = require('ws');

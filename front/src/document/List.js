@@ -10,25 +10,27 @@ const DocumentList = ({ onClick }) => {
 
     const dispatch = useDispatch();
 
-    const [ reload, setReload ] = useState(false );
+    const [ reload, setReload ] = useState(0 );
 
     const documents = useSelector( state => {
         return state.documentSubscribe.documents;
     })
 
     useEffect(() => {
-        http.get('/api/documents').then(
-            data => {
-                dispatch( initDocumentsSubscribe({data: data.data}));
-            }, error => {
-                console.log(error);
-            });
+        if( reload ) {
+            http.get('/api/documents').then(
+                data => {
+                    dispatch(initDocumentsSubscribe({data: data.data}));
+                }, error => {
+                    console.log(error);
+                });
+        }
     }, [reload ]);
 
 
     const deleteDocument = (id) => {
         http.delete('/api/document/' + id ).then( data => {
-            setReload( !reload );
+            setReload( reload + 1 );
             dispatch( deleteDoc({id }));
         }, error => {
             console.log( error );
@@ -36,7 +38,7 @@ const DocumentList = ({ onClick }) => {
     }
 
     const reloadFunc = () => {
-        setReload( !reload );
+        setReload( reload + 1  );
     }
 
     const toggle = () => {

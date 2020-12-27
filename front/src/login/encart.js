@@ -6,10 +6,11 @@ import { login, logout } from "../redux/slice/loginSlice";
 import { Link } from 'react-router-dom';
 import usePrevious from "../utils/usePrevious";
 import {init} from "../redux/slice/subscribedSlice";
+import { initNotification } from "../redux/slice/notificationSlice";
 import Subscribe from "./../mercure/subscribe";
 import documentSubscribeFilters from "../redux/filter/documentSubscribeFilters";
-
 import _ from 'lodash'
+import {initDocumentsSubscribe} from "../redux/slice/documentSubscribeSlice";
 
 const Encart = () => {
 
@@ -51,7 +52,7 @@ const Encart = () => {
         //console.log( previousUser, subscribedDoc , _.isEqual( previousSD, subscribedDoc) )
         if( ! _.isEqual( previousSD ? previousSD.sort() : null,  subscribedDoc ? subscribedDoc.sort(): null)) {
             //console.log ( subscribedDoc );
-            //TODO : uncomment mercure.init(user, subscribedDoc);
+            mercure.init(user, subscribedDoc);
             //console.log( subscribedDoc );
             //console.log( 'init =============')
         }
@@ -65,13 +66,22 @@ const Encart = () => {
 
     useEffect(() => {
         if( previousUser !== undefined && previousUser !== user ) {
-            //TODO uncoment mercure.init(user, subscribedDoc );
+            mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 dispatch(init({data : data.data }));
             }, error => {
                 console.log( error );
             })
-            // TODO subscribe doc.
+            http.get('/api/notification').then( data => {
+                dispatch( initNotification({data : data.data }));
+            })
+            http.get('/api/documents').then(
+                data => {
+                    dispatch(initDocumentsSubscribe({data: data.data}));
+                }, error => {
+                    console.log(error);
+           });
+
         }
         return () => {
             mercure.close();

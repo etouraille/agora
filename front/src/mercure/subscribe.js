@@ -8,6 +8,7 @@ import { addVoter, removeVoter , forIt , againstIt } from "./../redux/slice/vote
 import { reloadVote } from "./../redux/slice/reloadVoteSlice";
 import { set as setReadyForVote } from './../redux/slice/readyForVoteSlice';
 import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
+import { addNotification } from "../redux/slice/notificationSlice";
 import store from "../redux/store";
 import config from '../config/config';
 
@@ -65,7 +66,7 @@ class  MercureSubscribe {
             let id = message.id;
             let user = message.user;
             //console.log( me );
-            //console.log( message );
+            console.log( message );
             if (message.subject === "docSubscribe") {
                 if (user !== me) {
                     store.dispatch(subscribeDoc({id, user}));
@@ -116,6 +117,11 @@ class  MercureSubscribe {
             if (message.subject === "hasSubscribe") {
                 if (user !== me) {
                     store.dispatch(subscribeDocument({id }));
+                }
+            }
+            if( message.subject === 'notification' ) {
+                if( user !== me ) {
+                    store.dispatch( addNotification({ id, user , notification : message.notification }))
                 }
             }
         }

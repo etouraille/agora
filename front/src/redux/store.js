@@ -12,6 +12,7 @@ import {reloadVoteSlice} from "./slice/reloadVoteSlice";
 import {documentChangeSlice} from "./slice/documentChangeSlice";
 import {documentSubscribeSlice} from "./slice/documentSubscribeSlice";
 import {barreToggleSlice} from "./slice/barreToggleSlice";
+import {notificationSlice} from "./slice/notificationSlice";
 
 
 const rootReducer = combineReducers({
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
     documentSubscribe : documentSubscribeSlice.reducer,
     editMenu : editMenuSlice.reducer,
     login : loginSlice.reducer,
+    notification : notificationSlice.reducer,
     readyForVote : readyForVoteSlice.reducer,
     reloadDocument : reloadDocumentSlice.reducer,
     reloadVote : reloadVoteSlice.reducer,
