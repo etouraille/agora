@@ -11,6 +11,7 @@ export const notificationSlice = createSlice({
                 id : action.payload.id ,
                 user : action.payload.user ,
                 notification : action.payload.notification,
+                title : action.payload.title,
             })
         },
         initNotification : (state , action ) => {

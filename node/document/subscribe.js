@@ -2,31 +2,8 @@ const getDriver = require('./../neo/driver');
 
 const { voteIsComplete, voteResult , saveComplete } = require('./../document/voteComplete');
 const { voteSuccess,voteFail } = require('./../document/voteSuccess');
-const { sendMessage } = require('./../mercure/mercure');
+const { sendMessageToSubscribers } = require('./../mercure/mercure');
 
-const getSubscribers = ( id ) => {
-    const driver = getDriver();
-    const session = driver.session();
-    const query = "" +
-        "MATCH (d:Document)-[r:HAS_PARENT|SUBSCRIBED_BY*1..]->(u:User) " +
-        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] " +
-        "AND d.id = $id " +
-        "RETURN u ";
-
-    let result = session.run( query , { id });
-    return new Promise( (resolve, reject   ) => {
-        result.then( data => {
-            let ret = []
-            data.records.forEach( elem => {
-                ret.push( elem.get(0).properties.login );
-            })
-            resolve( ret );
-        }, error => {
-            reject( error );
-        })
-
-    })
-}
 
 const getLinkedDocuments = (id) => {
     const driver = getDriver();
@@ -60,7 +37,7 @@ const processSubscribe = (subscribedId , user ) => {
         ids.forEach( id => {
             voteIsComplete(id).then( voteComplete => {
                 if( ! voteComplete ) {
-                    sendMessage(id, { id, user , subject : 'addVoter'});
+                    sendMessageToSubscribers(id, { id, sender : user , subject : 'addVoter'});
                 }
             })
         });
@@ -83,25 +60,25 @@ const processUnsubscribe = ( subscribedId , user ) => {
                         "DELETE r";
                     let result = session.run( query , {id, user})
                     result.then( () => {
-                        sendMessage(id , {id, user , subject : 'removeVoter'});
+                        sendMessageToSubscribers(id , {id, sender: user , subject : 'removeVoter'});
                         voteResult(id).then( vote => {
                             if( vote.complete && vote.fail ) {
                                 saveComplete(id , vote ).then( () => {
                                     voteFail(id).then( () => {
-                                        sendMessage(id, { id, user , subject : 'voteComplete', vote });
+                                        sendMessageToSubscribers(id, { id, sender : user , subject : 'voteComplete', vote });
                                     })
                                 })
 
                             }else if ( vote.complete && vote.success ) {
                                 voteSuccess(id).then( data => {
                                     if( data.updated ) {
-                                        sendMessage(data.parentId , {
+                                        sendMessageToSubscribers(data.parentId , {
                                             id : data.parentId ,
-                                            user ,
+                                            sender : user ,
                                             subject : 'reloadDocument'});
                                     }
                                     saveComplete(id , vote ).then(() => {
-                                        sendMessage(id, { id, user , subject : 'voteComplete', vote });
+                                        sendMessageToSubscribers(id, { id, sender: user , subject : 'voteComplete', vote });
                                     })
                                 })
                             }
@@ -122,5 +99,4 @@ module.exports = {
     getLinkedDocuments,
     processSubscribe,
     processUnsubscribe,
-    getSubscribers,
 }

@@ -53,6 +53,29 @@ const readyForVote = ( id , user ) => {
     })
 }
 
+const getEditors = ( id ) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "" +
+        "MATCH (d:Document)-[:FOR_EDIT_BY]->(u:User ) " +
+        "WHERE d.id =  $id " +
+        "RETURN u ";
+
+    const result = session.run( query , {id });
+    return new Promise( ( resolve, reject ) => {
+        result.then( data => {
+            let users = [];
+            data.records.forEach( elem => {
+                users.push( elem.get(0).properties.login );
+            })
+            resolve( users );
+        }, error => {
+            reject( error );
+        })
+    })
+}
+
 module.exports = {
     readyForVote,
+    getEditors,
 }

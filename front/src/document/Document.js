@@ -5,6 +5,7 @@ import Quill from 'quill';
 import history from "../utils/history";
 import { sub } from "../redux/slice/subscribedSlice";
 import {useDispatch} from "react-redux";
+import {reloadList} from "../redux/slice/reloadDocumentListSlice";
 
 const Document = () => {
 
@@ -37,6 +38,7 @@ const Document = () => {
                     history.push('/documentedit/' + data.data.id);
                     dispatch(sub({id : data.data.id }));
                     //TODO : new subscription to mercure
+                    dispatch(reloadList());
                     setSubmitting(false);
                 }, error => {
                     console.log(error);

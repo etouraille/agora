@@ -4,7 +4,7 @@ import {useParams} from "react-router";
 import Subscribe from "../document/subscribe/Subscribe";
 import http from "../http/http";
 import {useDispatch, useSelector} from "react-redux";
-import {initForOneDocument} from '../redux/slice/documentSubscribeSlice';
+//import {initForOneDocument} from '../redux/slice/documentSubscribeSlice';
 import { reload } from "../redux/slice/reloadDocumentSlice";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
@@ -45,7 +45,7 @@ const SubscribeBarre = () => {
         dispatch(toggleBarre({id : toggleName}));
     }
 
-
+    /*
     useEffect(() => {
         http.get('/api/subscribed-doc/' + id ).then( data => {
             dispatch(initForOneDocument({id , data : data.data }));
@@ -53,6 +53,7 @@ const SubscribeBarre = () => {
             console.log(error );
         })
     }, [id])
+    */
 
     return (
         <>

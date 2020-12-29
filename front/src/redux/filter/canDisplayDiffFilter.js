@@ -7,13 +7,15 @@ const canDisplayDiffFilter = ( id ) => {
         let doc = documentFilter(id)(state);
         let hasSubscribed = hasSubscribedFilter(id);
         let oneCanDisplay = false;
-        doc.children.forEach(elem => {
-            let rfv = readyForVoteSubscribedFilter(elem.child.id )(state);
-            if(rfv.isOwner || (! rfv.isOwner && rfv.isReadyForVote)) {
-                oneCanDisplay = true;
-            }
-        })
-        return hasSubscribed && doc.children.length > 0 && oneCanDisplay;
+        if( doc && doc.children ) {
+            doc.children.forEach(elem => {
+                let rfv = readyForVoteSubscribedFilter(elem.child.id)(state);
+                if (rfv.isOwner || (!rfv.isOwner && rfv.isReadyForVote)) {
+                    oneCanDisplay = true;
+                }
+            })
+        }
+        return hasSubscribed && doc && doc.children && doc.children.length > 0 && oneCanDisplay;
     }
 }
 export default canDisplayDiffFilter;

@@ -1,13 +1,15 @@
 const getDriver = require('./../neo/driver');
-const {sendMessage } = require('./../mercure/mercure');
+const {sendMessage , sendMessageToSubscribers } = require('./../mercure/mercure');
 const {v4 : uuid } = require('uuid');
-const { getSubscribers } = require('./../document/subscribe')
-const { findFirstParent }= require('./../document/findParent')
+const { getSubscribers } = require('./../document/subscribers');
+const { findFirstParent }= require('./../document/findParent');
 const query = "MATCH (u:User) , (d:Document) WHERE u.login = $user " +
     "AND d.id = $id " +
+    "OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document) WHERE NOT (p)-[:HAS_PARENT]->(:Document) " +
     "MERGE (u)-[:HAS_NOTIFICATION]" +
     "->(n: Notification { body : $body , clear : false , type : $type, id : $uuid})-[:NOTIFY_ON]->(d)" +
-    "RETURN n ";
+
+    "RETURN n , d, p ";
 
 
 const sendInvite = ( id, user, me ) => {
@@ -23,7 +25,8 @@ const sendInvite = ( id, user, me ) => {
     result.then( data => {
         if( data.records[0] ) {
             let notification = data.records[0].get(0).properties;
-            sendMessage(id , { id , user : user , subject : 'notification', notification },true );
+            let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+            sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
         } else {
             console.log( 'no notif created');
         }
@@ -48,12 +51,16 @@ const sendNotificationReadyForVote = ( id, me ) => {
           result.then( data => {
               if( data.records[0] ) {
                   let notification = data.records[0].get(0).properties;
+                  let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
                   console.log( 'message send ');
-                  sendMessage(id , {
+                  sendMessage(id , user,{
                       id ,
                       user : user,
+                      sender : me,
                       subject : 'notification',
-                      notification });
+                      notification,
+                      title : title,
+                  });
               } else {
                   console.log( 'no notif created');
               }
@@ -81,11 +88,16 @@ const sendNotificationVoteFail = ( id, me ) => {
             result.then( data => {
                 if( data.records[0] ) {
                     let notification = data.records[0].get(0).properties;
-                    sendMessage(id , {
+                    let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+
+                    sendMessage(id , user, {
                         id ,
                         user : user,
+                        sender : me,
                         subject : 'notification',
-                        notification });
+                        notification ,
+                        title,
+                    });
                 } else {
                     console.log( 'no notif created');
                 }
@@ -102,16 +114,18 @@ const sendNotificationVoteSuccess = ( id, me ) => {
             users.forEach( user  => {
                 const driver = getDriver();
                 const session = driver.session();
+                let newId;
+                let body;
                 if( ! parentId ) {
-                    const body = "Le vote est terminé pour {doc}, tout les participants sont d'accord"
-                    let newId = id;
+                    body = "Le vote est terminé pour {doc}, tout les participants sont d'accord"
+                    newId = id;
                 } else {
-                    let newId = parentId;
-                    const body = "les participant on voté pour, vous pouver amender {doc}";
+                    newId = parentId;
+                    body = "les participant on voté pour, vous pouver amender {doc}";
 
                 }
                 const result = session.run( query , {
-                    newId,
+                    id : newId,
                     user,
                     body ,
                     uuid : uuid(),
@@ -120,11 +134,15 @@ const sendNotificationVoteSuccess = ( id, me ) => {
                 result.then( data => {
                     if( data.records[0] ) {
                         let notification = data.records[0].get(0).properties;
-                        sendMessage(id , {
-                            newId ,
+                        let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+                        sendMessage(id , user,{
+                            id : newId ,
                             user : user,
+                            sender : me,
                             subject : 'notification',
-                            notification });
+                            notification,
+                            title,
+                        });
                     } else {
                         console.log( 'no notif created');
                     }
@@ -137,10 +155,83 @@ const sendNotificationVoteSuccess = ( id, me ) => {
     })
 }
 
+const removeInviteNotificationOnReadyForVote = ( id , users, me  ) => {
+
+    users.forEach( user => {
+        const driver = getDriver();
+        const session = driver.session();
+        const query = "" +
+            "MATCH (u:User)-[:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
+            "WHERE u.login = $user AND d.id = $id AND n.type = $type " +
+            "SET n.clear = true " +
+            "RETURN n ";
+        const result = session.run( query , { user, id , type :'invite'});
+        result.then( data => {
+            data.records.forEach( elem => {
+                const notification = elem.get(0).properties;
+                sendMessage(id, user, { id , sender : me , user, notification , subject : 'removeNotification'});
+            })
+        }, error => {
+            console.log( 'error');
+        }).finally(() => {
+            session.close();
+            driver.close();
+        })
+    })
+
+}
+
+removeReadyForVoteNotificationOnVote = ( id , user ) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (u:User)-[:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
+        "WHERE u.login = $user AND d.id = $id AND n.type = 'rfv' " +
+        "SET n.clear = true " +
+        "RETURN n ";
+    const result = session.run( query , { id , user });
+    result.then( data => {
+        data.records.forEach( elem => {
+            const notification = elem.get( 0).properties;
+            sendMessageToSubscribers( id,  { id,  user, notification, subject : 'removeNotification' });
+        })
+    }, error => {
+        console.log( error );
+    }).finally(() => {
+        session.close();
+        driver.close();
+    })
+}
+
+removeAllReadyForVoteNotificationOnVoteSuccessOrFail = ( id ) => {
+    const driver = getDriver();
+    const session = driver.session();
+
+    const query = "MATCH (u:User)-[:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
+        "WHERE d.id = $id AND n.type = 'rfv' " +
+        "SET n.clear = true " +
+        "RETURN n , u ";
+    const result = session.run( query , { id , user });
+    result.then( data => {
+        data.records.forEach( elem => {
+            const notification = elem.get( 0).properties;
+            const user = elem.get(1).properties.login;
+            sendMessage( id,  user, { id,  user, notification, subject : 'removeNotification' });
+        })
+    }, error => {
+        console.log( error );
+    }).finally(() => {
+        session.close();
+        driver.close();
+    })
+
+}
 
 module.exports = {
     sendInvite,
     sendNotificationReadyForVote,
     sendNotificationVoteFail,
     sendNotificationVoteSuccess,
+    removeInviteNotificationOnReadyForVote,
+    removeReadyForVoteNotificationOnVote,
+    removeAllReadyForVoteNotificationOnVoteSuccessOrFail
 }

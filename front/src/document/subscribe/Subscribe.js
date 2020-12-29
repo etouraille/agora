@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { sub, unsub } from "../../redux/slice/subscribedSlice";
 import { subscribeDoc, unsubscribeDoc } from "./../../redux/slice/documentSubscribeSlice";
 import {reload} from "../../redux/slice/reloadDocumentSlice";
+import { reloadList } from "../../redux/slice/reloadDocumentListSlice";
+
 const Subscribe = ({ id , reloadFunc }) => {
 
     const dispatch = useDispatch();
@@ -42,6 +44,7 @@ const Subscribe = ({ id , reloadFunc }) => {
             // subscribe associé au document.
             dispatch( subscribeDoc({id , user }))
             dispatch(reload({id}));
+            dispatch( reloadList());
         }, error => {
             console.log( error );
         })
@@ -59,6 +62,7 @@ const Subscribe = ({ id , reloadFunc }) => {
             }
             dispatch( unsubscribeDoc( {id , user }));
             dispatch(reload({id}));
+            dispatch( reloadList());
         }, error => {
             console.log( error );
         })

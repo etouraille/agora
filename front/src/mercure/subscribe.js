@@ -8,7 +8,8 @@ import { addVoter, removeVoter , forIt , againstIt } from "./../redux/slice/vote
 import { reloadVote } from "./../redux/slice/reloadVoteSlice";
 import { set as setReadyForVote } from './../redux/slice/readyForVoteSlice';
 import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
-import { addNotification } from "../redux/slice/notificationSlice";
+import { addNotification, removeNotification } from "../redux/slice/notificationSlice";
+import { reloadList } from "../redux/slice/reloadDocumentListSlice";
 import store from "../redux/store";
 import config from '../config/config';
 
@@ -35,10 +36,11 @@ class  MercureSubscribe {
             const url = new URL(config.mercure);
             if( subscribedDoc) {
                 subscribedDoc.forEach(id => {
-                    url.searchParams.append('topic', 'http://agora.org/document/' + id);
+                    url.searchParams.append('topic', 'http://agora.org/document/' + id + '/' + me );
                 })
             }
-            url.searchParams.append('topic', 'http://agora.org/subscribe');
+            url.searchParams.append('topic', 'http://agora.org/subscribe/' + me  );
+            url.searchParams.append('topic', 'http://agora.org/all' );
             self.eventSource = new EventSource(url, { headers  : { Authorization :"Bearer " + response.data.token } });
             self.eventSource.onmessage = this.onMessage(me);
             //store.dispatch(add({es : self.eventSource}));
@@ -65,6 +67,7 @@ class  MercureSubscribe {
             const message = JSON.parse(data.data);
             let id = message.id;
             let user = message.user;
+            let sender = message.sender;
             //console.log( me );
             console.log( message );
             if (message.subject === "docSubscribe") {
@@ -104,7 +107,7 @@ class  MercureSubscribe {
                 }
             }
             if (message.subject === "voteAgainst") {
-                if (user !== me) {
+                if ( user !== me) {
                     store.dispatch(againstIt({id}));
                 }
             }
@@ -120,9 +123,14 @@ class  MercureSubscribe {
                 }
             }
             if( message.subject === 'notification' ) {
-                if( user === me ) {
-                    store.dispatch( addNotification({ id, user , notification : message.notification }))
-                }
+                store.dispatch( addNotification({ id, user , notification : message.notification , title : message.title }));
+
+            }
+            if( message.subject === 'removeNotification' ) {
+                store.dispatch( removeNotification({ id : message.notification.id }))
+            }
+            if( message.subject === 'reloadDocumentList' ) {
+                store.dispatch( reloadList());
             }
         }
     }

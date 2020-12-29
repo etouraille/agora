@@ -6,7 +6,8 @@ const notificationGet = (req, res ) => {
     const session = driver.session();
     const query = "MATCH (u:User)-[nr:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
         "WHERE u.login = $user AND n.clear = false " +
-        "RETURN d, n ";
+        "OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document) WHERE NOT (p)-[:HAS_PARENT]->(:Document) " +
+        "RETURN d, n , p ";
     const result = session.run( query , { user : res.username });
 
     let ret = [];
@@ -16,11 +17,12 @@ const notificationGet = (req, res ) => {
             let notification = elem.get(1).properties;
             let user = res.username;
             let id = elem.get(0).properties.id;
-
-            ret.push({ id , user , notification });
+            let title = elem.get(2) ? elem.get(2).properties.title : elem.get(0).properties.title;
+            ret.push({ id , user , notification , title });
         })
         res.json(ret).end();
     }, error => {
+        console.log( error );
         res.status(500).json( { reason : error }).end();
     })
 

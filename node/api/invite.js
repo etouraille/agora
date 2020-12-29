@@ -1,5 +1,6 @@
 const getDriver = require('./../neo/driver');
 const { sendInvite } = require('./../notification/notification')
+const { sendMessage } = require('./../mercure/mercure')
 
 const invite = ( req, res ) => {
 
@@ -14,6 +15,7 @@ const invite = ( req, res ) => {
     let result = session.run( query , {id : id , email : email, me : res.username });
     result.then(data => {
         sendInvite(id, email, res.username );
+        sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
         res.json({id : id , email : email }).end();
     }, error => {
         res.json(500, {reason : error });
@@ -41,6 +43,7 @@ const uninvite = ( req, res ) => {
 
     let result = session.run( query , { id , email , me : res.username});
     result.then( data => {
+        sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
         return res.json(data).end();
     }, error => {
         return res.json(500, { reason : error }).end();

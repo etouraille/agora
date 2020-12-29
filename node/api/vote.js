@@ -1,24 +1,31 @@
 const getDriver = require('./../neo/driver');
 const { voteSuccess, voteFail  } = require('./../document/voteSuccess');
 const { saveComplete , voteResult } = require('../document/voteComplete')
-const { sendMessage } = require('../mercure/mercure');
+const { sendMessage, sendMessageToSubscribers , sendMessageToEditors , sendMessageToAll }  = require('../mercure/mercure');
 const { onVoteFailOrSuccess,onReadyForVoteComplete} = require('./../document/elasticProcess')
-const { sendNotificationReadyForVote, sendNotificationVoteSuccess, sendNotificationVoteFail } = require('./../notification/notification')
+const { sendNotificationReadyForVote,
+    sendNotificationVoteSuccess,
+    sendNotificationVoteFail,
+    removeInviteNotificationOnReadyForVote ,
+    removeReadyForVoteNotificationOnVote,
+    removeAllReadyForVoteNotificationOnVoteSuccessOrFail } = require('./../notification/notification')
 const isReadyForVote = (id) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH( d:Document)-[r:FOR_EDIT_BY]->(u:User) " +
         "WHERE d.id = $id " +
-        "RETURN r ";
+        "RETURN r , u ";
     let result = session.run( query , {id});
     return new Promise( (resolve, reject ) => {
         result.then(data => {
             let ret = [];
+            let users = [];
             data.records.forEach( elem => {
                 ret.push( elem.get(0).properties.readyForVote);
+                users.push(elem.get(1).properties.login )
             })
             let res = ret.length === ret.reduce((a , elem ) => (elem === true ? a + 1 : a ), 0);
-            resolve( res );
+            resolve( { ready : res, users });
         }, error => {
             reject( error );
         })
@@ -39,13 +46,16 @@ const readyForVote = (req , res ) => {
         'RETURN r, p ';
     let result = session.run( query , {id : id , me : me  });
     result.then( data => {
-        sendMessage( id , {id, user : me , subject : 'setReadyForVote'});
+        sendMessageToEditors(id ,{ id, user : me ,  subject : 'setReadyForVote'});
         let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
-        isReadyForVote(id).then( (isReady) => {
-            if( isReady ) {
-                if ( parentId ) sendMessage(parentId ,{ id : parentId, user  : me , subject : 'reloadDocument'});
+        isReadyForVote(id).then( ( rfv ) => {
+            if( rfv.ready ) {
+                if ( parentId ) sendMessageToAll({ id : parentId, sender  : me , subject : 'reloadDocument'}, true );
+                //TODO rajouter un abonnement quand on est sur le document et le supprimer quand on en part
+                //TODO ainsi on pourrra cibler uniquement sur ceux qui sont présnts sur le doc
                 onReadyForVoteComplete(id);
                 sendNotificationReadyForVote(id, me );
+                removeInviteNotificationOnReadyForVote(id, rfv.users, me );
             }
         })
         res.json({ user : me }).end();
@@ -97,7 +107,7 @@ const againstIt = ( req , res ) => {
     let result = session.run( query , { id: id  , me : user });
     result.then( data => {
 
-        sendMessage(id , {id, user, subject : 'voteAgainst'});
+        sendMessageToSubscribers(id , {id, user , subject : 'voteAgainst'});
 
         voteResult(id).then( vote => {
             if (vote.complete && vote.fail) {
@@ -105,9 +115,10 @@ const againstIt = ( req , res ) => {
                 saveComplete(id, vote).then(data => {
                     // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
                     voteFail(id).then(data => {
-                        sendMessage(id, {id , user , subject : 'voteComplete'});
+                        sendMessageToSubscribers(id, {id , user , subject : 'voteComplete'});
                         onVoteFailOrSuccess(id);
                         sendNotificationVoteFail(id, user );
+                        removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
                         return res.json({vote: vote, reload: true});
                     }, error => {
                         return res.json(500, {reason: error}).end();
@@ -122,6 +133,7 @@ const againstIt = ( req , res ) => {
         }, error => {
             return res.json(500, {reason : error }).end();
         })
+        removeReadyForVoteNotificationOnVote(id, user);
     }, error => {
         return res.json(500, {reason : error });
     }).finally(() => {
@@ -139,21 +151,22 @@ const forIt = (req, res ) => {
     const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : user });
-    sendMessage( id , {id, user , subject : 'voteFor'});
+    sendMessageToSubscribers( id , {id, user , subject : 'voteFor'});
     result.then( data => {
         voteResult(id).then( vote => {
             if( vote.success ) {
                 voteSuccess(id).then( data => {
                     if( data.updated) {
-                        sendMessage(data.parentId , {
+                        sendMessageToSubscribers(data.parentId , {
                             id : data.parentId ,
                             user,
                             subject : 'reloadDocument'});
                     }
                     saveComplete(id, vote).then( vote => {
-                        sendMessage( id , { id , user , subject : 'voteComplete'});
+                        sendMessageToSubscribers( id , { id ,  user , subject : 'voteComplete'});
                         onVoteFailOrSuccess(id);
-                        sendNotificationVoteSuccess(id , me );
+                        sendNotificationVoteSuccess(id , user );
+                        removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
                         return res.json({ majority : true , reload : data.updated , parentId : data.parentId });
                     }, error => {
                         return res.json(500, {reason : error });
@@ -169,6 +182,7 @@ const forIt = (req, res ) => {
             console.log(error);
             return res.json(500, {reason : error });
         })
+        removeReadyForVoteNotificationOnVote(id, user);
 
     }, error => {
         return res.json(500, {reason : error });

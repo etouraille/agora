@@ -61,14 +61,18 @@ const DocumentView = (props) => {
 
     const sortedChildren = useSelector( state => {
         const doc = documentFilter(id)(state);
-        const data = [ ...doc.children ];
-        let ret = data.sort((elem , elem2) => {
-            return ((elem.link.index  < elem2.link.index) ? -1 : 1);
-        })
-        let res = ret.map(elem => {
-            let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
-            return { ...elem, vote: vote };
-        })
+        let res = [];
+        if( doc && doc.children ) {
+            const data = [...doc.children];
+
+            let ret = data.sort((elem, elem2) => {
+                return ((elem.link.index < elem2.link.index) ? -1 : 1);
+            })
+            res = ret.map(elem => {
+                let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
+                return {...elem, vote: vote};
+            })
+        }
         return res;
     })
 
@@ -98,10 +102,15 @@ const DocumentView = (props) => {
 
 
     useEffect(() => {
+        console.log( 'reload', reload );
         if( id ) {
             console.log( 'RELOAD DOCUMENT ==========');
             http.get('/api/document/' + id ).then(
                 data => {
+                    if( data.data.children === undefined ) {
+                        history.push('/403');
+                        return;
+                    }
                     dispatch( initDoc({id : id, data : data.data }));
                     setCount( count + 1 );
                     let children = [];

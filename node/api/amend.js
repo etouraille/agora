@@ -1,6 +1,6 @@
 const getDriver = require('./../neo/driver');
 
-const {sendMessage} = require('./../mercure/mercure');
+const { sendMessageToSubscribers } = require('./../mercure/mercure');
 
 const { v4 : uuid } = require('uuid');
 
@@ -44,12 +44,12 @@ const amend = ( req, res ) => {
             })
             result.then(data => {
                 let singleResult = data.records[0];
-                sendMessage(childId , {id : childId , user : res.username , subject : 'hasSubscribe'});
+                sendMessageToSubscribers(childId , {id : childId , user : res.username , subject : 'hasSubscribe'});
                 if(! singleResult ) {
                     return res.json(500, {reason : 'Nothing persist'}).end();
                 } else {
 
-                    sendMessage(id , { id , user : res.username , subject : 'reloadDocument'});
+                    sendMessageToSubscribers(id , { id , user : res.username , subject : 'reloadDocument'});
                     return res.json({ id : singleResult.get(0) });
                 }
             }, error => {
