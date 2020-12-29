@@ -23,7 +23,7 @@ jobs:
       with:
         switches: -avzr --delete
         path: /
-        remote_path: /src/agora
+        remote_path: /src/agora/
         remote_host: flibus.team
         remote_user: root
         remote_key: ${{ env.SECRET }}
