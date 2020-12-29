@@ -26,4 +26,4 @@ jobs:
         remote_path: /src/agora/
         remote_host: flibus.team
         remote_user: root
-        remote_key: ${{ env.SECRET }}
+        remote_key: ${{ secrets.RSA_PUB }}
