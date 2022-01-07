@@ -12,6 +12,11 @@ import documentSubscribeFilters from "../redux/filter/documentSubscribeFilters";
 import _ from 'lodash'
 import {initDocumentsSubscribe} from "../redux/slice/documentSubscribeSlice";
 
+function unlog() {
+    window.localStorage.setItem('token', null);
+    http.get('api/ping')
+}
+
 const Encart = () => {
 
     const dispatch = useDispatch();
@@ -103,6 +108,7 @@ const Encart = () => {
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
                 <Link className="dropdown-item"  to="/documents" onClick={evt => setSelected(!selected)}>Liste des Documents</Link>
                 <Link className="dropdown-item"  to="/document" onClick={evt => setSelected(!selected)}>Créer un document</Link>
+                <Link className="dropdown-item"  onClick={evt => unlog()}>Unlog</Link>
             </div>
         </div> : <div></div> ;
 

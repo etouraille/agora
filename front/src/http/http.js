@@ -1,13 +1,12 @@
 import history from "../utils/history";
 import { logout } from "../redux/slice/loginSlice";
 import store from "../redux/store";
-import config from '../config/config';
 const axios = require('axios').default;
 
 
 
 const http = axios.create({
-    baseURL : config.api,
+    baseURL : process.env.REACT_APP_api,
     headers : { 'Content-Type': 'application/json' }
 });
 
@@ -16,6 +15,7 @@ http.interceptors.request.use((config) => {
     if( token ) {
         config['headers']['Authorization'] = 'Bearer ' + token;
     }
+    console.log( config);
     return config;
 }, (error) => {
     return Promise.reject( error );

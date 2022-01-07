@@ -46,7 +46,7 @@ class SubscribeForm extends React.Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: this.state.email , password : this.state.pwd })
         };
-        fetch('http://localhost:8000/subscribe', requestOptions)
+        fetch(process.env.REACT_APP_api + 'subscribe', requestOptions)
             .then(response => response.json())
             .then(data => {
                 if(data.reason ) {
