@@ -1,4 +1,5 @@
 const getDriver = require('./../neo/driver');
+const { deleteElastic } = require('./../elastic/deleteElastic');
 
 const documentDelete = ( id ) => {
     const driver = getDriver();
@@ -20,6 +21,7 @@ const documentDelete = ( id ) => {
     let result = session.run( query, {id});
     return new Promise((resolve ,reject ) => {
         result.then( data => {
+            deleteElastic(id);
             data.records.forEach( elem => {
                 if( elem.get(0 )) {
                     let childrenId = elem.get(0).properties.id;

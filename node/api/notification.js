@@ -39,7 +39,6 @@ const clear = (req, res ) => {
     let result = session.run( query , {id });
     result.then(data => {
 
-        console.log( data , 'here =====================================');
         return res.json({ ok : true}).end();
     }, error => {
         console.log(error);

@@ -1,8 +1,7 @@
 import Login from './Login';
 import SubscribeForm from './subscribe/SubscribeForm';
-import React, {useEffect} from 'react';
+import React from 'react';
 import Encart from "./login/encart";
-import DocumentList from "./document/List";
 import Document from './document/Document';
 import DocumentEdit from "./document/DocumentEdit";
 import DocumentView from "./document/DocumentView";
@@ -12,7 +11,6 @@ import {
     Route,
     Link
 } from 'react-router-dom';
-import { useDispatch } from "react-redux";
 import Barre from "./barre/Barre";
 import Search from "./document/search/Search";
 import _403 from "./403";

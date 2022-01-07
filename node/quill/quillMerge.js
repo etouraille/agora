@@ -37,6 +37,33 @@ const mergeApply = (parentId , id ) => {
                     }
                 }
             })
+
+            const updateIndexes = ( res , driver ) => {
+                return new Promise( (resolve, reject ) => {
+                    res.forEach( (elem , index ) => {
+                        let session = driver.session();
+                        let query = "MATCH(c:Document)-[r:HAS_PARENT]->(p:Document)-[cr:HAS_CHILDREN]->(c) " +
+                            "WHERE c.id = $id AND p.id = $parentId " +
+                            "SET r.index = $index " +
+                            "SET cr.index = $index ";
+                        session.run(query , { id : elem.id , parentId , index : elem.index }).then(() => {
+
+                            if(res.length === index + 1 ) {
+
+                                resolve( true );
+                            }
+                        }, error => {
+                            reject( error );
+                        }).finally(() => {
+                          session.close();
+                        })
+                    })
+                    if( res.length === 0 ) {
+                        resolve( true );
+                    }
+                })
+            }
+
             let query = "" +
                 "MATCH ( p:Document )-[cr:HAS_CHILDREN]->(c:Document)-[pr:HAS_PARENT]->(d) " +
                 "WHERE p.id = $parentId AND c.id = $id " +
@@ -61,39 +88,41 @@ const mergeApply = (parentId , id ) => {
                         let query = "MATCH (:User)-[r:VOTE_FOR]->(p:Document) WHERE p.id = $parentId " +
                             "DELETE r ";
                         session.run( query , { parentId }).then(() => {
-                            resolve( true );
-                        }).finally(() => {
-                            session.close();
-                            driver.close();
+
+                            updateIndexes(res, driver).then( success => {
+                                resolve( true );
+                                session.close();
+                                driver.close();
+                            } ,error => {
+                                reject( error );
+                                session.close();
+                                driver.close();
+                            })
+
                         })
 
                     } else {
-                        session.close();
-                        driver.close();
+                        updateIndexes(res, driver).then( success => {
+                            resolve( true );
+                            session.close();
+                            driver.close();
+                        } ,error => {
+                            reject( error );
+                            session.close();
+                            driver.close();
+                        })
                     }
                 })
 
-                res.forEach( elem => {
-                    let sess = driver.session();
-                    let query = "MATCH(c:Document)-[r:HAS_PARENT]->(p:Document)-[cr:HAS_CHILDREN]->(c) " +
-                        "WHERE c.id = $id AND p.id = $parentId " +
-                        "SET r.index = $index " +
-                        "SET cr.index = $index ";
-                    sess.run(query , { id : elem.id , parentId , index : elem.index }).then(() => {
-                        resolve( true );
-                    }, error => {
-                        reject( error );
-                    }).finally( () => {
-                        sess.close();
-                    })
-                })
-                if( res.length === 0 ) {
-                    resolve( true );
-                }
+
             },error => {
+                session.close();
+                driver.close();
                 reject( error );
             })
         }, error => {
+            session.close();
+            driver.close();
             reject( error );
         })
     })

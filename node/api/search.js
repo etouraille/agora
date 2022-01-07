@@ -5,9 +5,7 @@ const search = ( req, res ) => {
 
     const { data } = req.body;
     let matches = data.split(' ').filter( elem =>  elem );
-    console.log( matches );
     let somematches = matches.map( data => {
-        console.log( data );
         return { match : {"quotations.value":  data }};
     })
     let must = [];
@@ -28,7 +26,6 @@ const search = ( req, res ) => {
     }
     must = must.concat(someothermatch);
 
-    console.log( must );
 
     if( must.length > 0 ) {
         elastic.search({

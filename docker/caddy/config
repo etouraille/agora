@@ -1,0 +1,12 @@
+80, localhost:3000
+
+route {
+    mercure {
+        # Publisher JWT key
+        publisher_jwt ChangeIt
+        # Subscriber JWT key
+        subscriber_jwt ChangeIt
+    }
+
+    respond "Not Found" 404
+}

@@ -18,6 +18,8 @@ const Search = () => {
             http.post('/api/search', { data : value }).then( data => {
                 setItems(data.data);
             })
+        } else {
+            setItems([]);
         }
     }, [value ]);
 

@@ -7,7 +7,6 @@ const canVote = ( req, res, next ) => {
     readyForVote(id, user ).then(rfv => {
         voteResult( id ).then( vote => {
             if( rfv.hasSubscribed && rfv.isReadyForVote && !vote.final ) {
-                console.log( 'next =========================');
                 next();
             } else {
                 res.status( 403).json({rfv , vote }).end();

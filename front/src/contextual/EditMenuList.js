@@ -35,14 +35,16 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
     }, [menus])
 
     useEffect(() => {
+        console.log( menus );
         if( load ) {
             http.get('/api/ready-for-vote/' + id ).then( data => {
+                console.log( id );
                 dispatch(initReadyForVote({id : id , data : data.data}));
             }, error => {
                 console.log( error );
             })
             menus.forEach((menu) => {
-                if( partialForChange.indexOf( menu.id )=== -1 ) {
+                if( partialForChange.indexOf( menu.id ) === -1 ) {
                     partialForChange.push( menu.id );
                 }
                 http.get( '/api/ready-for-vote/' + menu.id ).then( data => {
@@ -61,7 +63,7 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
         return () => {
 
         }
-    }, [load , menus ])
+    }, [ load , menus ])
 
     return (
         <>

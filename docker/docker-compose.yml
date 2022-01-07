@@ -30,3 +30,6 @@ services:
       - discovery.type=single-node
     volumes:
       - ./elastic:/usr/share/elasticsearch/data
+
+
+

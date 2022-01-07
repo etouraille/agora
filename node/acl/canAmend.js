@@ -22,7 +22,7 @@ const canAmend = ( req , res , next ) => {
             if( can ) {
                 const query = "" +
                     "MATCH(d:Document)-[r:HAS_CHILDREN]->(c:Document) " +
-                    "WHERE d.id = $id AND r.voteComplete = false OR NOT EXISTS(r.voteComplete ) " +
+                    "WHERE d.id = $id AND ( r.voteComplete = false OR NOT EXISTS(r.voteComplete ) ) " +
                     "RETURN r ";
                 const result = session.run(query, {id});
                 result.then(data => {
@@ -39,8 +39,7 @@ const canAmend = ( req , res , next ) => {
                             itIsInRange = true;
                         }
                     })
-                    can = can && !itIsInRange;
-                    if( !can ) {
+                    if( itIsInRange ) {
                         res.status(403).json( {reason : 'is in range'}).end();
                     } else {
                         next();

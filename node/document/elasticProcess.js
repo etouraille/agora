@@ -11,7 +11,7 @@ const onReadyForVoteComplete = ( id ) => {
                 addNewDoc(doc).then( resolve => {
                     //console.log( resolve)
                 }, error => {
-                    console.log( error );
+                    console.log( 'error on ready for vote ========================))======', error );
                 });
             })
         }
@@ -20,13 +20,22 @@ const onReadyForVoteComplete = ( id ) => {
 }
 
 const onVoteFailOrSuccess = (id) => {
-    findParent(id).then( parentId => {
-        console.log( parentId , id );
-        contents(parentId).then(node => {
-            let data = JSON.stringify(buildDoc(node));
-            append(parentId, data ).then(resolve => {
-                console.log( resolve );
+    return new Promise( (resolve, reject ) => {
+        findParent(id).then( parentId => {
+            contents(parentId).then(node => {
+                let data = JSON.stringify(buildDoc(node));
+                console.log(data);
+                append(parentId, data ).then( success  => {
+                    console.log( 'resolve =====');
+                    resolve( success );
+                }, error => {
+                    reject( error );
+                })
+            }, error => {
+                reject( error )
             })
+        }, error => {
+            reject( error );
         })
     })
 }

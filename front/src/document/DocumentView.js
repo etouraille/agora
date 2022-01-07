@@ -102,15 +102,19 @@ const DocumentView = (props) => {
 
 
     useEffect(() => {
-        console.log( 'reload', reload );
         if( id ) {
-            console.log( 'RELOAD DOCUMENT ==========');
             http.get('/api/document/' + id ).then(
                 data => {
+                    if( data.data.parent && data.data.parent.link && data.data.parent.link.voteComplete ) {
+                        history.push( '/document/' + data.data.parent.document.id );
+                        return;
+                    }
+                    /*
                     if( data.data.children === undefined ) {
                         history.push('/403');
                         return;
                     }
+                     */
                     dispatch( initDoc({id : id, data : data.data }));
                     setCount( count + 1 );
                     let children = [];
@@ -167,7 +171,6 @@ const DocumentView = (props) => {
     }, [document]);
 
     const edit = () => {
-        console.log('edit');
         history.push('/documentedit/'+ id );
     }
 

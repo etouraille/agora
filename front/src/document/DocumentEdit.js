@@ -61,7 +61,7 @@ const DocumentEdit = () => {
 
     useEffect(() => {
         if( rfv.isReadyForVote ) {
-            history.push('/403');
+            history.push('/document/' + id );
         }
     }, [id , rfv ]);
 

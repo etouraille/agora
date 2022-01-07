@@ -41,11 +41,14 @@ const append = (id, data ) => {
                 }
             }).then(resp => {
                 elastic.indices.refresh({ index : 'document'}).then(() => {
-                    console.log( resp );
+                    resolve( true );
+                }, error => {
+                    reject ( error );
                 })
 
             }, err => {
-                throw err;
+                reject( err);
+                //throw err;
                 //console.log(err.body.error );
             })
         })

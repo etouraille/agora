@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import vote from "../svg/vote.svg";
-import { useParams } from "react-router";
 import {useDispatch, useSelector} from "react-redux";
-import { toggleDiff } from "../redux/slice/toggleDiffSlice";
 import canDisplayVoteFilter from "../redux/filter/canDisplayVoteFilter";
 import Vote from "../vote/Vote";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
+import {reload as reloadDocument } from "./../redux/slice/reloadDocumentSlice";
 
 const VoteButton = ({id}) => {
 
@@ -46,6 +45,10 @@ const VoteButton = ({id}) => {
         dispatch(toggleBarre({id : toggleName}));
     }
 
+    const forceReload = () => {
+        dispatch(reloadDocument({id}));
+    }
+
     return (
         <>
             { canDisplay ?
@@ -53,7 +56,7 @@ const VoteButton = ({id}) => {
                     <div className="barre-elem">
                         <img className="logo " src={vote} alt="Vote" onClick={toggle}/>
                         <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content">
-                            <Vote id={id}></Vote>
+                            <Vote id={id} forceReload={forceReload}></Vote>
                         </div>
                     </div>
                 </>

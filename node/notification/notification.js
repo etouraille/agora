@@ -73,85 +73,105 @@ const sendNotificationReadyForVote = ( id, me ) => {
 }
 
 const sendNotificationVoteFail = ( id, me ) => {
-    getSubscribers(id).then( users => {
-        users.forEach( user  => {
-            const driver = getDriver();
-            const session = driver.session();
-            const body = "les participant on voté contre , vous pouver amender {doc}";
-            const result = session.run( query , {
-                id,
-                user,
-                body ,
-                uuid : uuid(),
-                type : 'voteFail'
-            });
-            result.then( data => {
-                if( data.records[0] ) {
-                    let notification = data.records[0].get(0).properties;
-                    let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
-
-                    sendMessage(id , user, {
-                        id ,
-                        user : user,
-                        sender : me,
-                        subject : 'notification',
-                        notification ,
-                        title,
-                    });
-                } else {
-                    console.log( 'no notif created');
-                }
-            })
-
-        })
-    },error => {
-        console.log( error);
-    })
-}
-const sendNotificationVoteSuccess = ( id, me ) => {
-    getSubscribers(id).then( users => {
-        findFirstParent(id).then( parentId => {
-            users.forEach( user  => {
+    return new Promise((resolve, reject ) => {
+        getSubscribers(id).then( users => {
+            users.forEach( (user, index )  => {
                 const driver = getDriver();
                 const session = driver.session();
-                let newId;
-                let body;
-                if( ! parentId ) {
-                    body = "Le vote est terminé pour {doc}, tout les participants sont d'accord"
-                    newId = id;
-                } else {
-                    newId = parentId;
-                    body = "les participant on voté pour, vous pouver amender {doc}";
-
-                }
+                const body = "les participant on voté contre , vous pouver amender {doc}";
                 const result = session.run( query , {
-                    id : newId,
+                    id,
                     user,
                     body ,
                     uuid : uuid(),
-                    type : 'voteSuccess'
+                    type : 'voteFail'
                 });
                 result.then( data => {
                     if( data.records[0] ) {
                         let notification = data.records[0].get(0).properties;
                         let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
-                        sendMessage(id , user,{
-                            id : newId ,
+
+                        sendMessage(id , user, {
+                            id ,
                             user : user,
                             sender : me,
                             subject : 'notification',
-                            notification,
+                            notification ,
                             title,
                         });
+
                     } else {
                         console.log( 'no notif created');
                     }
+                    if( users.length === index + 1 ) {
+                        resolve( true );
+                    }
+                }, error => {
+                    reject( error );
+                }).finally(() => {
+                    session.close();
+                    driver.close();
                 })
-
             })
+        },error => {
+            reject( error );
         })
-    },error => {
-        console.log( error);
+    })
+}
+const sendNotificationVoteSuccess = ( id, me ) => {
+    return new Promise((resolve, reject ) => {
+        getSubscribers(id).then( users => {
+            findFirstParent(id).then( parentId => {
+                users.forEach( (user, index )  => {
+                    const driver = getDriver();
+                    const session = driver.session();
+                    let newId;
+                    let body;
+                    if( ! parentId ) {
+                        body = "Le vote est terminé pour {doc}, tout les participants sont d'accord"
+                        newId = id;
+                    } else {
+                        newId = parentId;
+                        body = "les participant on voté pour, vous pouver amender {doc}";
+
+                    }
+                    const result = session.run( query , {
+                        id : newId,
+                        user,
+                        body ,
+                        uuid : uuid(),
+                        type : 'voteSuccess'
+                    });
+                    result.then( data => {
+                        if( data.records[0] ) {
+                            let notification = data.records[0].get(0).properties;
+                            let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+                            sendMessage(id , user,{
+                                id : newId ,
+                                user : user,
+                                sender : me,
+                                subject : 'notification',
+                                notification,
+                                title,
+                            });
+                        } else {
+                            console.log( 'no notif created');
+                        }
+                        if( users.length === index + 1 ) {
+                            resolve( true );
+                        }
+                    }, error => {
+                        reject( error );
+                    }).finally(() => {
+                        session.close();
+                        driver.close();
+                    })
+
+                })
+            })
+        },error => {
+            reject( error );
+        })
     })
 }
 
@@ -210,7 +230,7 @@ removeAllReadyForVoteNotificationOnVoteSuccessOrFail = ( id ) => {
         "WHERE d.id = $id AND n.type = 'rfv' " +
         "SET n.clear = true " +
         "RETURN n , u ";
-    const result = session.run( query , { id , user });
+    const result = session.run( query , { id });
     result.then( data => {
         data.records.forEach( elem => {
             const notification = elem.get( 0).properties;

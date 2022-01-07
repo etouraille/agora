@@ -54,9 +54,9 @@ const Notif = () => {
                 { notifications.length > 0  ? <img className="logo" src={notif_white} onClick={click} alt="Notificaiton"/> :
                     <img className="logo" src={notif_black} onClick={click} alt="Notificaiton"/>
                 }
-                <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content left-content-invite">
+                { notifications.length > 0  ? <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content left-content-invite">
                     <NotificationList notifications={notifications}></NotificationList>
-                </div>
+                </div> : <></> }
             </div> : <></> }
         </>
     )

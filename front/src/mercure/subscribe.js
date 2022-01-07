@@ -46,7 +46,7 @@ class  MercureSubscribe {
             //store.dispatch(add({es : self.eventSource}));
             MercureSubscribe.es.push(self.eventSource);
             //this.setEventSource(self.eventSource);
-            console.log( 'open');
+
         },error => {
             console.log( error);
         })
@@ -69,7 +69,6 @@ class  MercureSubscribe {
             let user = message.user;
             let sender = message.sender;
             //console.log( me );
-            console.log( message );
             if (message.subject === "docSubscribe") {
                 if (user !== me) {
                     store.dispatch(subscribeDoc({id, user}));

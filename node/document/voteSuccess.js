@@ -20,10 +20,7 @@ const voteSuccess = (id ) => {
 
                 let parentId = data.records[0].get(1).properties.id;
                 let complete  = data.records[0].get(2).properties.voteComplete;
-                let parentBody = data.records[0].get(1).properties.body;
-                let childBody = data.records[0].get(0).properties.body;
-                let index = data.records[0].get(2).properties.index;
-                let length = data.records[0].get(2).properties.length;
+
 
                 if (parentId && !complete) {
                     let query = "MATCH (d:Document) WHERE d.id = $parentId " +
@@ -48,17 +45,14 @@ const voteSuccess = (id ) => {
 
                         result.then(data => {
                             mergeApply(parentId , id ).then(data => {
-                                console.log('updated');
                                 resolve({updated: true, parentId });
                             }, error => {
-                                console.log(1, error);
                                 reject(error);
                             }).finally(() => {
                                 session.close();
                                 driver.close();
                             })
                         }, error => {
-                            console.log(2, error);
                             reject(error);
                             session.close();
                             driver.close();
@@ -66,7 +60,6 @@ const voteSuccess = (id ) => {
 
 
                     }, error => {
-                        console.log(3, error);
                         reject(error);
                         session.close();
                         driver.close();
@@ -83,7 +76,6 @@ const voteSuccess = (id ) => {
                 driver.close();
             }
         }, error => {
-            console.log( 7, error );
             reject(error);
             session.close();
             driver.close();

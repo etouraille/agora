@@ -115,11 +115,16 @@ const againstIt = ( req , res ) => {
                 saveComplete(id, vote).then(data => {
                     // on sauvegarde la relation voteComplete = false dans les différents HAS_CHILDREN|HAS_PARENT
                     voteFail(id).then(data => {
+                        res.json({vote: vote, reload: true}).end();
                         sendMessageToSubscribers(id, {id , user , subject : 'voteComplete'});
-                        onVoteFailOrSuccess(id);
-                        sendNotificationVoteFail(id, user );
-                        removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
-                        return res.json({vote: vote, reload: true});
+                        onVoteFailOrSuccess(id).then(() => {
+                            sendNotificationVoteFail(id, user ).then(() => {
+                                removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
+                            })
+                        }, error => {
+                            console.log ( error);
+                        })
+                        return;
                     }, error => {
                         return res.json(500, {reason: error}).end();
                     })
@@ -151,8 +156,8 @@ const forIt = (req, res ) => {
     const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : user });
-    sendMessageToSubscribers( id , {id, user , subject : 'voteFor'});
     result.then( data => {
+        sendMessageToSubscribers( id , {id, user , subject : 'voteFor'});
         voteResult(id).then( vote => {
             if( vote.success ) {
                 voteSuccess(id).then( data => {
@@ -163,11 +168,14 @@ const forIt = (req, res ) => {
                             subject : 'reloadDocument'});
                     }
                     saveComplete(id, vote).then( vote => {
+                        res.json({ majority : true , reload : data.updated , parentId : data.parentId }).end();
                         sendMessageToSubscribers( id , { id ,  user , subject : 'voteComplete'});
-                        onVoteFailOrSuccess(id);
-                        sendNotificationVoteSuccess(id , user );
-                        removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
-                        return res.json({ majority : true , reload : data.updated , parentId : data.parentId });
+                        onVoteFailOrSuccess(id).then(() => {
+                            sendNotificationVoteSuccess(id , user ).then(() => {
+                                removeAllReadyForVoteNotificationOnVoteSuccessOrFail(id);
+                            })
+                        })
+                        return
                     }, error => {
                         return res.json(500, {reason : error });
                     })
@@ -251,8 +259,11 @@ const deleteVote = ( req, res ) => {
     const id = req.params.id;
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH (:User)-[r:VOTE_FOR]->( d:Document )" +
-        " WHERE d.id = $id " +
+    const query = "MATCH (:User)-[r:VOTE_FOR]->( d:Document ) " +
+        "WHERE d.id = $id " +
+        "OPTIONAL MATCH (d)-[r1:HAS_PARENT]->(p:Document)-[r2:HAS_CHILDREN]->(d) " +
+        "REMOVE r1.voteComplete " +
+        "REMOVE r2.voteComplete " +
         "DELETE r ";
     let result = session.run( query , { id });
     result.then( data => {

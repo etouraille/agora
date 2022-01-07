@@ -58,9 +58,13 @@ const Vote = ({ id , forceReload }) => {
     }, [reload])
 
     const voteForIt = useCallback(() => {
+        console.log( id , user );
+        console.log( 'vote for =====');
         if( id && user ) {
             http.post('/api/vote/for', {id: id}).then(data => {
                 dispatch(forIt({id: id, user: user}));
+                console.log( data.data, 'in here ==========');
+                console.log( typeof forceReload )
                 if( data.data.reload && typeof forceReload === 'function') {
                     forceReload();
                     if( data.data.parentId ) {
