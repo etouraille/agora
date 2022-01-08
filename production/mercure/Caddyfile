@@ -1,0 +1,16 @@
+{
+   debug
+   auto_https off
+}
+:80
+route {
+    mercure {
+        publisher_jwt OAQgcmuJzrySPFyFyVb35tMVUBjNDAZz
+        subscriber_jwt changeIt
+        publish_origins *
+        cors_origins https://queel.fr http://localhost:3000
+
+    }
+
+    respond "Not Found" 404
+}

@@ -17,7 +17,7 @@ const sendMessage = ( id , user , message , isSubscribe = false ) => {
         };
         const bearer = jwt.sign(
             {mercure: {publish: [datas.topic]}},
-            'changeIt',
+            publisherJwtKey,
             {
                 expiresIn: 60, // Bearer expiring in one minute
                 noTimestamp: true // Do not add "issued at" information to avoid error "Token used before issued"
