@@ -10,6 +10,7 @@ const config = {
     jwtKey : process.env.jwtKey,
     jwtExpirySeconds : process.env.jwtExpirySeconds,
     front: process.env.front,
+    sendinblueApiKey: process.env.SENDINBLUE_TRANSAC,
 }
 module.exports = config;
 
