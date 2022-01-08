@@ -24,6 +24,7 @@ const sendMessage = ( id , user , message , isSubscribe = false ) => {
             }
         );
 
+        console.log('endpoint ========================================', endpoint);
 
         request.post(
             {
@@ -62,6 +63,7 @@ const sendMessageToSubscribers = ( id ,message ) => {
                     }
                 );
 
+                console.log('endpoint ========================================', endpoint);
 
                 request.post(
                     {
@@ -103,6 +105,7 @@ const sendMessageToEditors = ( id ,message ) => {
                 }
             );
 
+            console.log('endpoint ========================================', endpoint);
 
             request.post(
                 {
@@ -135,17 +138,18 @@ const sendMessageToAll = ( message ) => {
             }
         );
 
+        console.log('endpoint ========================================', endpoint);
 
         request.post(
-            {
-                url: `https://${endpoint}/.well-known/mercure`,
-                auth: {bearer},
-                form: datas
-            },
-            (err, res) => {
-                err ? console.log(err) : null;
-            }
-        );
+                {
+                    url: `https://${endpoint}/.well-known/mercure`,
+                    auth: {bearer},
+                    form: datas
+                },
+                (err, res) => {
+                    err ? console.log(err) : null;
+                }
+            );
 
 
 }

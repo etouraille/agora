@@ -1,4 +1,3 @@
 #!/bin/bash
-#rsync -avz . ubuntu@ami:production/node/
-rsync -abz .env.production ubuntu@ami:production/node/.env
+rsync -avz . ubuntu@ami:production/node/
 ssh ubuntu@ami production/restart_node.sh

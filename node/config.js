@@ -1,10 +1,15 @@
 const dotenv = require('dotenv');
-dotenv.config();
+if (process.env.ENV === 'development') {
+   dotenv.config({path: __dirname + '/.env.development'});
+} else {
+    dotenv.config({path : __dirname + '/.env.production'});
+}
 const config = {
-    mercureEndpoint : process.env.mercureEndpoint ? process.env.mercureEndpoint : 'mercure.flibus.team',
-    mercureToken : process.env.mercureToken ? process.env.mercureToken : 'OAQgcmuJzrySPFyFyVb35tMVUBjNDAZz',
-    jwtKey : process.env.jwtKey ? process.env.jwtKey : 'la vie des mouettes',
-    jwtExpirySeconds : process.env.jwtExpirySeconds ? process.env.jwtExpirySeconds : 6000,
-    front: process.env.front ? process.env.front : 'http://localhost:3000'
+    mercureEndpoint : process.env.mercureEndpoint,
+    mercureToken : process.env.mercureToken,
+    jwtKey : process.env.jwtKey,
+    jwtExpirySeconds : process.env.jwtExpirySeconds,
+    front: process.env.front,
 }
 module.exports = config;
+
