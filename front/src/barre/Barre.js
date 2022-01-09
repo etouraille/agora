@@ -12,6 +12,7 @@ import Documents from "./Documents";
 import SubscribeBarre from "./SubscribeBarre";
 import {useDispatch} from "react-redux";
 import Notif from "./Notif";
+import ShareBarre from "./shareBarre";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
@@ -54,6 +55,7 @@ const Barre = () => {
                 { page === 'document' ? <AmendButtonBarre></AmendButtonBarre> : <></> }
                 { page === 'document' ? <VoteButton id={id}></VoteButton> : <></>}
                 { page === 'document' || page === 'documentedit' || page === 'documents'? <Documents ></Documents> : <></> }
+                { page === 'document' ? <ShareBarre id={id}></ShareBarre> : <></> }
                 { page === 'document' ? <SubscribeBarre></SubscribeBarre> : <></>}
                 { page === 'documentedit' ? <ReadyForVoteBarre></ReadyForVoteBarre> : <></> }
                 { page === 'documentedit' ? <InviteBarre></InviteBarre> : <></> }

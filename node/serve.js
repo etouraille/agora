@@ -17,6 +17,7 @@ const { amend } = require('./api/amend');
 const { canAmend } = require('./acl/canAmend');
 const { getUsers } = require('./api/users');
 const { invite, uninvite,  getInvitedUsers } = require( './api/invite');
+const { inviteEmail } = require("./api/invite-email");
 const { canVote } = require('./acl/canVote');
 const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVote } = require('./api/vote');
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
@@ -75,6 +76,7 @@ app.get('/api/mercure', mercure );
 app.post('/api/search', search );
 app.post('/api/notification/clear', clear );
 app.get('/api/notification', notificationGet );
+app.post('/api/invite-to-contribute', inviteEmail );
 //app.get('/test', test );
 //app.get('/elastic/:id', elasticRoute );
 

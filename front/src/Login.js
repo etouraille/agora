@@ -31,7 +31,12 @@ const Login = () => {
                     .then( data => {
                         if( data.data.token ) {
                             localStorage.setItem( 'token', data.data.token );
-                            history.push("/documents");
+                            if(localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
+                                history.push(localStorage.getItem('redirect'));
+                                localStorage.setItem('redirect', null);
+                            } else {
+                                history.push("/documents");
+                            }
                             dispatch(login({token : data.data.token , user : data.data.user}));
                         } else {
                             dispatch(logout());
