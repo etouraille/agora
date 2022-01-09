@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import EditMenuList from "../../contextual/EditMenuList";
 import Quill from 'quill';
 import Delta from 'quill-delta';
@@ -8,6 +8,9 @@ import documentFilter from "../../redux/filter/documentFilter";
 import {createSerializableStateInvariantMiddleware} from "@reduxjs/toolkit";
 import usePrevious from "../../utils/usePrevious";
 import readyForVoteSubscribedFilter from "../../redux/filter/readyForVoteSubscribedFilter";
+//import history from "../../utils/history";
+import {useHistory} from 'react-router-dom';
+import routeFromHref from "../../utils/routeFromHref";
 
 const AmendView = ({id, reload , countParent }) => {
 
@@ -49,11 +52,31 @@ const AmendView = ({id, reload , countParent }) => {
         })
     });
 
+    const history = useHistory();
+
+    /*
+    const cb = useCallback((evt) => {
+        if (evt.target.tagName === 'A') {
+            history.push(routeFromHref(evt.target.href));
+        }
+    })
+     */
+
     useEffect(() => {
         let nodeAndId = [];
         if(  doc.children  && document.querySelector('#rightEditor') ) {
 
-            const righteditor = new Quill('#rightEditor', {readOnly : true });
+            /*
+            Quill.register('modules/clink', function(quill, options ) {
+                let currentLink = null;
+                quill.container.addEventListener('click', cb);
+
+            });
+            const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
+                clink: true
+            }});
+             */
+            const righteditor = new Quill('#rightEditor', {readOnly: true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));
 
@@ -83,7 +106,8 @@ const AmendView = ({id, reload , countParent }) => {
                 if(a) {
                     yellow.push({retain : a });
                 }
-                if(b) yellow.push({retain : b , attributes : { background : '#ffc107'}})
+                //if(b) yellow.push({retain : b , attributes : { background : '#ffc107', link: process.env.REACT_APP_front + '/document/' + object.child.id }})
+                if(b) yellow.push({retain : b , attributes : { background : '#ffc107' }})
 
                 const yellowBackground =  new Delta(yellow);
                 deltaIndex = emptyQuill.getLength() - 1 - object.link.length;

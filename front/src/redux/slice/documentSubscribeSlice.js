@@ -32,7 +32,6 @@ export const documentSubscribeSlice = createSlice({
             }
         },
         deleteDoc : ( state , action ) => {
-            console.log( 5 );
             let index = state.documents.findIndex( elem => elem.id === action.payload.id );
             state.documents.splice(index, 1 );
         }

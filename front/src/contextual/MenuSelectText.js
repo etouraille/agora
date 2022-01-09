@@ -11,7 +11,6 @@ const MenuSelectText = ({selection, id }) => {
 
     useEffect(() => {
         const quill = new Quill('#text', { readOnly : true });
-        console.log( selection );
         quill.setContents(selection );
     }, [selection])
 
@@ -21,7 +20,6 @@ const MenuSelectText = ({selection, id }) => {
 
     const amend = useCallback((evt) => {
         evt.preventDefault();
-        console.log( 'post');
 
         http.post('/api/amend', { id : id , selection : previousSel }).then(
             data => {

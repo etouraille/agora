@@ -8,7 +8,6 @@ const After = ({ document, id , count }) => {
     const recurse = ( parent , elems ) => {
         let doc = new Delta(JSON.parse(parent.document.body));
         let content = doc.slice(parent.link.index + parent.link.length , doc.length());
-        console.log( content );
         elems.push(content);
         if(parent.parent) {
             recurse( parent.parent, elems );

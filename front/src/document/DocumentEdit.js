@@ -75,7 +75,6 @@ const DocumentEdit = () => {
     }, [forSave , connection , id , socket])
 
     useEffect(() => {
-        //console.log( connection );
         if( focusChanged && connection ) {
             socket.onopen = () => {
                 connection.send({a: 'hs', id: 'save-' + id + '---' + user });

@@ -3,7 +3,6 @@ import { useState, useCallback, useEffect } from 'react';
 
 const useSelection = (quill) => {
 
-    console.log( quill );
 
     const [ selection , setSelection ] = useState([]);
 

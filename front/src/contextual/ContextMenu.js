@@ -3,6 +3,8 @@ import useContext from "./useContext";
 const ContextMenu = ({ menu }) => {
     const {x , y, show } = useContext();
 
+    return (<></>)
+
     return (
         <div>
             { show ? (

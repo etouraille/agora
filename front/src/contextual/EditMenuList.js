@@ -35,10 +35,8 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
     }, [menus])
 
     useEffect(() => {
-        console.log( menus );
         if( load ) {
             http.get('/api/ready-for-vote/' + id ).then( data => {
-                console.log( id );
                 dispatch(initReadyForVote({id : id , data : data.data}));
             }, error => {
                 console.log( error );
