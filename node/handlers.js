@@ -19,7 +19,15 @@ const subscribe = (req , res ) => {
 
             session.close();
             driver.close();
-            res.json(200, { email : email, password : password });
+            const token = jwt.sign({ username }, jwtKey, {
+                algorithm: 'HS256',
+                expiresIn: parseInt(jwtExpirySeconds)
+            })
+            // set the cookie as the token string, with a similar max age as the token
+            // here, the max age is in milliseconds, so we multiply by 1000
+            res.setHeader('token', token );
+
+            res.json(200, { email : email, password : password , token});
             res.end();
         }, (reason ) => {
             session.close();
@@ -49,7 +57,7 @@ const signIn = (req, res) => {
         } else {
             const token = jwt.sign({ username }, jwtKey, {
                 algorithm: 'HS256',
-                expiresIn: jwtExpirySeconds
+                expiresIn: parseInt(jwtExpirySeconds)
             })
             // set the cookie as the token string, with a similar max age as the token
             // here, the max age is in milliseconds, so we multiply by 1000
@@ -91,7 +99,7 @@ const eachCheckToken = (req , res, next ) => {
             // Now, create a new token for the current user, with a renewed expiration time
             const newToken = jwt.sign({ username: payload.username }, jwtKey, {
                 algorithm: 'HS256',
-                expiresIn: jwtExpirySeconds
+                expiresIn: parseInt(jwtExpirySeconds)
             })
 
 

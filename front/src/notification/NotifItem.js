@@ -23,7 +23,7 @@ const NotifItem = ({ notification }) => {
         if ( type === 'invite' ) {
             body = body.replace(regexp, '<a href="' + process.env.REACT_APP_front +'/documentedit/' + id + '">' + title + '</a>');
             link = '/documentedit/' + id;
-        } else if ( type === 'rfv' || type === 'voteSuccess' || type === 'voteFail' ) {
+        } else if ( type === 'rfv' || type === 'voteSuccess' || type === 'voteFail' || 'invite-email') {
             body = body.replace(regexp, '<a href="' + process.env.REACT_APP_front +'/document/' + id + '">' + title +'</a>');
             link = '/document/' + id ;
         }

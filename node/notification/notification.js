@@ -35,6 +35,30 @@ const sendInvite = ( id, user, me ) => {
     })
 }
 
+const sendInviteEmail = ( id, user, me ) => {
+    const body = 'Vous avez été invité par ' + me + ' à participer à {doc}';
+    const driver = getDriver();
+    const session = driver.session();
+    const result = session.run( query , {
+        id ,
+        user ,
+        body ,
+        uuid : uuid(),
+        type : 'invite-email'});
+    result.then( data => {
+        if( data.records[0] ) {
+            let notification = data.records[0].get(0).properties;
+            let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+            sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
+        } else {
+            console.log( 'no notif created');
+        }
+    }, error => {
+        console.log( error );
+    })
+}
+
+
 const sendNotificationReadyForVote = ( id, me ) => {
     getSubscribers(id).then( users => {
         users.forEach( user  => {
@@ -248,6 +272,7 @@ removeAllReadyForVoteNotificationOnVoteSuccessOrFail = ( id ) => {
 
 module.exports = {
     sendInvite,
+    sendInviteEmail,
     sendNotificationReadyForVote,
     sendNotificationVoteFail,
     sendNotificationVoteSuccess,

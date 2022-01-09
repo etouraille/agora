@@ -1,5 +1,6 @@
 import React from 'react';
 import Email from '../validation/Mail';
+import history from "../utils/history";
 
 class SubscribeForm extends React.Component {
 
@@ -51,6 +52,14 @@ class SubscribeForm extends React.Component {
             .then(data => {
                 if(data.reason ) {
                     this.setState( {userExists : true });
+                } else if( data.token ) {
+                    localStorage.setItem('token', data.token);
+                    if (localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
+                        history.push(localStorage.getItem('redirect'));
+                        localStorage.setItem('redirect', null);
+                    } else {
+                        history.push('/documents');
+                    }
                 }
             });
     }
