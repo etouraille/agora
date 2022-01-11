@@ -8,20 +8,26 @@ import documentFilter from "../../redux/filter/documentFilter";
 import {createSerializableStateInvariantMiddleware} from "@reduxjs/toolkit";
 import usePrevious from "../../utils/usePrevious";
 import readyForVoteSubscribedFilter from "../../redux/filter/readyForVoteSubscribedFilter";
-//import history from "../../utils/history";
-import {useHistory} from 'react-router-dom';
 import routeFromHref from "../../utils/routeFromHref";
+import history from "../../utils/history";
 
 const AmendView = ({id, reload , countParent }) => {
 
     const [ menus,setMenus ] = useState([]);
     const [ count , setCount ] = useState(0);
+    const [ navigateTo, setNavigateTo] = useState(null);
 
     const doc = useSelector(documentFilter(id));
 
     useEffect(() => {
         setCount( count + 1 );
     }, [ countParent  ])
+
+    useEffect(() => {
+        if(navigateTo) {
+            history.push(navigateTo);
+        }
+    }, [navigateTo])
 
     const currentReload = () => {
         setCount( count + 1 );
@@ -52,31 +58,28 @@ const AmendView = ({id, reload , countParent }) => {
         })
     });
 
-    const history = useHistory();
 
-    /*
-    const cb = useCallback((evt) => {
+    const cb = (evt) => {
+        evt.stopPropagation();
         if (evt.target.tagName === 'A') {
-            history.push(routeFromHref(evt.target.href));
+            evt.target.removeAttribute('target');
+            setNavigateTo(routeFromHref(evt.target.href));
         }
-    })
-     */
+    }
+
 
     useEffect(() => {
         let nodeAndId = [];
-        if(  doc.children  && document.querySelector('#rightEditor') ) {
+        Quill.register('modules/clink', function(quill, options ) {
+            quill.container.addEventListener('click', cb);
+        });
+        if (doc.children  && document.querySelector('#rightEditor') ) {
 
-            /*
-            Quill.register('modules/clink', function(quill, options ) {
-                let currentLink = null;
-                quill.container.addEventListener('click', cb);
 
-            });
             const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
                 clink: true
             }});
-             */
-            const righteditor = new Quill('#rightEditor', {readOnly: true });
+            //const righteditor = new Quill('#rightEditor', {readOnly: true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));
 
@@ -106,8 +109,8 @@ const AmendView = ({id, reload , countParent }) => {
                 if(a) {
                     yellow.push({retain : a });
                 }
-                //if(b) yellow.push({retain : b , attributes : { background : '#ffc107', link: process.env.REACT_APP_front + '/document/' + object.child.id }})
-                if(b) yellow.push({retain : b , attributes : { background : '#ffc107' }})
+                if(b) yellow.push({retain : b , attributes : { background : '#ffc107', link: process.env.REACT_APP_front + '/document/' + object.child.id }})
+                //if(b) yellow.push({retain : b , attributes : { background : '#ffc107' }})
 
                 const yellowBackground =  new Delta(yellow);
                 deltaIndex = emptyQuill.getLength() - 1 - object.link.length;
@@ -138,7 +141,7 @@ const AmendView = ({id, reload , countParent }) => {
         }
         setMenus( nodeAndId );
 
-    }, [doc])
+    }, [doc ])
 
 
     return (

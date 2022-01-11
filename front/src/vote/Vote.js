@@ -8,7 +8,7 @@ import yes from './../svg/yes.svg';
 import no from './../svg/no.svg';
 import { reloadVote } from "../redux/slice/reloadVoteSlice";
 
-const Vote = ({ id , forceReload }) => {
+const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
 
     const dispatch = useDispatch();
 
@@ -19,6 +19,18 @@ const Vote = ({ id , forceReload }) => {
     // on peut voter quand le texte a été modifié suffisament
     // et par tout les participants
     // et qu'on est inscrit au texte ou a son parent
+
+    const _onMouseEnter = () =>{
+        if(onMouseEnter && typeof onMouseEnter === 'function') {
+            onMouseEnter();
+        }
+    }
+
+    const _onMouseLeave = () =>{
+        if(onMouseLeave && typeof onMouseLeave === 'function') {
+            onMouseLeave();
+        }
+    }
 
     const readyForVote = useSelector( readyForVoteSubscribedFilter(id));
 
@@ -105,11 +117,11 @@ const Vote = ({ id , forceReload }) => {
     }
 
     return(
-        <div className="vote-container" style={{ display : readyForVote.isReadyForVote && readyForVote.hasSubscribed ? 'block' : 'none'}}>
+        <div className="vote-container" onMouseEnter={_onMouseEnter} onMouseLeave={_onMouseLeave} style={{ display : readyForVote.isReadyForVote && readyForVote.hasSubscribed ? 'block' : 'none'}}>
             {(vote === null && result && result.final === false && result.complete === false ) ? <div>
                 <button className="btn btn-black" onClick={voteForIt}><img className="logo-small" src={yes}/>Pour</button>
                 <button className="btn btn-black margin-left" onClick={voteAgainstIt}><img className="logo-small" src={no}/>Contre</button>
-            </div>: vote !== null ? <div>J'ai voté { vote  ? <strong>Pour<img className="logo-small margin-left" src={yes}></img></strong> : <strong>Contre<img className="logo-small margin-left" src={no}></img></strong>}</div>: <></>  }
+            </div>: vote !== null ? <div style={{width: '100px'}}>J'ai voté { vote  ? <strong>Pour<img className="logo-small margin-left" src={yes}></img></strong> : <strong>Contre<img className="logo-small margin-left" src={no}></img></strong>}</div>: <></>  }
             <div><button className="btn btn-sm btn-danger" onClick={resetVote}>Reset</button></div>
             { result !== null && (result.final || result.complete)? <div>
                 { result.success ? <div>Resultat :<img className="logo"src={yes}></img></div> : <div>Résultat : <img className="logo" src={no}></img></div>}

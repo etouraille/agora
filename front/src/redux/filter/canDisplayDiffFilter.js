@@ -5,11 +5,12 @@ import readyForVoteSubscribedFilter from "./readyForVoteSubscribedFilter";
 const canDisplayDiffFilter = ( id ) => {
     return ( state ) => {
         let doc = documentFilter(id)(state);
-        let hasSubscribed = hasSubscribedFilter(id);
+        let hasSubscribed = hasSubscribedFilter(id)(state);
         let oneCanDisplay = false;
         if( doc && doc.children ) {
             doc.children.forEach(elem => {
                 let rfv = readyForVoteSubscribedFilter(elem.child.id)(state);
+                console.log( rfv);
                 if (rfv.isOwner || (!rfv.isOwner && rfv.isReadyForVote)) {
                     oneCanDisplay = true;
                 }

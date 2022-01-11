@@ -8,7 +8,11 @@ import { init as initVote } from './../redux/slice/voteSlice';
 import http from "../http/http";
 import voteFilter from "../redux/filter/voteFilter";
 
-const EditMenuList = ({ menus, id , load , reload , relative }) => {
+const EditMenuList = ({ display, menus, id , load , reload , relative }) => {
+
+    if(typeof display === 'undefined') {
+        display = true;
+    }
 
     const dispatch = useDispatch();
 
@@ -35,6 +39,7 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
     }, [menus])
 
     useEffect(() => {
+        // TODO : move this subscribe think into DocumentView.
         if( load ) {
             http.get('/api/ready-for-vote/' + id ).then( data => {
                 dispatch(initReadyForVote({id : id , data : data.data}));
@@ -64,23 +69,27 @@ const EditMenuList = ({ menus, id , load , reload , relative }) => {
     }, [ load , menus ])
 
     return (
-        <>
-            {editMenu.map((item , id ) => {
-                return (
+        <>{display ?
+            <>
+                {editMenu.map((item, id) => {
+                    return (
 
 
                         <EditMenu
                             key={id}
                             id={item.id}
-                            node={ menus[id] ? menus[id].node : null}
+                            node={menus[id] ? menus[id].node : null}
                             disp={item.display}
                             reload={() => reload()}
                             relative={relative}
                         >
                         </EditMenu>
 
-                )
-            })}
+                    )
+                })}
+            </>
+            : <></>
+        }
         </>
     )
 }

@@ -38,7 +38,7 @@ const After = ({ document, id , count }) => {
 
     return (
         <div>
-            <div id="afterElem"></div>
+            <div id="afterElem" style={{ zIndex : 0}}></div>
         </div>
     )
 }

@@ -1,10 +1,10 @@
-import React, {useCallback, useState} from 'react';
-import {Modal} from "react-bootstrap";
+import React, { useCallback, useState } from 'react';
+import { Modal } from "react-bootstrap";
 import Quill from "quill";
 import http from "../../http/http";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { sub } from "../../redux/slice/subscribedSlice";
-import {add } from "./../../redux/slice/amendSlice";
+import { add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
 
@@ -107,7 +107,7 @@ const AmendButton = ({id , document, reload , onClick }) => {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="example-custom-modal-styling-title">
-                        Ammendement du text
+                        Amendement du text
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

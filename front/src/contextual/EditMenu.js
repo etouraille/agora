@@ -88,16 +88,17 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
             position : 'absolute',
             left : x + 'px',
             top : y + 'px' ,
-            display : ( display  )? 'block' : 'none'
+            display : ( display  )? 'block' : 'none',
+            zIndex: 10000
         }}>
             <div className="caret down" onMouseEnter={enterCaret} ></div>
-            <div className="menu-container" style={{ display : displayList ? 'block' : 'none', width : '400px'}} onMouseLeave={outList}>
-                <nav className="nav flex-column nav-fill">
+            <div className="menu-container" style={{ display : displayList ? 'block' : 'none', width : '400px'}}>
+                <div className="height-500" onMouseEnter={enterCaret}>
                     { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <img className="logo" src={docSvg} onClick={goToDoc} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <img className="logo" src={editSvg} onClick={edit} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote id={id} forceReload={() => reload()}></Vote> : <></>}
-                </nav>
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote onMouseEnter={enterCaret} onMouseLeave={outList} id={id} forceReload={() => reload()}></Vote> : <></>}
+                </div>
             </div>
         </div>: <></>}
         </>
