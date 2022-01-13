@@ -25,7 +25,8 @@ const DiffButton = () => {
         dispatch(initOne({id : toggleName}));
     }, [])
 
-    const toggle = () => {
+    const toggle = (evt) => {
+        evt.stopPropagation();console.log(1);
         dispatch(toggleDiff({ id : id }));
         dispatch( toggleBarre({id : toggleName}));
     }

@@ -7,8 +7,17 @@ export const barreToggleSlice = createSlice({
     initialState,
     reducers : {
         initBarreToggle : ( state, action ) => {
-            state.barreToggle = [];
-            state.barreToggle = action.payload.data.map(elem => { return { id : elem, display : false } });
+            state.barreToggle = state.barreToggle.map(elem => {
+                return { ...elem, display: false }
+            })
+             /* else {
+                state.barreToggle = [];
+                state.barreToggle = action.payload.data.map(elem => {
+                    return {id: elem, display: false}
+                });
+
+            }
+            */
         },
         initOne : (state , action ) => {
             let index = state.barreToggle.findIndex(elem => elem.id === action.payload.id );

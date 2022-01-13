@@ -28,7 +28,7 @@ const AmendButton = ({id , document, reload , onClick }) => {
 
     const amend = useCallback((evt ) => {
         if( typeof onClick === 'function') {
-            onClick();
+            onClick(evt);
         }
 
         const param = { readOnly : true, toolbar : '#toolbar' };

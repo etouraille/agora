@@ -1,4 +1,4 @@
-import React , { useState, useEffect  }from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import history from "../utils/history";
 import routeFromHref from "../utils/routeFromHref";
 import DiffButton from "./DiffButton";
@@ -10,20 +10,39 @@ import InviteBarre from "./InviteBarre";
 import SaveDocument from "./SaveDocument";
 import Documents from "./Documents";
 import SubscribeBarre from "./SubscribeBarre";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Notif from "./Notif";
 import ShareBarre from "./shareBarre";
+import usePrevious from "../utils/usePrevious";
+import {initBarreToggle} from "../redux/slice/barreToggleSlice";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
     const [ page , setPage ] = useState( null );
     const { id } = useParams();
 
+    const dispatch = useDispatch();
+
     const hide = () => {
         setRight('-50px');
     }
 
-    const dispatch = useDispatch();
+    const click = useSelector((state) => {
+        return state.click.click;
+    })
+
+
+    const prevClick = usePrevious(click);
+
+
+    useEffect(() => {
+
+        if(click > 0 && click > prevClick) {
+            dispatch(initBarreToggle())
+        }
+    }, [click, prevClick])
+
+
     useEffect( () => {
         //console.log( routeFromHref() );
         let mounted = true;

@@ -29,7 +29,8 @@ const AmendButtonBarre = () => {
         dispatch(setReload({ id : id }));
     }
 
-    const click = () => {
+    const click = (evt) => {
+        evt.stopPropagation();console.log(1);
         dispatch( toggleBarre({id : toggleName}));
     }
 
@@ -37,7 +38,7 @@ const AmendButtonBarre = () => {
         <>
             { canDisplay ? <div className="barre-elem">
                 <div>
-                    <AmendButton id={id} document={document} reload={reload} onClick={click}></AmendButton>
+                    <AmendButton id={id} document={document} reload={reload} onClick={(evt) => click(evt)}></AmendButton>
                 </div>
             </div> : <></> }
         </>

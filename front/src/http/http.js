@@ -11,10 +11,15 @@ const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
+    if (config.url.match(/^https?/)) {
+        config['baseURL'] = config.url;
+        config['url'] = '';
+    }
     let token = localStorage.getItem('token');
     if( token ) {
         config['headers']['Authorization'] = 'Bearer ' + token;
     }
+
     return config;
 }, (error) => {
     return Promise.reject( error );
@@ -24,13 +29,11 @@ http.interceptors.response.use( response => {
     const token = response.headers.token;
     if(token ) {
         localStorage.setItem('token', token  );
-    } else {
-        localStorage.setItem('token', null);
     }
     return response;
 }, error => {
 
-    if( error.response.status === 401 ) {
+    if( error.response?.status === 401 ) {
         if(!window.localStorage.getItem('redirect')) {
             window.localStorage.setItem('redirect', window.location.pathname);
         }

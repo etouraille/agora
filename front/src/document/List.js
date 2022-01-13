@@ -41,9 +41,9 @@ const DocumentList = ({ onClick }) => {
         dispatch(reloadList());
     }
 
-    const toggle = () => {
+    const toggle = (evt) => {
         if( typeof onClick === 'function') {
-            onClick();
+            onClick(evt);
         }
     }
 

@@ -10,6 +10,8 @@ import editSvg from './../svg/edit.svg';
 import docSvg from './../svg/doc.svg';
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import voteFilter from "../redux/filter/voteFilter";
+import VoteModal from "../document/vote/VoteModal";
+import usePrevious from "../utils/usePrevious";
 const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     const dispatch = useDispatch();
@@ -24,10 +26,27 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
         return vote.hasSubscribed && (( vote.isOwner && ! vote.isReadyForVote) || vote.isReadyForVote);
     })
 
+    const click = useSelector((state) => {
+        return state.click.click;
+    })
+
+    const prevClick  = usePrevious(click);
+
+
     const [x, setX ] = useState(0);
     const [y, setY ] = useState(0);
     const [display, setDisplay] = useState( false );
     const [displayList, setDisplayList] = useState( false );
+    const [toggleModal, setToggleModal] = useState( false);
+
+
+
+    useEffect(() => {
+        if( click > 0 && click> prevClick) {
+            setDisplay(false);
+        }
+    }, [click, prevClick])
+
 
     useEffect(() => {
         setDisplay(disp);
@@ -57,6 +76,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
     }, [id, node ]);
 
     const enterCaret = ( evt ) => {
+        console.log( evt );
         setDisplayList(true);
     }
 
@@ -77,8 +97,16 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
         })
     }
 
-    const goToDoc = () => {
-        history.push('/document/' + id )
+
+    const _toggleModal = (evt) => {
+        evt.stopPropagation();console.log(1);
+        console.log( 'click ========================');
+        setToggleModal(!toggleModal);
+    }
+
+    const _reload = () => {
+        setToggleModal(!toggleModal);
+        reload();
     }
 
 
@@ -89,16 +117,15 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
             left : x + 'px',
             top : y + 'px' ,
             display : ( display  )? 'block' : 'none',
-            zIndex: 10000
+            zIndex: 1000
         }}>
-            <div className="caret down" onMouseEnter={enterCaret} ></div>
-            <div className="menu-container" style={{ display : displayList ? 'block' : 'none', width : '400px'}}>
-                <div className="height-500" onMouseEnter={enterCaret}>
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <img className="logo" src={docSvg} onClick={goToDoc} /> : <></> }
+            <div className="caret down" onMouseEnter={enterCaret} onClick={_toggleModal} ></div>
+            <div className="menu-container" style={{ display : displayList ? 'block' : 'none', width : '400px'}} onMouseLeave={outList}>
+                <div className="height-500" onMouseEnter={enterCaret} >
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <img className="logo" src={editSvg} onClick={edit} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <Vote onMouseEnter={enterCaret} onMouseLeave={outList} id={id} forceReload={() => reload()}></Vote> : <></>}
                 </div>
+                <VoteModal id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={_reload}></VoteModal>
             </div>
         </div>: <></>}
         </>

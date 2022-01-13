@@ -44,7 +44,8 @@ const Notif = () => {
     }, [])
 
 
-    const click = () => {
+    const click = (evt) => {
+        evt.stopPropagation();console.log(1);
         dispatch( toggleBarre({id : toggleName}));
     }
 

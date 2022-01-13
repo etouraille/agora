@@ -23,6 +23,7 @@ import { initReload , reload as setReload } from "../redux/slice/reloadDocumentS
 import { initReloadVote  } from "../redux/slice/reloadVoteSlice";
 import Before from "./parent/Before";
 import After from "./parent/After";
+import UploadFile from "../upload/UploadFile";
 
 const DocumentView = (props) => {
     const { id } = useParams();

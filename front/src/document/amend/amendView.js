@@ -60,7 +60,7 @@ const AmendView = ({id, reload , countParent }) => {
 
 
     const cb = (evt) => {
-        evt.stopPropagation();
+        evt.stopPropagation();console.log(1);
         if (evt.target.tagName === 'A') {
             evt.target.removeAttribute('target');
             setNavigateTo(routeFromHref(evt.target.href));

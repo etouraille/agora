@@ -1,3 +1,10 @@
+html {
+    height: 100%;
+}
+.app {
+    height: 100%;
+}
+
 .rightBarre {
     position : absolute;
     width : 50px;
@@ -77,4 +84,17 @@
     height: 1000px;
     width: 500px;
     z-index: 10000;
+}
+.box-space-around {
+    justify-content: space-around;
+    flex-direction: row;
+    display: flex;
+}
+.picture-content {
+    width: 100%;
+    height: auto;
+}
+.iframe-content {
+    width: 100%;
+    height: auto;
 }

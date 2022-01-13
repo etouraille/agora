@@ -10,7 +10,6 @@ const canDisplayDiffFilter = ( id ) => {
         if( doc && doc.children ) {
             doc.children.forEach(elem => {
                 let rfv = readyForVoteSubscribedFilter(elem.child.id)(state);
-                console.log( rfv);
                 if (rfv.isOwner || (!rfv.isOwner && rfv.isReadyForVote)) {
                     oneCanDisplay = true;
                 }

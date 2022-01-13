@@ -5,14 +5,14 @@ const useContext = () => {
     const [show , setShow ] = useState(false );
 
     const handleContextMenu = useCallback((e) => {
-      e.preventDefault();
+      //e.preventDefault();
       setX(`${e.pageX}px`);
       setY(`${e.pageY}px`);
       setShow(true);
     }, [setX, setY]);
 
     const handleClick = useCallback((e) => {
-        e.preventDefault();
+        //e.preventDefault();
         show && setShow( false );
     }, [show]);
 

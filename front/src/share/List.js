@@ -42,24 +42,24 @@ const List = ({id}) => (
                                 {values.friends && values.friends.length > 0 ? (
                                     values.friends.map((friend, index) => (
                                         <div key={index}>
-                                            <Field name={`friends.${index}`} />
+                                            <Field name={`friends.${index}`} onClick={evt => evt.stopPropagation()}/>
                                             <ErrorMessage name={`emails.${index}`} component="div"></ErrorMessage>
                                             <button
                                                 type="button"
-                                                onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
+                                                onClick={(evt) => {evt.stopPropagation();console.log(1);arrayHelpers.remove(index)}} // remove a friend from the list
                                             >
                                                 -
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => arrayHelpers.insert(index, "")} // insert an empty string at a position
+                                                onClick={(evt) => {evt.stopPropagation();console.log(1);arrayHelpers.insert(index, "")}} // insert an empty string at a position
                                             >
                                                 +
                                             </button>
                                         </div>
                                     ))
                                 ) : (
-                                    <button type="button" onClick={() => arrayHelpers.push("")}>
+                                    <button type="button" onClick={(evt) => {evt.stopPropagation();console.log(1);arrayHelpers.push("")}}>
                                         {/* show this when user has removed all friends from the list */}
                                         Add a friend
                                     </button>
@@ -69,7 +69,7 @@ const List = ({id}) => (
                         )}
                     />
                     <div>
-                        <button type="submit" onClick={() => handleSubmit()}>Submit</button>
+                        <button type="submit" onClick={(evt) => {evt.stopPropagation();console.log(1);handleSubmit()}}>Submit</button>
                     </div>
                 </Form>
             )}

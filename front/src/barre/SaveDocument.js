@@ -21,7 +21,8 @@ const SaveDocument = () => {
         }
     })
 
-    const save = () => {
+    const save = (evt) => {
+        evt.stopPropagation();console.log(1);
         dispatch( forSave({id}));
     }
 

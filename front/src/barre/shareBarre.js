@@ -41,7 +41,8 @@ const ShareBarre = ({id}) => {
 
         }
     }, [display])
-    const toggle = () => {
+    const toggle = (evt) => {
+        evt.stopPropagation();console.log(1);
         dispatch(toggleBarre({id : toggleName}));
     }
 

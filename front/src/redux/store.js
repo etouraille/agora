@@ -14,11 +14,13 @@ import {documentSubscribeSlice} from "./slice/documentSubscribeSlice";
 import {barreToggleSlice} from "./slice/barreToggleSlice";
 import {notificationSlice} from "./slice/notificationSlice";
 import {reloadDocumentListSlice} from "./slice/reloadDocumentListSlice";
+import {clickSlice} from "./slice/clickSlice";
 
 
 const rootReducer = combineReducers({
     amend : amendSlice.reducer,
     barreToggle : barreToggleSlice.reducer,
+    click : clickSlice.reducer,
     document : documentSlice.reducer,
     documentChange : documentChangeSlice.reducer,
     documentSubscribe : documentSubscribeSlice.reducer,

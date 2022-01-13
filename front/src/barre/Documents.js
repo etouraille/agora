@@ -38,7 +38,8 @@ const Documents = () => {
 
     }, [ display ]);
 
-    const toggle = () => {
+    const toggle = (evt) => {
+        let dev_null =  evt ? evt.stopPropagation() : null;
         dispatch( toggleBarre({id : toggleName}));
     }
 

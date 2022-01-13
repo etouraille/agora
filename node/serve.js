@@ -27,6 +27,7 @@ const { search } = require( './api/search');
 const { test } = require('./api/test');
 const { elasticRoute } = require('./api/elastic');
 const { clear, notificationGet } = require('./api/notification');
+const { postAttach, getAttach, deleteAttach} = require("./api/attach");
 const { socketDocument } = require('./socket/document');
 const app = express()
 app.use(bodyParser.json())
@@ -77,6 +78,9 @@ app.post('/api/search', search );
 app.post('/api/notification/clear', clear );
 app.get('/api/notification', notificationGet );
 app.post('/api/invite-to-contribute', inviteEmail );
+app.post('/api/attach', postAttach);
+app.get('/api/attach/:id', getAttach);
+app.delete('/api/attach/:id', deleteAttach);
 //app.get('/test', test );
 //app.get('/elastic/:id', elasticRoute );
 
