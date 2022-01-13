@@ -1,2 +1,2 @@
 #!/bin/bash
-rsync -avz ---exclude '.env' . ununtu@ami:production/cdn/
+rsync -avz --exclude '.env' . ubuntu@ami:production/cdn/

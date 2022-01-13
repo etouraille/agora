@@ -42,9 +42,8 @@ services:
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:api.queel.fr"
-      - "traefik.basic.port=8000"
-    command: npm install -g pm2;pm2 start app.js
+      - "traefik.basic.frontend.rule=Host:cdn.queel.fr"
+      - "traefik.basic.port=4000"
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     ports:
@@ -52,6 +51,7 @@ services:
       - "9300:9300"
     environment:
       - discovery.type=single-node
+      - xpack.ml.enabled=false
     volumes:
       - ./elastic:/usr/share/elasticsearch/data
 
