@@ -31,8 +31,11 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:api.queel.fr"
       - "traefik.basic.port=8000"
+    depends_on:
+      - elastic
+      - neo
   node_cdn:
-    image: node:latest
+    build: ./docker/node
     volumes:
       - ./cdn:/src
     tty: true
