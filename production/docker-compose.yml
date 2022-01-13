@@ -31,6 +31,20 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:api.queel.fr"
       - "traefik.basic.port=8000"
+  node_cdn:
+    image: node:latest
+    volumes:
+      - ./cdn:/src
+    tty: true
+    working_dir: /src
+    networks:
+      - web
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:api.queel.fr"
+      - "traefik.basic.port=8000"
+    command: npm install -g pm2;pm2 start app.js
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     ports:
