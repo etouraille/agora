@@ -10,12 +10,17 @@ import usePrevious from "../../utils/usePrevious";
 import readyForVoteSubscribedFilter from "../../redux/filter/readyForVoteSubscribedFilter";
 import routeFromHref from "../../utils/routeFromHref";
 import history from "../../utils/history";
+import idFromRoute from "../../utils/idFromRoute";
+import ContextMenu from "../../contextual/ContextMenu";
 
 const AmendView = ({id, reload , countParent }) => {
 
     const [ menus,setMenus ] = useState([]);
     const [ count , setCount ] = useState(0);
     const [ navigateTo, setNavigateTo] = useState(null);
+    const [ evt, setEventContext] = useState( null);
+    const [_id, setIdContext] = useState( null);
+    const [display, setDisplayContext] = useState( false);
 
     const doc = useSelector(documentFilter(id));
 
@@ -61,17 +66,33 @@ const AmendView = ({id, reload , countParent }) => {
 
     const cb = (evt) => {
         evt.stopPropagation();console.log(1);
+        evt.preventDefault();
         if (evt.target.tagName === 'A') {
             evt.target.removeAttribute('target');
-            setNavigateTo(routeFromHref(evt.target.href));
+
+            //history.push(routeFromHref(evt.target.href));
+            setDisplayContext(false);
         }
     }
+
+    const cb_context = (evt) => {
+        evt.stopPropagation();
+        evt.preventDefault();
+        if ( evt.target.tagName === 'A') {
+            setEventContext(evt);
+            setIdContext(idFromRoute(routeFromHref(evt.target.href)));
+            setDisplayContext(true);
+        }
+    }
+
+
 
 
     useEffect(() => {
         let nodeAndId = [];
         Quill.register('modules/clink', function(quill, options ) {
             quill.container.addEventListener('click', cb);
+            quill.container.addEventListener('contextmenu', cb_context);
         });
         if (doc.children  && document.querySelector('#rightEditor') ) {
 
@@ -149,7 +170,9 @@ const AmendView = ({id, reload , countParent }) => {
             <div id="source"></div>
             <div id="emptyQuill"></div>
             <div id="rightEditor"></div>
+            <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()}></ContextMenu>
             <EditMenuList menus={menus} load={false} relative={true} reload={() => currentReload()}></EditMenuList>
+
         </div>
 
     )

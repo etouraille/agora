@@ -72,6 +72,8 @@ const EditMenuList = ({ display, menus, id , load , reload , relative }) => {
         <>{display ?
             <>
                 {editMenu.map((item, id) => {
+                    return (<></>);
+
                     return (
 
 

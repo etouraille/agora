@@ -76,7 +76,6 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
     }, [id, node ]);
 
     const enterCaret = ( evt ) => {
-        console.log( evt );
         setDisplayList(true);
     }
 
@@ -100,7 +99,6 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
 
     const _toggleModal = (evt) => {
         evt.stopPropagation();console.log(1);
-        console.log( 'click ========================');
         setToggleModal(!toggleModal);
     }
 
@@ -125,7 +123,7 @@ const EditMenu = ({ id , node , disp, reload , relative }) => {
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <img className="logo" src={editSvg} onClick={edit} /> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <button className="nav-link active" onClick={deleteDocument}>Delete</button> : <></> }
                 </div>
-                <VoteModal id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={_reload}></VoteModal>
+
             </div>
         </div>: <></>}
         </>
