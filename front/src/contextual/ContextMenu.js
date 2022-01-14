@@ -8,11 +8,24 @@ import editSvg from "../svg/edit.svg";
 import {useSelector} from "react-redux";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import voteFilter from "../redux/filter/voteFilter";
-const ContextMenu = ({ display, evt , id, reload}) => {
+import docSvg from "../svg/doc.svg";
+import Vote from "../vote/Vote";
+import usePrevious from "../utils/usePrevious";
+const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
 
     const canEdit = useSelector( readyForVoteSubscribedFilter(id));
 
     const vote = useSelector( voteFilter(id ));
+
+    const click = useSelector((state) => state.click.click);
+
+    const prevClick = usePrevious(click);
+
+    useEffect(() => {
+        if( click > 0 && click > prevClick && typeof setDisplay === 'function') {
+            setDisplay(false);
+        }
+    }, [prevClick, click, setDisplay]);
 
     console.log( vote);
 
@@ -24,7 +37,7 @@ const ContextMenu = ({ display, evt , id, reload}) => {
     const [x, setX] = useState('0px');
     const [y, setY] = useState('0px');
     const [toggleModal, setToggleModal] = useState(false);
-    const [_display, setDisplay] = useState(false);
+    const [_display, _setDisplay] = useState(false);
 
     useEffect(() => {
         if(evt) {
@@ -33,11 +46,8 @@ const ContextMenu = ({ display, evt , id, reload}) => {
         }
     }, [evt, setX, setY])
 
-    useEffect(() => {
-        if(typeof display === 'boolean') {
-            setDisplay(display);
-        }
-    }, [display]);
+
+
 
     const navigate = (evt) => {
         evt.stopPropagation();
@@ -63,16 +73,16 @@ const ContextMenu = ({ display, evt , id, reload}) => {
 
     return (
         <div>
-            { _display ? (
+            { display ? (
                 <div className="menu-container" style={{ top : y, left : x ,position : 'fixed' }}>
-                    <div className="menu-row" onClick={navigate}>
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <div className="menu-row" onClick={navigate}>
                         <span className="before"><img className="logo-small" src={arrow_right} /></span>
                         <span className="middle">Naviguer</span>
-                    </div>
-                    <div className="menu-row" onClick={toggle}>
+                    </div> : <></> }
+                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <div className="menu-row" onClick={toggle}>
                         <span className="before"><img className="logo-small" src={voteSvg} /></span>
                         <span className="middle">Voter</span>
-                    </div>
+                    </div> : <></> }
                     { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <div className="menu-row" onClick={edit}>
                         <span className="before"><img className="logo-small" src={editSvg} /></span>
                         <span className="middle">Modifier</span>

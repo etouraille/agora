@@ -1,6 +1,7 @@
 const elastic = require('./elastic/search');
 
 elastic.indices.delete({index : 'document'}).then(() => {
+}).catch((e) => console.log(e)).finally(() => {
     elastic.indices.create( {index: 'document'}).then(() => {
         elastic.indices.putMapping({
             index: 'document',

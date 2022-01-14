@@ -15,7 +15,7 @@
     "express-fileupload": "^1.2.1",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
-    "sharp": "^0.28.3",
+    "sharp": "^0.27.2",
     "uid": "^2.0.0"
   }
 }

@@ -22,6 +22,8 @@ const AmendView = ({id, reload , countParent }) => {
     const [_id, setIdContext] = useState( null);
     const [display, setDisplayContext] = useState( false);
 
+    console.log( 'display', display);
+
     const doc = useSelector(documentFilter(id));
 
     useEffect(() => {
@@ -75,7 +77,8 @@ const AmendView = ({id, reload , countParent }) => {
         }
     }
 
-    const cb_context = (evt) => {
+    const cb_context = useCallback((evt) => {
+        console.log( 'context', evt);
         evt.stopPropagation();
         evt.preventDefault();
         if ( evt.target.tagName === 'A') {
@@ -83,7 +86,7 @@ const AmendView = ({id, reload , countParent }) => {
             setIdContext(idFromRoute(routeFromHref(evt.target.href)));
             setDisplayContext(true);
         }
-    }
+    }, [setEventContext, setIdContext, setDisplayContext])
 
 
 
@@ -170,7 +173,7 @@ const AmendView = ({id, reload , countParent }) => {
             <div id="source"></div>
             <div id="emptyQuill"></div>
             <div id="rightEditor"></div>
-            <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()}></ContextMenu>
+            <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
             <EditMenuList menus={menus} load={false} relative={true} reload={() => currentReload()}></EditMenuList>
 
         </div>

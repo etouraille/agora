@@ -20,7 +20,7 @@ services:
       - "traefik.basic.frontend.rule=Host:neo.queel.fr"
       - "traefik.basic.port=7474"
   node:
-    image: node:latest
+    build: ./docker/node_api
     volumes:
       - ./node:/src
     tty: true
@@ -31,13 +31,18 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:api.queel.fr"
       - "traefik.basic.port=8000"
+      - "traefik.ws.frontend.rule=Host:ws.queel.fr"
+      - "traefik.ws.port=8080"
+      - "traefik.ws.protocol=ws"
     depends_on:
       - elastic
       - neo
+    working_dir: /src
   node_cdn:
     build: ./docker/node
     volumes:
       - ./cdn:/src
+      - /../upload:/upload
     tty: true
     working_dir: /src
     networks:
@@ -57,7 +62,8 @@ services:
       - xpack.ml.enabled=false
     volumes:
       - ./elastic:/usr/share/elasticsearch/data
-
+    networks:
+      - web
   nginx:
     image: nginx
     volumes:

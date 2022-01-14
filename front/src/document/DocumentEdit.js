@@ -24,7 +24,7 @@ Sharedb.types.register(richText.type);
 
 const DocumentEdit = () => {
 
-    const socket = new WebSocket('ws://127.0.0.1:8080');
+    const socket = new WebSocket(process.env.REACT_APP_ws);
     const connection = new Sharedb.Connection(socket);
     const { id } = useParams();
     const [ editor, setEditor] = useState( null );

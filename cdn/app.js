@@ -65,11 +65,14 @@ function onFileupload(req, res) {
                     return res.status(200).json({file: id + '.png'});
             })
             .catch((error) => {
+                console.log(error);
                 return res.status(500).json(error);
             })
     } else {
         fs.writeFile(__dirname + '/../upload/' + id + '.' + ext, file.data, (error) => {
             if (error) {
+                console.log(error);
+                console.log(error);
                 return res.status(500).json(error);
             }
             return res.status(200).json({file : id + '.' + ext });
