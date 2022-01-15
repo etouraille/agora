@@ -19,6 +19,11 @@ function unlog() {
 
 const Encart = () => {
 
+    const token = useSelector( state =>  state.login.token );
+
+    const [selected , setSelected ] = useState( false );
+
+
     const dispatch = useDispatch();
 
     const on = useSelector(state => {
@@ -28,6 +33,16 @@ const Encart = () => {
     const user = useSelector( state => {
         return state.login.user;
     })
+
+    const click = useSelector(state => state.click.click);
+
+    const prevClick = usePrevious(click);
+
+    useEffect(() => {
+        if( click > 0 && click > prevClick ) {
+            setSelected(false);
+        }
+    }, [click, prevClick])
 
     const  mercure  = new Subscribe();
 
@@ -93,16 +108,13 @@ const Encart = () => {
             mercure.close();
         }
     }, [user]);
-    const token = useSelector( state =>  state.login.token );
-
-    const [selected , setSelected ] = useState( false );
 
     const Logged = () => {
 
         const logged = on ?
         <div>
             <div className="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={evt => setSelected(!selected)}>
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={evt => { evt.stopPropagation();setSelected(!selected)}}>
                 { jwtDecode(token).username }
             </div>
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
