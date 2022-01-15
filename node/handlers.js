@@ -11,29 +11,43 @@ const subscribe = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
     try {
-        const result = session.run('CREATE (u:User { login : $login, password : $password }) RETURN u ',
-            {login: email, password: password}
-        );
 
-        result.then((result) => {
+        const resu = session.run('MATCH (u:User) WHERE u.login = $email RETURN u', {email})
 
-            session.close();
-            driver.close();
-            const token = jwt.sign({ username }, jwtKey, {
-                algorithm: 'HS256',
-                expiresIn: parseInt(jwtExpirySeconds)
-            })
-            // set the cookie as the token string, with a similar max age as the token
-            // here, the max age is in milliseconds, so we multiply by 1000
-            res.setHeader('token', token );
+        resu.then(data => {
 
-            res.json(200, { email : email, password : password , token});
-            res.end();
-        }, (reason ) => {
-            session.close();
-            driver.close();
-            res.json(500, { reason : reason });
-            res.end();
+            if (!data.records[0]) {
+
+                const result = session.run('CREATE (u:User { login : $login, password : $password }) RETURN u ',
+                    {login: email, password: password}
+                );
+
+                result.then((result) => {
+
+                    session.close();
+                    driver.close();
+                    const token = jwt.sign({username: email}, jwtKey, {
+                        algorithm: 'HS256',
+                        expiresIn: parseInt(jwtExpirySeconds)
+                    })
+                    // set the cookie as the token string, with a similar max age as the token
+                    // here, the max age is in milliseconds, so we multiply by 1000
+                    res.setHeader('token', token);
+
+                    res.json(200, {email: email, password: password, token});
+                    res.end();
+                }, (reason) => {
+                    session.close();
+                    driver.close();
+                    res.json(500, {reason: reason});
+                    res.end();
+                })
+            } else {
+                res.status(409).json({reason: 'User already exists', exists: true});
+                session.close();
+                driver.close();
+            }
+
         })
 
     } finally {
