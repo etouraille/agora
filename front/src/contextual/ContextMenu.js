@@ -27,8 +27,6 @@ const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
         }
     }, [prevClick, click, setDisplay]);
 
-    console.log( vote);
-
     const canDisplay = useSelector( state => {
         let vote = readyForVoteSubscribedFilter(id)(state);
         return vote.hasSubscribed && (( vote.isOwner && ! vote.isReadyForVote) || vote.isReadyForVote);

@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import EditMenuList from "../../contextual/EditMenuList";
 import Quill from 'quill';
 import Delta from 'quill-delta';
 import $ from 'jquery';
@@ -21,8 +20,6 @@ const AmendView = ({id, reload , countParent }) => {
     const [ evt, setEventContext] = useState( null);
     const [_id, setIdContext] = useState( null);
     const [display, setDisplayContext] = useState( false);
-
-    console.log( 'display', display);
 
     const doc = useSelector(documentFilter(id));
 
@@ -174,8 +171,6 @@ const AmendView = ({id, reload , countParent }) => {
             <div id="emptyQuill"></div>
             <div id="rightEditor"></div>
             <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
-            <EditMenuList menus={menus} load={false} relative={true} reload={() => currentReload()}></EditMenuList>
-
         </div>
 
     )

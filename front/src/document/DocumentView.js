@@ -6,14 +6,13 @@ import ContextMenu from "../contextual/ContextMenu";
 import MenuSelectText from "../contextual/MenuSelectText";
 import Delta  from 'quill-delta'
 import Quill from 'quill';
-import EditMenuList from "../contextual/EditMenuList";
 import {useDispatch, useSelector} from "react-redux";
 import voteFilter from "../redux/filter/voteFilter";
 import AmendView from "./amend/amendView";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import { init } from './../redux/slice/amendSlice';
 
-import { initWith } from './../redux/slice/editMenuSlice';
+import {add, initWith, off , init as initMenu } from './../redux/slice/editMenuSlice';
 import { init as initDoc } from './../redux/slice/documentSlice';
 import QFactory from "./../quill/QFactory";
 import documentFilter from "../redux/filter/documentFilter";
@@ -23,7 +22,8 @@ import { initReload , reload as setReload } from "../redux/slice/reloadDocumentS
 import { initReloadVote  } from "../redux/slice/reloadVoteSlice";
 import Before from "./parent/Before";
 import After from "./parent/After";
-import UploadFile from "../upload/UploadFile";
+import {init as initReadyForVote} from "../redux/slice/readyForVoteSlice";
+import {init as initVote} from "../redux/slice/voteSlice";
 
 const DocumentView = (props) => {
     const { id } = useParams();
@@ -175,6 +175,50 @@ const DocumentView = (props) => {
         history.push('/documentedit/'+ id );
     }
 
+    let partialForChange = [];
+
+    useEffect(() => {
+        leftMenus.forEach( (elem , index )=> {
+            dispatch(add({ id : elem.id}));
+        })
+        //TODO
+        if( leftMenus.length === 0 ) {
+            dispatch( off());
+            dispatch(initMenu());
+        }
+        return () => { dispatch( initMenu())}
+    }, [leftMenus])
+
+    useEffect(() => {
+        // TODO : move this subscribe think into Document.
+        http.get('/api/ready-for-vote/' + id ).then( data => {
+            dispatch(initReadyForVote({id : id , data : data.data}));
+        }, error => {
+            console.log( error );
+        })
+        leftMenus.forEach((menu) => {
+            if( partialForChange.indexOf( menu.id ) === -1 ) {
+                partialForChange.push( menu.id );
+            }
+            http.get( '/api/ready-for-vote/' + menu.id ).then( data => {
+                dispatch(initReadyForVote({id : menu.id, data : data.data}));
+            }, error => {
+                console.log( error );
+            })
+            http.get('/api/vote/voters/' + menu.id ).then( data  => {
+                dispatch( initVote({ id : menu.id , data : data.data }))
+            }, error => {
+                console.log( error);
+            })
+        });
+
+
+        return () => {
+
+        }
+    }, [ true , leftMenus ])
+
+
     return (
         <div>
             <div style={{ display : 'none'}} id="emptyQuill"></div>
@@ -202,7 +246,6 @@ const DocumentView = (props) => {
                 }
             </div>
             <After document={document} id={id} count={count}></After>
-            <EditMenuList display={false} menus={leftMenus} load={true} id={id} reload={() => dispatch(setReload({id}))}></EditMenuList>
         </div>
 
     )
