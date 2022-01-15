@@ -15,10 +15,18 @@ import Notif from "./Notif";
 import ShareBarre from "./shareBarre";
 import usePrevious from "../utils/usePrevious";
 import {initBarreToggle} from "../redux/slice/barreToggleSlice";
+import Burger from "./Burger";
+import useIsMobile from "../utils/useIsMobile";
 const Barre = () => {
 
     const [ right , setRight ] = useState( '0px');
     const [ page , setPage ] = useState( null );
+    const [ _open, setOpen ] = useState( false );
+
+    const isMobile = useIsMobile();
+
+    const classMobile = isMobile ? 'mobile' : '';
+
     const { id } = useParams();
 
     const dispatch = useDispatch();
@@ -68,7 +76,7 @@ const Barre = () => {
 
     return (
         <div>
-            <div className="rightBarre" style={{ right : right }}>
+            <div className={ `rightBarre ${classMobile}`} style={{ right : right }}>
                 { page === 'document' || page === 'documentedit' || page === 'documents'? <Notif></Notif> : <></> }
                 { page === 'document' ? <DiffButton></DiffButton> : <></> }
                 { page === 'document' ? <AmendButtonBarre></AmendButtonBarre> : <></> }
