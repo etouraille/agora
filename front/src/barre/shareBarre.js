@@ -16,7 +16,7 @@ const ShareBarre = ({id}) => {
     const canDisplay = useSelector(isDocumentRootFilter(id));
 
     const toggle = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         setOpen(!open);
     }
 

@@ -19,9 +19,6 @@ const AmendButtonBarre = () => {
 
     const canDisplay = useSelector(canDisplayAmendFilter(id));
     const document = useSelector(documentFilter(id));
-
-    console.log( canDisplay );
-
     const dispatch = useDispatch();
 
 
@@ -35,7 +32,7 @@ const AmendButtonBarre = () => {
     }
 
     const click = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         dispatch( toggleBarre({id : toggleName}));
     }
 

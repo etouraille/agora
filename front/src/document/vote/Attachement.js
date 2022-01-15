@@ -51,7 +51,7 @@ const Attachement = ({id}) => {
 
     // only if user is owner.
     const remove = (i, evt ) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         let object = objects[i];
         objects.splice(i, 1);
         setFiles(objects);
@@ -95,7 +95,7 @@ const Attachement = ({id}) => {
     }
 
     const selectLink = (i, evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         selectDisplay(i);
     }
 

@@ -11,7 +11,7 @@ const Share = ({ id }) => {
     const [isEmail, setIsEmail] = useState(false);
 
     const toggleEmail = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         setIsEmail(!isEmail);
     }
 
@@ -24,7 +24,7 @@ const Share = ({ id }) => {
     }
 
     const saveLink = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         const link = process.env.REACT_APP_front + '/document/' + id;
         copyToClipboard(link);
         // todo close window.

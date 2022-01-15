@@ -5,7 +5,7 @@ const Link = ({onUpload}) => {
     const [ value , setValue ] = useState( '');
 
     const submit = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         if(value && value.match(/^https?/)) {
             onUpload({type: 'link', link: value});
             setValue('');

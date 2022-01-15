@@ -30,7 +30,7 @@ const VoteModal = ({id, toggleModal, onChangeToggle, reload }) => {
                 dialogClassName="modal-xl"
                 aria-labelledby="example-custom-modal-styling-title"
                 onEntered={onEnteredModal}
-                onClick={evt => {evt.stopPropagation(); console.log(1);}}
+                onClick={evt => {evt.stopPropagation(); }}
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="example-custom-modal-styling-title">

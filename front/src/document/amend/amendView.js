@@ -64,7 +64,7 @@ const AmendView = ({id, reload , countParent }) => {
 
 
     const cb = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         evt.preventDefault();
         if (evt.target.tagName === 'A') {
             evt.target.removeAttribute('target');

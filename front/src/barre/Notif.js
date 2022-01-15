@@ -20,7 +20,7 @@ const Notif = () => {
 
 
     const click = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         setOpen(!open);
     }
 

@@ -22,7 +22,7 @@ const SubscribeBarre = () => {
     const canDisplay = doc.parentLink === null;
 
     const toggle = (evt) => {
-        evt.stopPropagation();console.log(1);
+        evt.stopPropagation();
         setOpen(!open)
     }
 

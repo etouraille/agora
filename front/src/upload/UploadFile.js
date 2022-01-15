@@ -43,7 +43,7 @@ const UploadFile = ({onUpload}) => {
     const uploadFile = (evt) => {
         console.log(textInput.current);
         textInput.current.click();
-        //evt.stopPropagation();console.log(1);
+        //evt.stopPropagation();
 
     }
 
