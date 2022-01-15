@@ -24,6 +24,7 @@ import Before from "./parent/Before";
 import After from "./parent/After";
 import {init as initReadyForVote} from "../redux/slice/readyForVoteSlice";
 import {init as initVote} from "../redux/slice/voteSlice";
+import arrow from './../svg/arrow_lett_docuent.svg';
 
 const DocumentView = (props) => {
     const { id } = useParams();
@@ -220,33 +221,34 @@ const DocumentView = (props) => {
 
 
     return (
-        <div>
-            <div style={{ display : 'none'}} id="emptyQuill"></div>
-            <div style={{ display : 'none'}} id="source"></div>
-            <ContextMenu menu={() => { return (<MenuSelectText id={id}></MenuSelectText>);
-            }} />
-            <Before document={document} id={id} count={count}></Before>
-            {document.parent && document.parent.document ? <button className="btn btn-black" onClick={prev}>Précédent</button> : <></> }
-            <h1>{document.document.title}</h1>
-            <div className="row">
-                <div className="col-sm">
-                    <div id="editor"></div>
-                    <br />
-                    <br />
-                    <div>{  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
-                        <button type="button" className="btn btn-primary" onClick={edit}>Modifier</button> :
-                        <></>
-                    }</div>
-                </div>
-                { showAmended ?
+        <>
+            {document.parent && document.parent.document ? <img className="logo logo-prev" src={arrow} onClick={prev}/> : <></> }
+            <div>
+                <div style={{ display : 'none'}} id="emptyQuill"></div>
+                <div style={{ display : 'none'}} id="source"></div>
+
+                <Before document={document} id={id} count={count}></Before>
+                <h1>{document.document.title}</h1>
+                <div className="row">
                     <div className="col-sm">
-                        <AmendView id={id} reload={() => dispatch(setReload({id}))} countParent={count}></AmendView>
+                        <div id="editor"></div>
+                        <br />
+                        <br />
+                        <div>{  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
+                            <button type="button" className="btn btn-primary" onClick={edit}>Modifier</button> :
+                            <></>
+                        }</div>
                     </div>
-                    : <></>
-                }
+                    { showAmended ?
+                        <div className="col-sm">
+                            <AmendView id={id} reload={() => dispatch(setReload({id}))} countParent={count}></AmendView>
+                        </div>
+                        : <></>
+                    }
+                </div>
+                <After document={document} id={id} count={count}></After>
             </div>
-            <After document={document} id={id} count={count}></After>
-        </div>
+        </>
 
     )
 }

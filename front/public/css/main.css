@@ -133,3 +133,8 @@ html {
     position: relative;
     left: 4px;
 }
+.logo-prev {
+    position: absolute;
+    left: 25px;
+    top: 70px;
+}
