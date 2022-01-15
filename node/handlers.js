@@ -1,13 +1,14 @@
 const jwt = require('jsonwebtoken')
 const getDriver = require('./neo/driver');
 const config  = require('./config');
-
+const { v4 : uuid } = require('uuid')
+const {addNewUser} = require("./elastic/addElastic");
 const jwtKey = config.jwtKey
 const jwtExpirySeconds = config.jwtExpirySeconds;
 
-const subscribe = (req , res ) => {
+const subscribe = async (req , res ) => {
 
-    const { email, password } = req.body;
+    const { email, password , name } = req.body;
     const driver = getDriver();
     const session = driver.session();
     try {
@@ -18,14 +19,24 @@ const subscribe = (req , res ) => {
 
             if (!data.records[0]) {
 
-                const result = session.run('CREATE (u:User { login : $login, password : $password }) RETURN u ',
-                    {login: email, password: password}
+                const _user = {login: email, password: password, name, uuid: uuid() };
+
+                const result = session.run('CREATE (u:User { login : $login, password : $password , name: $name , id : $uuid }) RETURN u ',
+                    _user
                 );
 
                 result.then((result) => {
 
                     session.close();
                     driver.close();
+
+                    try {
+                        addNewUser(_user, null);
+                    } catch(e) {
+                        console.log('elastic error==================', e);
+                        return res.status(500).json({ error: 'Elastic error adding user'});
+                    }
+
                     const token = jwt.sign({username: email}, jwtKey, {
                         algorithm: 'HS256',
                         expiresIn: parseInt(jwtExpirySeconds)
@@ -34,7 +45,7 @@ const subscribe = (req , res ) => {
                     // here, the max age is in milliseconds, so we multiply by 1000
                     res.setHeader('token', token);
 
-                    res.json(200, {email: email, password: password, token});
+                    res.json(200, {email: email, password: password, token, name});
                     res.end();
                 }, (reason) => {
                     session.close();

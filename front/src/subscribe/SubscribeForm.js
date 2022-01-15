@@ -8,15 +8,20 @@ const SubscribeForm = () => {
 
     const dispatch = useDispatch();
 
-    let [email, setEmail] = useState(null);
-    let [pwd, setPwd] = useState( null);
-    let [pwd2, setPwd2] = useState(null);
+    let [ email, setEmail] = useState(null);
+    let [ name, setName ] = useState(null);
+    let [ pwd, setPwd] = useState( null);
+    let [ pwd2, setPwd2] = useState(null);
     let [ error, setError ] = useState( false);
     let [ userExists , setUserExists] = useState( false);
     let [ isEmailValid, setIsEmailValid ] = useState( false );
 
     const changeEmail = ( evt ) => {
         setEmail(evt.target.value)
+    }
+
+    const changeName = (evt) => {
+        setName(evt.target.value);
     }
 
     const changePassword = ( evt ) => {
@@ -41,7 +46,7 @@ const SubscribeForm = () => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email , password : pwd })
+            body: JSON.stringify({ email: email , password : pwd , name})
         };
         fetch(process.env.REACT_APP_api + 'subscribe', requestOptions)
             .then(response => response.json())
@@ -49,7 +54,7 @@ const SubscribeForm = () => {
                 if(data.reason ) {
                     setUserExists(true);
                 } else if( data.token ) {
-                    dispatch(login({token : data.token , user : data.email}));
+                    dispatch(login({token : data.token , user : data.email, name : data.name }));
                     localStorage.setItem('token', data.token);
                     if (localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
                         history.push(localStorage.getItem('redirect'));
@@ -76,6 +81,11 @@ const SubscribeForm = () => {
                 </div>
                 <Email change={evt => changeEmail(evt)} valid={ valid => setIsEmailValid(valid)}></Email>
             </div>
+            <div className="form-group">
+                <label htmlFor="name">Nom</label>
+                <input type="text" className="form-control" id="name" onChange={evt => changeName( evt )} />
+            </div>
+
             <div className="form-group">
                 <label htmlFor="password">Mot de passe</label>
                 <input type="password" className="form-control" id="password" onChange={evt => changePassword( evt )} />

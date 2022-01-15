@@ -22,6 +22,28 @@ const addNewDoc = ( doc ) => {
     })
 }
 
+const addNewUser = async (user, invitedBy) => {
+    const params = {
+        index: 'user',
+        body: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            friends : []
+        }
+    };
+    if( invitedBy) {
+        params.body.friends.push({
+            id: invitedBy.id,
+            email: invitedBy.email,
+            name: invitedBy.name
+        });
+        //TODO add in friend indices.
+    }
+    await elastic.index(params);
+    await elastic.indices.refresh({ index : 'user'})
+}
+
 const append = (id, data ) => {
 
     return new Promise( (resolve , reject ) => {
@@ -57,5 +79,6 @@ const append = (id, data ) => {
 
 module.exports = {
     addNewDoc,
+    addNewUser,
     append,
 }
