@@ -9,12 +9,17 @@ import { reload } from "../redux/slice/reloadDocumentSlice";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
 import ModalBarre from "./ModalBarre";
+import documentFilter from "../redux/filter/documentFilter";
 
 const SubscribeBarre = () => {
 
     const [ open, setOpen ] = useState(false);
 
     const { id } = useParams();
+
+    const doc = useSelector(documentFilter(id));
+
+    const canDisplay = doc.parentLink === null;
 
     const toggle = (evt) => {
         evt.stopPropagation();console.log(1);
@@ -25,12 +30,13 @@ const SubscribeBarre = () => {
 
     return (
         <>
-            <div className="barre-elem">
+            { canDisplay ? <div className="barre-elem">
                 <img onClick={toggle} className="logo " src={subscribe} alt="Amend"/>
                 <div>
                     <ModalBarre title={`subscribe`} open={open} setOpen={setOpen} content={() => <Subscribe id={id}></Subscribe>}></ModalBarre>
                 </div>
-            </div>
+            </div> : <></>
+            }
         </>
     )
 }

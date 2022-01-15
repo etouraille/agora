@@ -7,7 +7,7 @@ const ModalBarre = ({open, setOpen, content, title}) => {
             <Modal
                 show={open}
                 onHide={() => setOpen(false)}
-                dialogClassName="modal-90w"
+                dialogClassName="modal-xl"
                 aria-labelledby="example-custom-modal-styling-title"
             >
                 <Modal.Header closeButton>
