@@ -6,49 +6,29 @@ import ReadyForVote from "../vote/ReadyForVote";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
 import {useDispatch, useSelector} from "react-redux";
+import ModalBarre from "./ModalBarre";
 const ReadyForVoteBarre = () => {
 
-    const toggleName = 'rfv';
-
-    const [ visibility , setVisibility ] = useState( 'hidden');
-    const [ opacity , setOpacity ] = useState( 0);
-    const [ zIndex , setZIndex ] = useState( -1 );
-    const canDisplay = true;
-
+    const [open, setOpen] = useState(false);
     const { id } = useParams();
-
-    const dispatch = useDispatch();
-
-    useEffect( () => {
-        dispatch(initOne({id : toggleName }));
-    }, [])
-
-    const display = useSelector(barreToggleFilter(toggleName));
-
-    useEffect(() => {
-        if( display) {
-            setVisibility('visible');
-            setOpacity(1);
-            setZIndex(1000);
-        } else {
-            setVisibility('hidden');
-            setOpacity(0);
-            setZIndex(-1 );
-
-        }
-    }, [display])
-
     const toggle = (evt) => {
-        evt.stopPropagation();console.log(1);
-        dispatch(toggleBarre({id : toggleName}));
+        evt.stopPropagation();
+        setOpen(!open)
     }
 
     return (
         <>
-            { canDisplay ? <div className="barre-elem">
+            <div className="barre-elem">
                 <img onClick={toggle} className="logo " src={ok} alt="Amend"/>
-                <div className="left-content" style={{visibility, opacity, zIndex }}><ReadyForVote id={id}></ReadyForVote></div>
-            </div> : <></> }
+                <div>
+                    <ModalBarre
+                        open={open}
+                        setOpen={setOpen}
+                        title={`Ready for vote`}
+                        content={() => <ReadyForVote id={id}></ReadyForVote>}
+                     />
+                </div>
+            </div>
         </>
     )
 }

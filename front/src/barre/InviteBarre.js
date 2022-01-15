@@ -5,56 +5,32 @@ import Invite from "../invite/Invite";
 import {useParams} from "react-router";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
+import ModalBarre from "./ModalBarre";
 
 const InviteBarre = () => {
-    const [ visibility, setVisibility ] = useState( 'hidden');
-    const [ opacity, setOpacity] = useState( 0);
-    const [ zIndex , setZIndex ] = useState( -1 );
 
     const { id } = useParams();
-    const canDisplay = true;
 
     const toggleName = 'invite';
 
-    const dispatch = useDispatch();
+    const [open, setOpen] = useState(false);
 
-    useEffect(() => {
-        dispatch(initOne({id : toggleName}));
-    }, [])
 
-    const display = useSelector(barreToggleFilter(toggleName));
-
-    useEffect(() => {
-        if( display) {
-            setVisibility('visible');
-            setOpacity(1);
-            setZIndex(1000);
-        } else {
-            setVisibility('hidden');
-            setOpacity(0);
-            setZIndex(-1 );
-        }
-    }, [display])
 
     const toggle = (evt) => {
-        evt.stopPropagation();console.log(1);
-        dispatch( toggleBarre({ id : toggleName}));
+        evt.stopPropagation();
+        setOpen(!open);
     }
 
     return (
         <>
-            { canDisplay ?
+            <div className="barre-elem">
+                <img className="logo " src={invite} alt="Invite" onClick={toggle}/>
                 <div>
-                    <div className="barre-elem">
-                        <img className="logo " src={invite} alt="Invite" onClick={toggle}/>
-                        <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content left-content-invite">
-                            <Invite id={id}></Invite>
-                        </div>
-                    </div>
-
+                    <ModalBarre open={open} setOpen={setOpen} content={() => <Invite id={id}></Invite>}/>
                 </div>
-                : <></>
-            }
+
+            </div>
         </>
     )
 

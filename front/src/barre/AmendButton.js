@@ -8,6 +8,7 @@ import AmendButton from "../document/amend/AmendButton";
 import documentFilter from "../redux/filter/documentFilter";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
+import ModalBarre from "./ModalBarre";
 
 
 const AmendButtonBarre = () => {
@@ -19,7 +20,11 @@ const AmendButtonBarre = () => {
     const canDisplay = useSelector(canDisplayAmendFilter(id));
     const document = useSelector(documentFilter(id));
 
+    console.log( canDisplay );
+
     const dispatch = useDispatch();
+
+
 
     useEffect(() => {
         dispatch( initOne( { id : toggleName }));

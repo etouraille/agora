@@ -6,44 +6,18 @@ import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlic
 import barreToggleFilter from "../redux/filter/barreToggleFilter";
 import Share from "../share/Share";
 import isDocumentRootFilter from "../redux/filter/isDocumentRootFilter";
+import ModalBarre from "./ModalBarre";
 
 const ShareBarre = ({id}) => {
 
-    const toggleName = 'share';
 
+    const [ open, setOpen] = useState(false);
 
-    const [ right , setRight ] = useState( '0px');
-    const [ visibility, setVisibility ] = useState( 'hidden');
-    const [ opacity, setOpacity] = useState( 0);
-    const [zIndex , setZIndex ] = useState( -1 );
     const canDisplay = useSelector(isDocumentRootFilter(id));
 
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(initOne({id : toggleName}));
-    }, []);
-
-    const display = useSelector(barreToggleFilter(toggleName));
-
-    useEffect(() => {
-        if(display) {
-            setRight('200px');
-            setVisibility('visible');
-            setOpacity(1);
-            setZIndex(1000);
-        }
-        else{
-            setRight('0px');
-            setVisibility('hidden');
-            setOpacity(0);
-            setZIndex(-1 );
-
-        }
-    }, [display])
     const toggle = (evt) => {
         evt.stopPropagation();console.log(1);
-        dispatch(toggleBarre({id : toggleName}));
+        setOpen(!open);
     }
 
     return (
@@ -52,8 +26,8 @@ const ShareBarre = ({id}) => {
                 <>
                     <div className="barre-elem">
                         <img className="logo " src={share} alt="Share" onClick={toggle}/>
-                        <div style={{ visibility, opacity  , zIndex : zIndex }} className="left-content">
-                            <Share id={id}></Share>
+                        <div>
+                            <ModalBarre title={`Share`} content={() => <Share id={id}></Share>} open={open} setOpen={setOpen}></ModalBarre>
                         </div>
                     </div>
                 </>
