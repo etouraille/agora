@@ -115,7 +115,7 @@ const Encart = () => {
         <div>
             <div className="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={evt => { evt.stopPropagation();setSelected(!selected)}}>
-                { jwtDecode(token).username }
+                { jwtDecode(token).name ? jwtDecode(token).name: jwtDecode(token).email }
             </div>
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
                 <Link className="dropdown-item"  to="/documents" onClick={evt => setSelected(!selected)}>Liste des Documents</Link>

@@ -19,9 +19,11 @@ const subscribe = async (req , res ) => {
 
             if (!data.records[0]) {
 
-                const _user = {login: email, password: password, name, uuid: uuid() };
+                const _user = {login: email, password: password, name, id: uuid() };
 
-                const result = session.run('CREATE (u:User { login : $login, password : $password , name: $name , id : $uuid }) RETURN u ',
+                console.log( 'user ==============', _user);
+
+                const result = session.run('CREATE (u:User { login : $login, password : $password , name: $name , id : $id }) RETURN u ',
                     _user
                 );
 
@@ -37,7 +39,7 @@ const subscribe = async (req , res ) => {
                         return res.status(500).json({ error: 'Elastic error adding user'});
                     }
 
-                    const token = jwt.sign({username: email}, jwtKey, {
+                    const token = jwt.sign({email, name, id: _user.id}, jwtKey, {
                         algorithm: 'HS256',
                         expiresIn: parseInt(jwtExpirySeconds)
                     })
@@ -73,14 +75,24 @@ const signIn = (req, res) => {
 
     const driver = getDriver();
     const session = driver.session();
-    const result = session.run('MATCH(u:User) WHERE u.login = $email RETURN u.password', { email : username });
+    const result = session.run('MATCH(u:User) WHERE u.login = $email RETURN u ', { email : username });
     result.then(value => {
-        let recordedPassword = value.records[0].get(0);
+        let _user = {};
+        let recordedPassword = value.records[0].get(0).properties.password;
+        let id = value.records[0].get(0).properties.id;
+        let picture = value.records[0].get(0).properties?.picture;
+        let name = value.records[0].get(0).properties?.name;
+
+        if (id) _user['id'] = id;
+        if (picture) _user['picture'] = picture;
+        if (name) _user['name'] = name;
+        if (username) _user['email'] = username;
+
         if( recordedPassword !== password ) {
           res.json(401, { token : null}).end();
           return;
         } else {
-            const token = jwt.sign({ username }, jwtKey, {
+            const token = jwt.sign( _user, jwtKey, {
                 algorithm: 'HS256',
                 expiresIn: parseInt(jwtExpirySeconds)
             })
@@ -105,7 +117,8 @@ const eachCheckToken = (req , res, next ) => {
             let token = auth.match( regexp)[1];
             try {
                 payload = jwt.verify( token, jwtKey);
-                res.username = payload.username;
+                res.username = payload.email;
+                res.userId = payload.id;
             } catch( e ) {
                 if( e instanceof jwt.JsonWebTokenError) {
                     return res.status(401).end();
@@ -122,7 +135,7 @@ const eachCheckToken = (req , res, next ) => {
             }
 
             // Now, create a new token for the current user, with a renewed expiration time
-            const newToken = jwt.sign({ username: payload.username }, jwtKey, {
+            const newToken = jwt.sign({ email: payload.email, id: payload.id, name: payload.name, picture: payload.picture }, jwtKey, {
                 algorithm: 'HS256',
                 expiresIn: parseInt(jwtExpirySeconds)
             })
