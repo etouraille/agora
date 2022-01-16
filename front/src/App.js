@@ -17,6 +17,7 @@ import _403 from "./403";
 import {useDispatch} from "react-redux";
 import {add} from "./redux/slice/clickSlice";
 import UploadFile from "./upload/UploadFile";
+import Home from "./Home";
 
 
 export default function App() {
@@ -83,8 +84,3 @@ export default function App() {
     );
 }
 
-function Home() {
-    return (
-        <h1>Home</h1>
-    )
-}

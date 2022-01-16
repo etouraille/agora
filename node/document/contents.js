@@ -2,6 +2,8 @@ const getDriver = require('./../neo/driver');
 const Delta = require('quill-delta');
 const contents = (id) => {
 
+    // construit un arbre des documents qui ne sont pas complet au niveau du vote
+    // TODO : maybe this is not correct the length should be minus one to take in account the last vote complete.
     const driver = getDriver();
     const session = driver.session();
     const query = "" +
@@ -57,6 +59,7 @@ const contents = (id) => {
 
 const buildDoc = ( node ) => {
 
+    // construit le document partiel
     if( node.document ) {
 
         let doc = new Delta(JSON.parse(node.document.body));

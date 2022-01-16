@@ -97,9 +97,9 @@ const AmendView = ({id, reload , countParent }) => {
         if (doc.children  && document.querySelector('#rightEditor') ) {
 
 
-            const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
-                clink: true
-            }});
+                const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
+                    clink: true
+                }});
             //const righteditor = new Quill('#rightEditor', {readOnly: true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));

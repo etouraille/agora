@@ -102,6 +102,7 @@ html {
     justify-content: space-around;
     flex-direction: row;
     display: flex;
+    flex-wrap: wrap;
 }
 .picture-content {
     width: 100%;
@@ -150,4 +151,14 @@ html {
     position: absolute;
     left: 25px;
     top: 70px;
+}
+.item-home {
+    width: 33%;
+    padding: 17px;
+    flex-grow: initial;
+}
+.item-users {
+    position: relative;
+    left: 86%;
+    top: -20%;
 }

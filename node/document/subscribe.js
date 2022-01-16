@@ -54,7 +54,9 @@ const processUnsubscribe = ( subscribedId , user ) => {
                     const driver = getDriver();
                     const session = driver.session();
                     // TODO check if it is pertinant : on efface le vote
-                    // de la personne qui se désinscrit si le vote n'est pas complete
+                    // de la personne qui se désinscrit si le vote n'est pas complet
+
+                    //TODO do the vote think also in here : including the indexation. which is not present here
                     let query = "MATCH(u:User)-[r:VOTE_FOR]->(d:Document) " +
                         "WHERE d.id = $id AND u.login = $user " +
                         "DELETE r";

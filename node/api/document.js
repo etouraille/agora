@@ -14,7 +14,7 @@ const create = ( req, res ) => {
         const query = '' +
         'MATCH (user: User ) WHERE user.login = $email ' +
         'MERGE (user)-[r:CREATE]->' +
-        '(document : Document {title : $title , body : $body , id : $id })' +
+        '(document : Document {title : $title , body : $body , id : $id , created_at : localdatetime()})' +
         '-[s:CREATE_BY]->(user) ' +
         'MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user) ' +
         "MERGE (document)-[:SUBSCRIBED_BY]->(user)-[:HAS_SUBSCRIBE_TO]->(document) " +

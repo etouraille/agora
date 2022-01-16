@@ -9,7 +9,8 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 
-const  { ping } = require('./api/ping');
+const { home } = require("./home");
+const { ping } = require('./api/ping');
 const { signIn , subscribe , eachCheckToken } = require('./handlers')
 const { create, get , deleteDocument } = require('./api/document');
 const { documents } = require('./api/documents')
@@ -45,6 +46,8 @@ app.use(function(req, res, next) {
 
 app.use(eachCheckToken);
 
+app.post('/home', home);
+app.get('/home', home);
 app.get('/api/ping', ping );
 app.get('/api/users', getUsers);
 app.get('/api/documents', documents);
@@ -88,6 +91,7 @@ app.delete('/api/attach/:id', deleteAttach);
 
 
 const WebSocket = require('ws');
+
 
 
 const wss = new WebSocket.Server({ port: 8080 });
