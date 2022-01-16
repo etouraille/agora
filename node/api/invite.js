@@ -1,6 +1,11 @@
 const getDriver = require('./../neo/driver');
 const { sendInvite } = require('./../notification/notification')
 const { sendMessage } = require('./../mercure/mercure')
+const {sendMessageToAll} = require("../mercure/mercure");
+const {onReadyForVoteComplete} = require("../document/elasticProcess");
+const {sendNotificationReadyForVote, removeInviteNotificationOnReadyForVote} = require("../notification/notification");
+const {isReadyForVote} = require("./vote");
+const {findParent} = require("../document/findParent");
 
 const invite = ( req, res ) => {
 
@@ -29,6 +34,7 @@ const invite = ( req, res ) => {
 const uninvite = ( req, res ) => {
 
     const { id , email } = req.body;
+    const me = res.username;
 
     const driver = getDriver();
     const session = driver.session();
@@ -41,8 +47,23 @@ const uninvite = ( req, res ) => {
     // TODO : check if user is owner of the document to enable supression also.
 
 
+
     let result = session.run( query , { id , email , me : res.username});
     result.then( data => {
+        //if document is accepted do the index stuff.
+        //document can be accepted because some other left could be accepted yet.
+        isReadyForVote(id).then( ( rfv ) => {
+            if( rfv.ready ) {
+                findParent(id).then(parentId => {
+                    if (parentId) sendMessageToAll({id: parentId, sender: me, subject: 'reloadDocument'}, true);
+                    //TODO rajouter un abonnement quand on est sur le document et le supprimer quand on en part
+                    //TODO ainsi on pourrra cibler uniquement sur ceux qui sont présnts sur le doc
+                    onReadyForVoteComplete(id);
+                    sendNotificationReadyForVote(id, me);
+                    removeInviteNotificationOnReadyForVote(id, rfv.users, me);
+                })
+            }
+        })
         sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
         return res.json(data).end();
     }, error => {

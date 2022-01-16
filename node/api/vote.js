@@ -284,4 +284,5 @@ module.exports = {
     forIt,
     getVoters,
     deleteVote,
+    isReadyForVote,
 }

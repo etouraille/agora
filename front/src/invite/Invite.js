@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../redux/slice/readyForVoteSlice";
 import inviteSvg from './../svg/invite.svg';
 import minusSvg from './../svg/minus.svg';
+import SearchApi from "../search/SearchApi";
 const Invite = ({id}) => {
 
     const [invitedUsers , setInvitedUsers ] = useState([]);
@@ -94,15 +95,9 @@ const Invite = ({id}) => {
             </ul>
             <br/>
             <h1>Membres à inviter</h1>
-            <ul className="list-group">
-                {users.map((user, index ) => {
-                    return (
-                        <li className="list-group-item" key={index}>{user}
-                            <button className="btn btn-black float-right" onClick={() => invite(user)}><img className="logo-small margin-right" src={inviteSvg} /> Inviter</button>
-                        </li>
-                    )
-                })}
-            </ul>
+            <SearchApi api={`/api/search-user`} item={((elem, index) => <>{ elem.email !== user && invitedUsers.findIndex(rs => rs = elem.email ) === -1 ?  <li className="list-group-item" key={index}>{elem.name}
+                <button className="btn btn-black float-right" onClick={() => invite(elem.email)}><img className="logo-small margin-right" src={inviteSvg} />Inviter</button>
+            </li>: <></> }</>)}></SearchApi>
         </div>
     )
 }

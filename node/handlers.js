@@ -19,11 +19,11 @@ const subscribe = async (req , res ) => {
 
             if (!data.records[0]) {
 
-                const _user = {login: email, password: password, name, id: uuid() };
+                const _user = {email, password, name, id: uuid()};
 
                 console.log( 'user ==============', _user);
 
-                const result = session.run('CREATE (u:User { login : $login, password : $password , name: $name , id : $id }) RETURN u ',
+                const result = session.run('CREATE (u:User { login : $email, password : $password , name: $name , id : $id }) RETURN u ',
                     _user
                 );
 

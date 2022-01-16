@@ -28,6 +28,7 @@ const { test } = require('./api/test');
 const { elasticRoute } = require('./api/elastic');
 const { clear, notificationGet } = require('./api/notification');
 const { postAttach, getAttach, deleteAttach} = require("./api/attach");
+const { searchUsers } = require("./api/searchUsers");
 const { socketDocument } = require('./socket/document');
 const app = express()
 app.use(bodyParser.json())
@@ -74,7 +75,8 @@ app.post('/api/unsubscribe-doc', unsubscribeDoc);
 app.get('/api/subscribed-doc', getSubscribedDoc);
 app.get('/api/subscribed-doc/:id', getSubscribedForDocument);
 app.get('/api/mercure', mercure );
-app.post('/api/search', search );
+app.post('/api/search-document', search );
+app.post('/api/search-user', searchUsers );
 app.post('/api/notification/clear', clear );
 app.get('/api/notification', notificationGet );
 app.post('/api/invite-to-contribute', inviteEmail );
