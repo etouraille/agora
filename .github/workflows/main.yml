@@ -34,7 +34,7 @@ jobs:
               echo $ENV_FILE > .env
         - name: npm ci, build and test
           run: |
-            cd front && npm run build --if-present
+            cd front && npm install && npm run build --if-present
         - name: rsync deployments
           uses: burnett01/rsync-deployments@4.1
           with:
