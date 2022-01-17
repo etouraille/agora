@@ -48,31 +48,31 @@ const append = (id, data ) => {
 
     return new Promise( (resolve , reject ) => {
         findById(id).then(_id  => {
-            const appended = {
-                field: "quotations",
-                value: [{value: data}]
-            }
-            elastic.update({
-                index: 'document',
-                id: _id,
-                body: {
-                    script: {
-                        source : "ctx._source.quotations.add(params.quotation)",
-                        params: {quotation: {value: data}}
-                    },
-                }
-            }).then(resp => {
-                elastic.indices.refresh({ index : 'document'}).then(() => {
-                    resolve( true );
-                }, error => {
-                    reject ( error );
-                })
+            if(_id) {
+                elastic.update({
+                    index: 'document',
+                    id: _id,
+                    body: {
+                        script: {
+                            source : "ctx._source.quotations.add(params.quotation)",
+                            params: {quotation: {value: data}}
+                        },
+                    }
+                }).then(resp => {
+                    elastic.indices.refresh({ index : 'document'}).then(() => {
+                        resolve( true );
+                    }, error => {
+                        reject ( error );
+                    })
 
-            }, err => {
-                reject( err);
-                //throw err;
-                //console.log(err.body.error );
-            })
+                }, err => {
+                    reject( err);
+                    //throw err;
+                    //console.log(err.body.error );
+                })
+            } else {
+                reject('no index for the current object return by find');
+            }
         })
     })
 }

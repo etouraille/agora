@@ -8,6 +8,7 @@ const documentDelete = ( id ) => {
         "OPTIONAL MATCH (d)-[pr:HAS_PARENT]->(p:Document)-[cr:HAS_CHILDREN]->(d) " +
         "OPTIONAL MATCH (d)-[hc:HAS_CHILDREN]->(c)-[hp:HAS_PARENT]->(d) "  +
         "OPTIONAL MATCH (d)-[ar:HAS_ARCHIVE]->(a:Document) " +
+        "OPTIONAL MATCH (d)-[ar2:HAS_ARCHIVE]->(a2:Archive) " +
         "OPTIONAL MATCH (:User)-[vr:VOTE_FOR]->(d) " +
         "OPTIONAL MATCH (d)-[re:FOR_EDIT_BY]->(:User) " +
         "OPTIONAL MATCH (d)-[cbr:CREATE_BY]->(:User) " +
@@ -15,7 +16,7 @@ const documentDelete = ( id ) => {
         "OPTIONAL MATCH (d)-[sbr:SUBSCRIBED_BY]->(:User) " +
         "OPTIONAL MATCH (:User)-[sr:HAS_SUBSCRIBE_TO]->(d) " +
         "OPTIONAL MATCH (:User)-[has_notif:HAS_NOTIFICATION]->(notification:Notification)-[notify_on:NOTIFY_ON]->(d)" +
-        "DELETE has_notif , notify_on, notification, pr, cr, hc, hp, ar, vr, re, cbr, cre, sbr, sr , a, d " +
+        "DELETE has_notif , notify_on, notification, pr, cr, hc, hp, ar, ar2, vr, re, cbr, cre, sbr, sr , a, a2,  d " +
         "RETURN c ";
 
     let result = session.run( query, {id});

@@ -14,7 +14,6 @@ const home = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
 
-    //TODO : change the type of archive to Archive for now it is Document.
     let  query = "MATCH (d:Document) " +
         "WHERE NOT ((d)-[:HAS_PARENT]->(:Document) OR (:Document)-[:HAS_ARCHIVE]->(d)) " +
         "RETURN d " +

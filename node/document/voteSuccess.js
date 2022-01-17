@@ -24,7 +24,7 @@ const voteSuccess = (id ) => {
 
                 if (parentId && !complete) {
                     let query = "MATCH (d:Document) WHERE d.id = $parentId " +
-                        "OPTIONAL MATCH (d)-[r:HAS_ARCHIVE]->(p:Document ) " +
+                        "OPTIONAL MATCH (d)-[r:HAS_ARCHIVE]->(p:Archive ) " +
                         "RETURN d, r " +
                         "ORDER BY r.rank DESC ";
                     // on crée un document archive avec l'ancien document.
@@ -34,7 +34,7 @@ const voteSuccess = (id ) => {
                         let rank = data.records[0].get(1) ? data.records[0].get(1).properties.rank + 1 : 0;
                         let query = "MATCH (d:Document) WHERE d.id = $parentId " +
                             "MERGE (d)-[:HAS_ARCHIVE{ rank : $rank }]" +
-                            "->(a:Document { body : $body, title : $title, id : $uid }) "
+                            "->(a:Archive { body : $body, title : $title, id : $uid }) "
                         let result = session.run(query, {
                             parentId,
                             body: docParent.body,
