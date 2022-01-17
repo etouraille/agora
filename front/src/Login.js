@@ -28,7 +28,6 @@ const Login = () => {
             onReset={values => {}}
             onSubmit={(values , { setSubmitting , resetForm }) => {
                 let mounted = true;
-                console.log( 'submit');
                 http.post('/signin', { username : values.email, password : values.password })
                     .then( data => {
                         console.log(data);
@@ -52,7 +51,6 @@ const Login = () => {
             }}>
             {({ isSubmitting, handleSubmit }) => (
                 <Form>
-                    { isSubmitting ? 'true': 'false'}
                     <div className="input-group flex-nowrap">
                         <div className="input-group-prepend">
                             <span className="input-group-text" id="addon-wrapping">@</span>
