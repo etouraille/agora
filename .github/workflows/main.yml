@@ -34,7 +34,7 @@ jobs:
               echo $ENV_FILE > .env
         - name: Build front
           run: |
-            cd front && npm install && npm run build --if-present
+            cd front && npm install && npm run build
         - name: rsync deployments
           uses: burnett01/rsync-deployments@4.1
           with:
