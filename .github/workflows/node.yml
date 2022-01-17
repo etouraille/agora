@@ -37,7 +37,7 @@ jobs:
           ENV_FILE: ${{ secrets.ENV_NODE }}
         run: |
           cd node 
-          echo $ENV_FILE > .env.production
+          echo $ENV_FILE | base64 --decode > .env.production
 
       - name: rsync deployments
         uses: burnett01/rsync-deployments@4.1

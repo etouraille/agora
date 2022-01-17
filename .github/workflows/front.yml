@@ -31,7 +31,7 @@ jobs:
             ENV_FILE: ${{ secrets.ENV }}
           run: |
               cd front 
-              echo $ENV_FILE > .env
+              echo $ENV_FILE | base64 --decode > .env
         - name: Build front
           env:
             CI: false
