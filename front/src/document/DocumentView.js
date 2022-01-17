@@ -25,6 +25,7 @@ import After from "./parent/After";
 import {init as initReadyForVote} from "../redux/slice/readyForVoteSlice";
 import {init as initVote} from "../redux/slice/voteSlice";
 import arrow from './../svg/arrow_lett_docuent.svg';
+import ContextMenuAmend from "../contextual/ContextMenuAmend";
 
 const DocumentView = (props) => {
     const { id } = useParams();
@@ -60,7 +61,6 @@ const DocumentView = (props) => {
     })
 
 
-
     const sortedChildren = useSelector( state => {
         const doc = documentFilter(id)(state);
         let res = [];
@@ -78,28 +78,20 @@ const DocumentView = (props) => {
         return res;
     })
 
-   const setMenuFunc = (doc , quill ) => {
+   const setMenuFunc = (doc) => {
         let leftMenusTemp = [];
-        if( quill && doc.children.length > 0 ) {
-
-
+        if( doc.children.length > 0 ) {
             sortedChildren.forEach((elem, index ) => {
-                const [ line, offset ] = quill.getLeaf(elem.link.index + 1) || editor.scroll.line( elem.link.index );
-                if( line && line.parent ) {
-                    const node = line.parent.domNode;
-                    leftMenusTemp.push({node: node, id: elem.child.id});
-                }
-            })
+               leftMenusTemp.push({id: elem.child.id});
 
+            })
         }
         setLeftMenus(leftMenusTemp);
     }
 
     useEffect(() => {
-        const param = { readOnly : true, toolbar : '#toolbar' };
-        let quill = new Quill('#editor', param )
-        setMenuFunc(document, quill );
-    }, [showAmended])
+        setMenuFunc(document );
+    }, [sortedChildren.length])
 
 
 
@@ -190,13 +182,26 @@ const DocumentView = (props) => {
         return () => { dispatch( initMenu())}
     }, [leftMenus])
 
+
     useEffect(() => {
-        // TODO : move this subscribe think into Document.
-        http.get('/api/ready-for-vote/' + id ).then( data => {
-            dispatch(initReadyForVote({id : id , data : data.data}));
-        }, error => {
-            console.log( error );
-        })
+        if (id) {
+            http.get('/api/ready-for-vote/' + id).then(data => {
+                console.log(data );
+                dispatch(initReadyForVote({id: id, data: data.data}));
+            }, error => {
+                console.log(error);
+            })
+            http.get('/api/vote/voters/' + id ).then( data  => {
+                dispatch( initVote({ id , data : data.data }))
+            }, error => {
+                console.log( error);
+            })
+        }
+
+    }, [id])
+
+    useEffect(() => {
+        console.log( 'left menues ==========',leftMenus );
         leftMenus.forEach((menu) => {
             if( partialForChange.indexOf( menu.id ) === -1 ) {
                 partialForChange.push( menu.id );
@@ -217,7 +222,7 @@ const DocumentView = (props) => {
         return () => {
 
         }
-    }, [ true , leftMenus ])
+    }, [ true , leftMenus.length, leftMenus ])
 
 
     return (
@@ -232,6 +237,7 @@ const DocumentView = (props) => {
                 <div className="row">
                     <div className="col-sm">
                         <div id="editor"></div>
+                        <ContextMenuAmend id={id} reload={() => dispatch(setReload({id}))} editor={editor}></ContextMenuAmend>
                         <br />
                         <br />
                         <div>{  ! readyForVote.isReadyForVote && readyForVote.isOwner ?
@@ -247,6 +253,7 @@ const DocumentView = (props) => {
                     }
                 </div>
                 <After document={document} id={id} count={count}></After>
+
             </div>
         </>
 

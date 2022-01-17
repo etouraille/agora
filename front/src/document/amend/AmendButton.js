@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import { Modal } from "react-bootstrap";
 import Quill from "quill";
 import http from "../../http/http";
@@ -8,13 +8,16 @@ import { add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
 
-const AmendButton = ({id , document, reload , onClick }) => {
+const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,setClickEvent }) => {
+
 
     const [ modalIsOpen, setModalIsOpen ] = useState( false );
     const [ before , setBefore ] = useState([]);
     const [ after , setAfter ] = useState([]);
     const [ current, setCurrent ] = useState( []);
     const [ range , setRange ] = useState( null );
+
+
 
     const user = useSelector( state => state.login.user );
 
@@ -27,8 +30,9 @@ const AmendButton = ({id , document, reload , onClick }) => {
     }
 
     const amend = useCallback((evt ) => {
+        evt.nativeEvent.preventDefault();
         if( typeof onClick === 'function') {
-            onClick(evt);
+            //onClick(evt);
         }
 
         const param = { readOnly : true, toolbar : '#toolbar' };
@@ -36,8 +40,8 @@ const AmendButton = ({id , document, reload , onClick }) => {
 
 
 
-            evt.preventDefault();
             const somerange = editor.getSelection();
+
 
             let inRange = false;
             if( document.children.length > 0 && somerange ) {
@@ -47,6 +51,7 @@ const AmendButton = ({id , document, reload , onClick }) => {
                     }
                 })
             }
+
 
 
             if (somerange && !inRange ) {
@@ -59,9 +64,19 @@ const AmendButton = ({id , document, reload , onClick }) => {
 
             }
 
+            /*
+            if(typeof setClickEvent === 'function') {
+                setClickEvent(null);
+            }
+             */
 
+    }, [ document , setClickEvent])
 
-    }, [ document ])
+    useEffect(() => {
+        if (_clickEvent) {
+            amend(_clickEvent);
+        }
+    }, [_clickEvent])
 
     const onEnteredModal = () => {
         const quillBefore = new Quill('#before', {readOnly : true});
@@ -97,7 +112,7 @@ const AmendButton = ({id , document, reload , onClick }) => {
 
     return (
         <>
-            <img className="logo" src={junction} onClick={amend}></img>
+            { noIcon ? <></> :<img className="logo" src={junction} onClick={amend}></img> }
             <Modal
                 show={modalIsOpen}
                 onHide={() => setModalIsOpen(false)}

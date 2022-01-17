@@ -25,6 +25,7 @@ export default function App() {
     const dispatch = useDispatch();
 
     const click = (evt) => {
+        evt.preventDefault();
         dispatch(add());
     }
 
