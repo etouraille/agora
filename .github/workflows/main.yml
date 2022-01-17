@@ -41,7 +41,7 @@ jobs:
           uses: burnett01/rsync-deployments@4.1
           with:
             switches: -avzr --delete
-            path: ~/front/build/
+            path: /front/build/
             remote_path: ~/production/build/
             remote_host: queel.fr
             remote_user: ubuntu
@@ -63,8 +63,16 @@ jobs:
           uses: burnett01/rsync-deployments@4.1
           with:
             switches: -avzr --delete
-            path: ~/node
+            path: /node/
             remote_path: ~/production/node/
             remote_host: queel.fr
             remote_user: ubuntu
             remote_key: ${{ secrets.RSA_PUB }}
+        - name: ssh key passphrase
+          uses: appleboy/ssh-action@master
+          with:
+              host: queel.fr
+              username: ubuntu
+              key: ${{ secrets.RSA_PUB }}
+              script: |
+                cd prduction && ./restart_node.sh
