@@ -22,13 +22,16 @@ const Login = () => {
                 ) {
                     errors.email = 'Invalid email address';
                 }
+                console.log(errors);
                 return errors;
             }}
             onReset={values => {}}
             onSubmit={(values , { setSubmitting , resetForm }) => {
                 let mounted = true;
+                console.log( 'submit');
                 http.post('/signin', { username : values.email, password : values.password })
                     .then( data => {
+                        console.log(data);
                         if( data.data.token ) {
                             localStorage.setItem( 'token', data.data.token );
                             if(localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
@@ -47,8 +50,9 @@ const Login = () => {
                     resetForm({ values : ''});
 
             }}>
-            {({ isSubmitting }) => (
+            {({ isSubmitting, handleSubmit }) => (
                 <Form>
+                    { isSubmitting ? 'true': 'false'}
                     <div className="input-group flex-nowrap">
                         <div className="input-group-prepend">
                             <span className="input-group-text" id="addon-wrapping">@</span>
@@ -61,7 +65,7 @@ const Login = () => {
                         <Field type="password" name="password" className="form-control"></Field>
                         <ErrorMessage name="password" component="div"></ErrorMessage>
                     </div>
-                    <button className="btn btn-primary" type="submit" disabled={isSubmitting} >
+                    <button className="btn btn-primary" type="submit" onClick={handleSubmit} disabled={isSubmitting} >
                         Submit
                     </button>
                 </Form>
