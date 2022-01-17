@@ -1,6 +1,6 @@
 import Login from './Login';
 import SubscribeForm from './subscribe/SubscribeForm';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Encart from "./login/encart";
 import Document from './document/Document';
 import DocumentEdit from "./document/DocumentEdit";
@@ -18,11 +18,27 @@ import {useDispatch} from "react-redux";
 import {add} from "./redux/slice/clickSlice";
 import UploadFile from "./upload/UploadFile";
 import Home from "./Home";
+import { useLocation } from 'react-router-dom';
 
 
 export default function App() {
 
     const dispatch = useDispatch();
+
+    const location = useLocation();
+
+    console.log( location );
+
+    useEffect(() => {
+        let currentUrl = location.pathname;
+        console.log(currentUrl);
+        window.localStorage.setItem('redirect', window.localStorage.getItem('currentUrl'));
+        window.localStorage.setItem('previousUrl', window.localStorage.getItem('currentUrl'));
+        if( ! currentUrl.match(/\/login/)) {
+            window.localStorage.setItem('currentUrl', currentUrl);
+        }
+
+    }, [location.pathname])
 
     const click = (evt) => {
         evt.preventDefault();

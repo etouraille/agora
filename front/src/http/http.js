@@ -34,10 +34,6 @@ http.interceptors.response.use( response => {
 }, error => {
 
     if( error.response?.status === 401 ) {
-        if(!window.localStorage.getItem('redirect')) {
-            window.localStorage.setItem('redirect', window.location.pathname);
-        }
-
         store.dispatch(logout());
         history.push('/login');
 

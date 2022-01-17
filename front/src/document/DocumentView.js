@@ -201,7 +201,6 @@ const DocumentView = (props) => {
     }, [id])
 
     useEffect(() => {
-        console.log( 'left menues ==========',leftMenus );
         leftMenus.forEach((menu) => {
             if( partialForChange.indexOf( menu.id ) === -1 ) {
                 partialForChange.push( menu.id );
