@@ -28,7 +28,7 @@ jobs:
             node-version: ${{ matrix.node-version }}
         - name: Copy env file
             env:
-              ENV_FILE: ${{ secrets.ENV }}
+              - ENV_FILE: ${{ secrets.ENV }}
             run: |
               cd front 
               echo $ENV_FILE > .env
