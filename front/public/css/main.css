@@ -159,6 +159,11 @@ html {
     padding: 17px;
     flex-grow: initial;
 }
+.item-home-mobile {
+    width: 100%;
+    padding: 17px;
+    flex-grow: initial;
+}
 .item-users {
     position: relative;
     left: 86%;

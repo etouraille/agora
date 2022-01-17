@@ -4,11 +4,14 @@ import Quill from "quill";
 import Delta from 'quill-delta';
 import history from "./utils/history";
 import {Dropdown} from "react-bootstrap";
+import useIsMobile from "./utils/useIsMobile";
 
 const Home = () => {
 
     const [ docs, setDocuments] = useState([]);
     const [ page, setPage] = useState(1);
+
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         http.post('/home', {page}).then(data => {
@@ -40,7 +43,7 @@ const Home = () => {
 
     const item = (elem, index ) => {
         return (
-            <div key={index} className="item-home">
+            <div key={index} className={`item-home${isMobile ? '-mobile': ''}`}>
                 <h6 onClick={evt => navigate(elem.id)}>{elem.title}</h6>
                 <div id={`content_${index}`}></div>
                 { elem.users.length > 0 ? <div className="item-users">
