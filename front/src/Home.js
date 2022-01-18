@@ -8,6 +8,7 @@ const Home = () => {
     const [ docs, setDocuments] = useState([]);
     const [ page, setPage] = useState(1);
 
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         http.post('/home', {page}).then(data => {

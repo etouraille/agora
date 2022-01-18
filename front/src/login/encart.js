@@ -52,12 +52,6 @@ const Encart = () => {
 
     const subscribedDoc = useSelector( documentSubscribeFilters);
 
-    const isPing = (pathname) => {
-        noPing.findIndex( elem => {
-
-        })
-    }
-
     useEffect(() => {
 
         if (-1 === noPing.findIndex(elem => location.pathname.match(elem))) {

@@ -8,8 +8,6 @@ import useIsMobile from "../utils/useIsMobile";
 
 const ItemDocument = ({ index, document }) => {
 
-    console.log( document );
-
     const isMobile = useIsMobile();
 
     useEffect(() => {

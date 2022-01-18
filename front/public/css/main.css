@@ -170,3 +170,7 @@ html {
     top: -20%;
     width: 20px;
 }
+.big {
+    font-size: 14em;
+    font-style: italic;
+}
