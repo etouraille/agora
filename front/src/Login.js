@@ -22,7 +22,6 @@ const Login = () => {
                 ) {
                     errors.email = 'Invalid email address';
                 }
-                console.log(errors);
                 return errors;
             }}
             onReset={values => {}}
@@ -30,7 +29,7 @@ const Login = () => {
                 let mounted = true;
                 http.post('/signin', { username : values.email, password : values.password })
                     .then( data => {
-                        console.log(data);
+
                         if( data.data.token ) {
                             localStorage.setItem( 'token', data.data.token );
                             if(localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {

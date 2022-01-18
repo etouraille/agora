@@ -31,7 +31,6 @@ export default function App() {
 
     useEffect(() => {
         let currentUrl = location.pathname;
-        console.log(currentUrl);
         window.localStorage.setItem('redirect', window.localStorage.getItem('currentUrl'));
         window.localStorage.setItem('previousUrl', window.localStorage.getItem('currentUrl'));
         if( ! currentUrl.match(/\/login/)) {
@@ -51,7 +50,7 @@ export default function App() {
                     <nav className="navbar navbar-light bg-light">
                         <ul className="nav">
                             <li className="nav-item active">
-                                <Link to="/home" className="nav-link">Home</Link>
+                                <Link to="/" className="nav-link">Home</Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/subscribe" className="nav-link">Inscription</Link>
@@ -69,9 +68,6 @@ export default function App() {
                             </Route>
                             <Route path="/login">
                                 <Login></Login>
-                            </Route>
-                            <Route path="/home">
-                                <Home></Home>
                             </Route>
                             <Route path="/documents">
                                 <Barre></Barre>
@@ -93,6 +89,9 @@ export default function App() {
                             </Route>
                             <Route path="/403">
                                 <_403></_403>
+                            </Route>
+                            <Route path="/">
+                                <Home></Home>
                             </Route>
                         </Switch>
                     </div>

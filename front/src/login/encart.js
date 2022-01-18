@@ -3,7 +3,7 @@ import { useSelector , useDispatch } from "react-redux";
 import jwtDecode from "jwt-decode";
 import http from "../http/http";
 import { login, logout } from "../redux/slice/loginSlice";
-import { Link } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import usePrevious from "../utils/usePrevious";
 import {init} from "../redux/slice/subscribedSlice";
 import { initNotification } from "../redux/slice/notificationSlice";
@@ -38,6 +38,10 @@ const Encart = () => {
 
     const prevClick = usePrevious(click);
 
+    const location = useLocation();
+
+    const noPing = ['/'];
+
     useEffect(() => {
         if( click > 0 && click > prevClick ) {
             setSelected(false);
@@ -49,15 +53,19 @@ const Encart = () => {
     const subscribedDoc = useSelector( documentSubscribeFilters);
 
     useEffect(() => {
-        http.get('/api/ping').then(
-            data => {
-                dispatch( login({ token  : localStorage.getItem('token'), user: data.data.user  }));
-            },
-            error => {
-                dispatch( logout());
-            });
 
-    }, [])
+        if (!noPing.includes(location.pathname)) {
+
+            http.get('/api/ping').then(
+                data => {
+                    dispatch(login({token: localStorage.getItem('token'), user: data.data.user}));
+                },
+                error => {
+                    dispatch(logout());
+                });
+        }
+
+    }, [location.pathname])
 
 
     useEffect(() => {
