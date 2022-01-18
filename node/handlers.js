@@ -21,7 +21,6 @@ const subscribe = async (req , res ) => {
 
                 const _user = {email, password, name, id: uuid()};
 
-                console.log( 'user ==============', _user);
 
                 const result = session.run('CREATE (u:User { login : $email, password : $password , name: $name , id : $id }) RETURN u ',
                     _user
@@ -35,7 +34,6 @@ const subscribe = async (req , res ) => {
                     try {
                         addNewUser(_user, null);
                     } catch(e) {
-                        console.log('elastic error==================', e);
                         return res.status(500).json({ error: 'Elastic error adding user'});
                     }
 

@@ -19,6 +19,7 @@ import {add} from "./redux/slice/clickSlice";
 import UploadFile from "./upload/UploadFile";
 import Home from "./Home";
 import { useLocation } from 'react-router-dom';
+import User from "./user/User";
 
 
 export default function App() {
@@ -89,6 +90,9 @@ export default function App() {
                             </Route>
                             <Route path="/403">
                                 <_403></_403>
+                            </Route>
+                            <Route path="/user/:id">
+                                <User></User>
                             </Route>
                             <Route path="/">
                                 <Home></Home>

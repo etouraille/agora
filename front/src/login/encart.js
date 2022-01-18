@@ -40,7 +40,7 @@ const Encart = () => {
 
     const location = useLocation();
 
-    const noPing = ['/'];
+    const noPing = [/^\/$/, /\/user\/(.*)$/];
 
     useEffect(() => {
         if( click > 0 && click > prevClick ) {
@@ -52,9 +52,15 @@ const Encart = () => {
 
     const subscribedDoc = useSelector( documentSubscribeFilters);
 
+    const isPing = (pathname) => {
+        noPing.findIndex( elem => {
+
+        })
+    }
+
     useEffect(() => {
 
-        if (!noPing.includes(location.pathname)) {
+        if (-1 === noPing.findIndex(elem => location.pathname.match(elem))) {
 
             http.get('/api/ping').then(
                 data => {

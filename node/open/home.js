@@ -1,7 +1,7 @@
-const getDriver = require('./neo/driver');
-const { sendInvite } = require('./notification/notification')
-const { sendMessage } = require('./mercure/mercure')
-const {contents, buildDoc} = require("./document/contents");
+const getDriver = require('../neo/driver');
+const { sendInvite } = require('../notification/notification')
+const { sendMessage } = require('../mercure/mercure')
+const {contents, buildDoc} = require("../document/contents");
 const neo4j = require('neo4j-driver');
 
 const home = ( req, res ) => {
@@ -15,7 +15,7 @@ const home = ( req, res ) => {
     const session = driver.session();
 
     let  query = "MATCH (d:Document) " +
-        "WHERE NOT ((d)-[:HAS_PARENT]->(:Document) OR (:Document)-[:HAS_ARCHIVE]->(d)) " +
+        "WHERE NOT (d)-[:HAS_PARENT]->(:Document) " +
         "RETURN d " +
         "ORDER BY d.created_at ASC SKIP $skip " +
         "LIMIT $per_page ";
@@ -40,8 +40,8 @@ const home = ( req, res ) => {
                 let _session = driver.session();
                 return _session.run(query, {id}).then(data => {
                     data.records.forEach(elem => {
-                        let { login, name } = elem.get(0).properties;
-                        users.push({login, name});
+                        let { login, name, id } = elem.get(0).properties;
+                        users.push({login, name, id });
                     })
                     return ret.push({content, users, title , id });
                 }).catch(err => {

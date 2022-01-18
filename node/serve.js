@@ -9,10 +9,11 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 
-const { home } = require("./home");
+const { home } = require("./open/home");
 const { ping } = require('./api/ping');
 const { signIn , subscribe , eachCheckToken } = require('./handlers')
 const { create, get , deleteDocument } = require('./api/document');
+const { getUser } = require("./open/user");
 const { documents } = require('./api/documents')
 const { amend } = require('./api/amend');
 const { canAmend } = require('./acl/canAmend');
@@ -46,8 +47,9 @@ app.use(function(req, res, next) {
 
 app.use(eachCheckToken);
 
+app.get('/', home);
 app.post('/home', home);
-app.get('/home', home);
+app.get('/user/:id', getUser);
 app.get('/api/ping', ping );
 app.get('/api/users', getUsers);
 app.get('/api/documents', documents);
