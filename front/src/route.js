@@ -14,7 +14,7 @@ import Home from "./Home";
 import React from "react";
 
 const _routes = [
-    { path:  "/subscribe", regexp: /\/suscribe$/, html : () => <SubscribeForm></SubscribeForm> },
+    { path:  "/subscribe", regexp: /\/subscribe$/, html : () => <SubscribeForm></SubscribeForm> },
     { path : "/login", regexp: /\/login$/, html : () => <Login></Login>},
     { path: "/documents", regexp: /\/documents$/,html: () => <><Barre></Barre><Search></Search></> },
     { path: "/documentedit/:id", regexp: /\/documentedit\/(.*)/, html: () => <><Barre></Barre><DocumentEdit></DocumentEdit></>},
