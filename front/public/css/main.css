@@ -4,15 +4,7 @@ html {
 .app {
     height: 100%;
 }
-p{
-    user-select: none;
-}
-div{
-    user-select: none;
-}
-a{
-    user-select: none;
-}
+
 
 
 .rightBarre {

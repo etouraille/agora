@@ -64,6 +64,10 @@ const DocumentView = (props) => {
         setEditor( quill );
         let delta = new Delta(JSON.parse(document.document.body));
 
+        quill.content.addEventListener('contextmenu', (evt) => {
+            evt.preventDefault();
+        })
+
         document.children.map(( object , index ) =>{
             let link = object.link;
             let res = [];
