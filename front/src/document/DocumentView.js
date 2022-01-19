@@ -64,9 +64,6 @@ const DocumentView = (props) => {
         setEditor( quill );
         let delta = new Delta(JSON.parse(document.document.body));
 
-        quill.content.addEventListener('contextmenu', (evt) => {
-            evt.preventDefault();
-        })
 
         document.children.map(( object , index ) =>{
             let link = object.link;
@@ -83,6 +80,10 @@ const DocumentView = (props) => {
             }
         })
         quill.setContents( delta );
+        quill.container.addEventListener('contextmenu', (evt) => {
+            evt.preventDefault();
+        })
+
         if( hasSubscribed ) {
             // TODO check if it is useful
             // setMenuFunc(document, editor);
