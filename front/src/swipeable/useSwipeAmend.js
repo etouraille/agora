@@ -9,6 +9,8 @@ const useSwipeAmend = ({editor, id }) => {
 
     const { ref } = useSwipeable({
         onSwipedLeft : (evt) => {
+            evt.event.stopPropagation();
+            evt.event.preventDefault();
             if( editor && editor.getSelection() && editor.getSelection().length > 0 ) {
                 dispatch(toggleAmend({from: 'context-menu'}));
             } else if (editor) {
