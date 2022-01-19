@@ -6,15 +6,16 @@ import { voteSlice } from "./slice/voteSlice";
 import { subscribedSlice } from "./slice/subscribedSlice";
 import { amendSlice } from "./slice/amendSlice";
 import { documentSlice } from "./slice/documentSlice";
-import {toggleDiffSlice} from "./slice/toggleDiffSlice";
-import {reloadDocumentSlice} from "./slice/reloadDocumentSlice";
-import {reloadVoteSlice} from "./slice/reloadVoteSlice";
-import {documentChangeSlice} from "./slice/documentChangeSlice";
-import {documentSubscribeSlice} from "./slice/documentSubscribeSlice";
-import {barreToggleSlice} from "./slice/barreToggleSlice";
-import {notificationSlice} from "./slice/notificationSlice";
-import {reloadDocumentListSlice} from "./slice/reloadDocumentListSlice";
-import {clickSlice} from "./slice/clickSlice";
+import { toggleDiffSlice } from "./slice/toggleDiffSlice";
+import { reloadDocumentSlice } from "./slice/reloadDocumentSlice";
+import { reloadVoteSlice } from "./slice/reloadVoteSlice";
+import { documentChangeSlice } from "./slice/documentChangeSlice";
+import { documentSubscribeSlice } from "./slice/documentSubscribeSlice";
+import { barreToggleSlice } from "./slice/barreToggleSlice";
+import { notificationSlice } from "./slice/notificationSlice";
+import { reloadDocumentListSlice } from "./slice/reloadDocumentListSlice";
+import { clickSlice } from "./slice/clickSlice";
+import { toggleAmendSlice } from "./slice/toggleAmend";
 
 
 const rootReducer = combineReducers({
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
     reloadDocumentList : reloadDocumentListSlice.reducer,
     reloadVote : reloadVoteSlice.reducer,
     subscribed : subscribedSlice.reducer,
+    toggleAmend : toggleAmendSlice.reducer,
     toggleDiff : toggleDiffSlice.reducer,
     vote : voteSlice.reducer,
 });

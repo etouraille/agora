@@ -26,12 +26,15 @@ import {init as initReadyForVote} from "../redux/slice/readyForVoteSlice";
 import {init as initVote} from "../redux/slice/voteSlice";
 import arrow from './../svg/arrow_lett_docuent.svg';
 import ContextMenuAmend from "../contextual/ContextMenuAmend";
+import useIsMobile from "../utils/useIsMobile";
+import useLoadDocument from "../utils/useLoadDocument";
 
 const DocumentView = (props) => {
     const { id } = useParams();
     const [ editor , setEditor ] = useState( null );
     const [ leftMenus , setLeftMenus ] = useState([]);
-    const [ count , setCount ] = useState( 0 );
+
+    const isMobile = useIsMobile();
 
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
     const vote = useSelector(voteFilter(id));
@@ -46,14 +49,7 @@ const DocumentView = (props) => {
     })
 
 
-    const document = useSelector( state => {
-        let res =  state.document.find( elem => elem.id === id );
-        if( res ) {
-            return res.doc;
-        } else {
-            return { document : { title : null, body : null }, children : []};
-        }
-    })
+    const { document, count } = useLoadDocument({id, reload })
 
     const showAmended = useSelector( state => {
         let elem = state.toggleDiff.find( elem => elem.id === id );
@@ -61,78 +57,6 @@ const DocumentView = (props) => {
         else return false;
     })
 
-
-    const sortedChildren = useSelector( state => {
-        const doc = documentFilter(id)(state);
-        let res = [];
-        if( doc && doc.children ) {
-            const data = [...doc.children];
-
-            let ret = data.sort((elem, elem2) => {
-                return ((elem.link.index < elem2.link.index) ? -1 : 1);
-            })
-            res = ret.map(elem => {
-                let vote = readyForVoteSubscribedFilter(elem.child.id)(state);
-                return {...elem, vote: vote};
-            })
-        }
-        return res;
-    })
-
-   const setMenuFunc = (doc) => {
-        let leftMenusTemp = [];
-        if( doc.children.length > 0 ) {
-            sortedChildren.forEach((elem, index ) => {
-               leftMenusTemp.push({id: elem.child.id});
-
-            })
-        }
-        setLeftMenus(leftMenusTemp);
-    }
-
-    useEffect(() => {
-        setMenuFunc(document );
-    }, [sortedChildren.length])
-
-
-
-    useEffect(() => {
-        if( id ) {
-            http.get('/api/document/' + id ).then(
-                data => {
-                    if( data.data.parent && data.data.parent.link && data.data.parent.link.voteComplete ) {
-                        history.push( '/document/' + data.data.parent.document.id );
-                        return;
-                    }
-                    /*
-                    if( data.data.children === undefined ) {
-                        history.push('/403');
-                        return;
-                    }
-                     */
-                    dispatch( initDoc({id : id, data : data.data }));
-                    setCount( count + 1 );
-                    let children = [];
-
-                    const res  = [ ...data.data.children ];
-                    let ret = res.sort((elem , elem2) => {
-                        return ((elem.link.index  < elem2.link.index) ? -1 : 1);
-                    })
-
-                    ret.map(( object , index ) =>{
-                        children.push( object.child.id );
-                    })
-                    dispatch(init({id : id , data : children }));
-                    dispatch(initWith({data: children }));
-                    dispatch(initToggleDiff({id : id  }));
-                    dispatch( initReload({id : id }))
-                    dispatch( initReloadVote({id : id }));
-                },error => {
-                    console.log( error )
-                })
-        }
-
-    }, [ reload , id ]);
 
     useEffect(() => {
         const param = { readOnly : true, toolbar : '#toolbar' };
@@ -156,7 +80,8 @@ const DocumentView = (props) => {
         })
         quill.setContents( delta );
         if( hasSubscribed ) {
-            setMenuFunc(document, editor);
+            // TODO check if it is useful
+            // setMenuFunc(document, editor);
         }
 
     }, [document.children.length, hasSubscribed, reload ])
@@ -173,59 +98,7 @@ const DocumentView = (props) => {
     let partialForChange = [];
 
 
-    useEffect(() => {
-        leftMenus.forEach( (elem , index )=> {
-            dispatch(add({ id : elem.id}));
-        })
-        //TODO
-        if( leftMenus.length === 0 ) {
-            dispatch( off());
-            dispatch(initMenu());
-        }
-        return () => { dispatch( initMenu())}
-    }, [leftMenus.length ])
 
-
-    useEffect(() => {
-        if (id) {
-            http.get('/api/ready-for-vote/' + id).then(data => {
-                console.log(data );
-                dispatch(initReadyForVote({id: id, data: data.data}));
-            }, error => {
-                console.log(error);
-            })
-            http.get('/api/vote/voters/' + id ).then( data  => {
-                dispatch( initVote({ id , data : data.data }))
-            }, error => {
-                console.log( error);
-            })
-        }
-
-    }, [id])
-
-
-    useEffect(() => {
-        leftMenus.forEach((menu) => {
-            if( partialForChange.indexOf( menu.id ) === -1 ) {
-                partialForChange.push( menu.id );
-            }
-            http.get( '/api/ready-for-vote/' + menu.id ).then( data => {
-                dispatch(initReadyForVote({id : menu.id, data : data.data}));
-            }, error => {
-                console.log( error );
-            })
-            http.get('/api/vote/voters/' + menu.id ).then( data  => {
-                dispatch( initVote({ id : menu.id , data : data.data }))
-            }, error => {
-                console.log( error);
-            })
-        });
-
-
-        return () => {
-
-        }
-    }, [ leftMenus.length ])
 
     return (
         <>
@@ -247,7 +120,7 @@ const DocumentView = (props) => {
                             <></>
                         }</div>
                     </div>
-                    { showAmended ?
+                    { !isMobile && showAmended ?
                         <div className="col-sm">
                             <AmendView id={id} reload={() => dispatch(setReload({id}))} countParent={count}></AmendView>
                         </div>

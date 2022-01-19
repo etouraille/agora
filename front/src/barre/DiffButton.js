@@ -5,10 +5,13 @@ import {useDispatch, useSelector} from "react-redux";
 import canDisplayDiffFilter from "../redux/filter/canDisplayDiffFilter";
 import { toggleDiff } from "../redux/slice/toggleDiffSlice";
 import {initOne , toggle as toggleBarre } from './../redux/slice/barreToggleSlice';
+import useIsMobile from "../utils/useIsMobile";
 
 const DiffButton = () => {
 
     const { id } = useParams();
+
+    const isMobile = useIsMobile();
 
     const toggleName = 'diff';
     // on ne montre ce boutton que :
@@ -35,7 +38,7 @@ const DiffButton = () => {
 
     return (
         <>
-            { canDisplay ? <div className="barre-elem">
+            { canDisplay && !isMobile ? <div className="barre-elem">
                 <img onClick={toggle} className="logo " src={diff} alt="Amend"/>
             </div> : <></> }
         </>

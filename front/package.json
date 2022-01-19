@@ -37,6 +37,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
+    "react-swipeable": "^6.2.0",
     "react-trumbowyg": "^1.1.0",
     "redux": "^4.0.5",
     "rich-text": "^4.1.0",

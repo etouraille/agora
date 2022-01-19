@@ -5,7 +5,7 @@ import arrow_right from '../svg/arrow_right_document.svg'
 import voteSvg from '../svg/vote.svg';
 import VoteModal from "../document/vote/VoteModal";
 import editSvg from "../svg/edit.svg";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import voteFilter from "../redux/filter/voteFilter";
 import docSvg from "../svg/doc.svg";
@@ -18,6 +18,9 @@ import junction from './../svg/junction.svg';
 import QFactory from "../quill/QFactory";
 import idFromRoute from "../utils/idFromRoute";
 import routeFromHref from "../utils/routeFromHref";
+import useIsMobile from "../utils/useIsMobile";
+import useSwipeAmend from "../swipeable/useSwipeAmend";
+import {toggleAmend} from "../redux/slice/toggleAmend";
 
 const ContextMenuAmend = ({ id, reload , editor}) => {
 
@@ -25,6 +28,9 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
     const canDisplay = useSelector(canDisplayAmendFilter(id));
     const document = useSelector(documentFilter(id));
 
+    const isMobile = useIsMobile();
+
+    const { ref } = useSwipeAmend({editor, id });
 
     const [ evt, setEvt ] = useState(null);
     const [ display, setDisplay ] = useState( false );
@@ -33,8 +39,7 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
 
     const click = useSelector((state) => state.click.click);
 
-    const [, updateState] = React.useState();
-    const forceUpdate = React.useCallback(() => updateState({}), []);
+    const dispatch = useDispatch();
 
     const prevClick = usePrevious(click);
 
@@ -48,9 +53,11 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
     }, [setEvt, setDisplay])
 
     useEffect(() => {
-        if( editor ) {
+        if( editor && !isMobile ) {
             editor.container.addEventListener('contextmenu', cb_context);
             //editor.container.addEventListener('onclick', (evt) => evt.preventDefault());
+        } else if (editor && isMobile ) {
+            ref(editor.container);
         }
     }, [editor])
 
@@ -99,18 +106,19 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
         evt.preventDefault();
         evt.stopPropagation();
 
+        dispatch(toggleAmend({from: 'context-menu'}));
+
         setClickEvent(evt);
         //forceUpdate();
 
         setTimeout(() => {
-            setClickEvent(null);
             setDisplay(false);
         }, 200);
     };
 
     return (
         <div>
-            { display && canDisplay && hasRange ? (
+            { display && canDisplay && hasRange && !isMobile ? (
                 <div className="menu-container" style={{ top : y, left : x ,position : 'fixed', zIndex: 7000 }}>
                     <div className="menu-row" onClick={(evt) => _onClick(evt)}>
                         <span className="before"><img  className="logo-small" src={junction} /></span>
@@ -119,14 +127,12 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
                 </div>
             ) : (<></>)}
             <AmendButton
+                label="context-menu"
                 id={id}
                 noIcon={true}
                 document={document}
                 reload={reload}
                 onClick={(evt) => _click(evt)}
-                _clickEvent={clickEvent}
-                setClickEvent={setClickEvent}
-                //forceReload={forceUpdate}
             ></AmendButton>
         </div>
     )

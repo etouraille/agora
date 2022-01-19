@@ -7,8 +7,9 @@ import { sub } from "../../redux/slice/subscribedSlice";
 import { add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
+import { toggleAmend as toggleAmendAction } from "../../redux/slice/toggleAmend";
 
-const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,setClickEvent }) => {
+const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,setClickEvent, label  }) => {
 
 
     const [ modalIsOpen, setModalIsOpen ] = useState( false );
@@ -16,6 +17,8 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
     const [ after , setAfter ] = useState([]);
     const [ current, setCurrent ] = useState( []);
     const [ range , setRange ] = useState( null );
+
+    const toggleAmend = useSelector(state => state.toggleAmend.toggle);
 
 
 
@@ -30,7 +33,7 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
     }
 
     const amend = useCallback((evt ) => {
-        evt.nativeEvent.preventDefault();
+        if (evt) evt.nativeEvent.preventDefault();
         if( typeof onClick === 'function') {
             //onClick(evt);
         }
@@ -70,13 +73,13 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
             }
              */
 
-    }, [ document , setClickEvent])
+    }, [ document ])
 
     useEffect(() => {
-        if (_clickEvent) {
-            amend(_clickEvent);
+        if(toggleAmend && label ==='context-menu')  {
+            amend();
         }
-    }, [_clickEvent])
+    }, [toggleAmend]);
 
     const onEnteredModal = () => {
         const quillBefore = new Quill('#before', {readOnly : true});
@@ -100,6 +103,7 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
             data => {
                 dispatch(sub({id : data.data.id , user: user }));
                 dispatch(add({ id: id , child : data.data.id }));
+                dispatch(toggleAmendAction({from: label}));
                 reload();
                 //history.push('/document/' + data.data.id );
             },
@@ -115,7 +119,7 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
             { noIcon ? <></> :<img className="logo" src={junction} onClick={amend}></img> }
             <Modal
                 show={modalIsOpen}
-                onHide={() => setModalIsOpen(false)}
+                onHide={() => {dispatch(toggleAmendAction({from: label}));setModalIsOpen(false)}}
                 dialogClassName="modal-90w"
                 aria-labelledby="example-custom-modal-styling-title"
                 onEntered={onEnteredModal}
