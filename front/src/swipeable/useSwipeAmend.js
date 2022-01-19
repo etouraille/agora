@@ -15,7 +15,7 @@ const useSwipeAmend = ({editor, id }) => {
                 history.push('/documentamend/' + id);
             }
         }
-    });
+    }, { preventDefaultTouchmoveEvent: true });
 
     return { ref };
 }
