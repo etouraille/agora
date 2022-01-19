@@ -1,5 +1,5 @@
 const idFromRoute = (route) => {
     let match = route.match(/\/document\/(.*)$/);
-    return match[1];
+    return match ? match[1]: null;
 }
 export default idFromRoute;

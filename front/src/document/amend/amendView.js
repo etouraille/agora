@@ -12,6 +12,7 @@ import history from "../../utils/history";
 import idFromRoute from "../../utils/idFromRoute";
 import ContextMenu from "../../contextual/ContextMenu";
 import useLoadDocument from "../../utils/useLoadDocument";
+import SwipeAmendItem from "../../swipeable/SwipeAmendItem";
 
 const AmendView = ({id, reload , countParent }) => {
 
@@ -44,7 +45,8 @@ const AmendView = ({id, reload , countParent }) => {
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
 
     const sortedChildren = useSelector( state => {
-        let data = [...doc.children];
+        console.log( doc.children );
+        let data = Array.isArray(doc.children) ? [...doc.children] : [];
         let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
         })
@@ -179,6 +181,11 @@ const AmendView = ({id, reload , countParent }) => {
             <div id="emptyQuill" style={{display: 'none'}}></div>
             <div id="rightEditor"></div>
             <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
+            { Array.from(window.document.querySelectorAll("p > a")).map((elem, index) => {
+                console.log( elem , '=================================================');
+                let id = elem.href ? idFromRoute(routeFromHref(elem.href)): null;
+                return <>{id ? <SwipeAmendItem index={index} elem={elem} id={id} reload={() => reload()}></SwipeAmendItem>: <></>}</>
+            })}
         </div>
 
     )

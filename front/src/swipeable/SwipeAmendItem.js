@@ -8,7 +8,7 @@ import voteFilter from "../redux/filter/voteFilter";
 
 const SwipeAmendItem = ({id, elem, index , reload}) => {
 
-    const [toggleModal, setToggleModel] = useState(false);
+    const [toggleModal, setToggleModal] = useState(false);
 
     const canEdit = useSelector(readyForVoteSubscribedFilter(id));
 
@@ -18,10 +18,12 @@ const SwipeAmendItem = ({id, elem, index , reload}) => {
         onSwipedLeft : (evt) => {
             if (canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail) {
                 history.push('/document/' + id );
-            } else if (canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && !vote.fail) {
+            }
+            if (canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && !vote.fail) {
                 //TODO maybe do some view instead of clicking
-                setToggleModel(!toggleModal);
-           } else if( canEdit && canEdit.isOwner && ! canEdit.isReadyForVote) {
+                setToggleModal(!toggleModal);
+            }
+            if( canEdit && canEdit.isOwner && ! canEdit.isReadyForVote) {
                 history.push('/documentedit/' + id );
             }
         }
