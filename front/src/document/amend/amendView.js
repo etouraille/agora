@@ -11,6 +11,8 @@ import routeFromHref from "../../utils/routeFromHref";
 import history from "../../utils/history";
 import idFromRoute from "../../utils/idFromRoute";
 import ContextMenu from "../../contextual/ContextMenu";
+import useLoadDocument from "../../utils/useLoadDocument";
+import SwipeAmendItem from "../../swipeable/SwipeAmendItem";
 
 const AmendView = ({id, reload , countParent }) => {
 
@@ -21,13 +23,15 @@ const AmendView = ({id, reload , countParent }) => {
     const [_id, setIdContext] = useState( null);
     const [display, setDisplayContext] = useState( false);
 
-    const doc = useSelector(documentFilter(id));
+    const { doc, document  } = useLoadDocument({id, reload : countParent });
 
     useEffect(() => {
+        console.log(1);
         setCount( count + 1 );
     }, [ countParent  ])
 
     useEffect(() => {
+        console.log(2);
         if(navigateTo) {
             history.push(navigateTo);
         }
@@ -41,8 +45,8 @@ const AmendView = ({id, reload , countParent }) => {
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
 
     const sortedChildren = useSelector( state => {
-        const doc = documentFilter(id)(state);
-        let data = [...doc.children];
+        console.log( doc.children );
+        let data = Array.isArray(doc.children) ? [...doc.children] : [];
         let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
         })
@@ -63,6 +67,8 @@ const AmendView = ({id, reload , countParent }) => {
     });
 
 
+
+
     const cb = (evt) => {
         evt.stopPropagation();
         evt.preventDefault();
@@ -75,7 +81,6 @@ const AmendView = ({id, reload , countParent }) => {
     }
 
     const cb_context = useCallback((evt) => {
-        console.log( 'context', evt);
         evt.stopPropagation();
         evt.preventDefault();
         if ( evt.target.tagName === 'A') {
@@ -89,22 +94,27 @@ const AmendView = ({id, reload , countParent }) => {
 
 
     useEffect(() => {
+        console.log(doc);
         let nodeAndId = [];
         Quill.register('modules/clink', function(quill, options ) {
             quill.container.addEventListener('click', cb);
             quill.container.addEventListener('contextmenu', cb_context);
         });
-        if (doc.children  && document.querySelector('#rightEditor') ) {
+        if (doc.children  && window.document.querySelector('#rightEditor') ) {
 
 
-                const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
-                    clink: true
-                }});
+
+            const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
+                clink: true
+            }});
             //const righteditor = new Quill('#rightEditor', {readOnly: true });
             const source = new Quill('#source');
             source.setContents(JSON.parse(doc.document.body));
 
             let hasSubscribed = readyForVote.hasSubscribed;
+
+            console.log(readyForVote );
+
 
 
             let content = sortedChildren[0] ? source.getContents( 0 , sortedChildren[0].link.index ): new Delta(JSON.parse(doc.document.body));
@@ -162,15 +172,20 @@ const AmendView = ({id, reload , countParent }) => {
         }
         setMenus( nodeAndId );
 
-    }, [doc ])
+    }, [doc.children.length ])
 
 
     return (
         <div>
-            <div id="source"></div>
-            <div id="emptyQuill"></div>
+            <div id="source" style={{display: 'none'}}></div>
+            <div id="emptyQuill" style={{display: 'none'}}></div>
             <div id="rightEditor"></div>
             <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
+            { Array.from(window.document.querySelectorAll("p > a")).map((elem, index) => {
+                console.log( elem , '=================================================');
+                let id = elem.href ? idFromRoute(routeFromHref(elem.href)): null;
+                return <>{id ? <SwipeAmendItem index={index} elem={elem} id={id} reload={() => reload()}></SwipeAmendItem>: <></>}</>
+            })}
         </div>
 
     )

@@ -5,6 +5,7 @@ import Barre from "./barre/Barre";
 import Search from "./document/search/Search";
 import DocumentEdit from "./document/DocumentEdit";
 import DocumentView from "./document/DocumentView";
+import DocumentAmend from "./document/DocumentAmend";
 import Document from "./document/Document";
 import InviteNavigate from "./invite/InviteNavigate";
 import _403 from "./403";
@@ -18,6 +19,7 @@ const _routes = [
     { path : "/login", regexp: /\/login$/, html : () => <Login></Login>},
     { path: "/documents", regexp: /\/documents$/,html: () => <><Barre></Barre><Search></Search></> },
     { path: "/documentedit/:id", regexp: /\/documentedit\/(.*)/, html: () => <><Barre></Barre><DocumentEdit></DocumentEdit></>},
+    { path: "/documentamend/:id", regexp: /\/documentamend\/(.*)/, html: () => <><Barre></Barre><DocumentAmend></DocumentAmend></>},
     { path: '/document/:id', regexp: /\/document\/(.*)/, html: () => <><Barre></Barre><DocumentView></DocumentView></>},
     { path : "/document", regexp: /\/document$/ ,html: () => <Document></Document> },
     { path: '/invite/:id', regexp: /\/invite\/(.*)/ ,html: () => <InviteNavigate></InviteNavigate>},

@@ -59,6 +59,9 @@ const Barre = () => {
                 if( location.pathname.match(/\/document\/(.*)$/)) {
                     setPage( 'document');
                 }
+                if( location.pathname.match(/\/documentamend\/(.*)$/)) {
+                    setPage( 'document');
+                }
                 if( location.pathname.match(/\/documentedit\/(.*)$/)) {
                     setPage( 'documentedit');
 

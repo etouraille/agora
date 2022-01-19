@@ -93,7 +93,7 @@ const Encart = () => {
     const previousUser = usePrevious(user );
 
     useEffect(() => {
-        if( previousUser !== undefined && previousUser !== user ) {
+        if( previousUser !== user ) {
             mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 //console.log( data.data );

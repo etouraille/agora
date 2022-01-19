@@ -23,6 +23,7 @@ import User from "./user/User";
 import _404 from "./404";
 import _routes from './route'
 import history from "./utils/history";
+import useSwipePrevious from "./swipeable/useSwipePrevious";
 
 
 export default function App() {
@@ -31,7 +32,11 @@ export default function App() {
 
     const location = useLocation();
 
-    console.log( location );
+    const { ref } = useSwipePrevious();
+
+    useEffect(() => {
+       ref(document);
+    }, [])
 
     // writting the previous url
     useEffect(() => {
