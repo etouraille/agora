@@ -9,7 +9,7 @@ export const toggleDiffSlice = createSlice({
         initToggleDiff : (state, action ) => {
             let index = state.findIndex( elem => elem.id === action.payload.id );
             if( index < 0 ) {
-                state.push({ id : action.payload.id , display : true });
+                state.push({ id : action.payload.id , display : false });
             }
         },
         toggleDiff : ( state , action ) => {

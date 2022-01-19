@@ -45,6 +45,7 @@ const DocumentView = (props) => {
         else return false;
     })
 
+
     const document = useSelector( state => {
         let res =  state.document.find( elem => elem.id === id );
         if( res ) {
@@ -158,7 +159,8 @@ const DocumentView = (props) => {
             setMenuFunc(document, editor);
         }
 
-    }, [document, hasSubscribed, reload ])
+    }, [document.children.length, hasSubscribed, reload ])
+
 
     const prev = useCallback(( id ) => {
         history.push('/document/' + document.parent.document.id );
@@ -170,6 +172,7 @@ const DocumentView = (props) => {
 
     let partialForChange = [];
 
+
     useEffect(() => {
         leftMenus.forEach( (elem , index )=> {
             dispatch(add({ id : elem.id}));
@@ -180,7 +183,7 @@ const DocumentView = (props) => {
             dispatch(initMenu());
         }
         return () => { dispatch( initMenu())}
-    }, [leftMenus])
+    }, [leftMenus.length ])
 
 
     useEffect(() => {
@@ -199,6 +202,7 @@ const DocumentView = (props) => {
         }
 
     }, [id])
+
 
     useEffect(() => {
         leftMenus.forEach((menu) => {
@@ -221,8 +225,7 @@ const DocumentView = (props) => {
         return () => {
 
         }
-    }, [ true , leftMenus.length, leftMenus ])
-
+    }, [ leftMenus.length ])
 
     return (
         <>
