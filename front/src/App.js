@@ -58,6 +58,19 @@ export default function App() {
 
     }, [location.pathname])
 
+    useEffect(() => {
+        document.addEventListener('contextmenu', (evt) => {
+            evt.preventDefault();
+        })
+
+        return () => {
+            document.removeEventListener('contextmenu', (evt) => {
+                evt.preventDefault();
+            })
+
+        }
+    }, []);
+
     const click = (evt) => {
         evt.preventDefault();
         dispatch(add());

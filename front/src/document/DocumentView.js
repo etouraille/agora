@@ -80,9 +80,7 @@ const DocumentView = (props) => {
             }
         })
         quill.setContents( delta );
-        quill.container.addEventListener('contextmenu', (evt) => {
-            evt.preventDefault();
-        })
+
 
         if( hasSubscribed ) {
             // TODO check if it is useful
