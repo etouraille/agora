@@ -89,7 +89,7 @@ const DocumentView = (props) => {
             // setMenuFunc(document, editor);
         }
 
-    }, [document.children.length, hasSubscribed, reload ])
+    }, [document, hasSubscribed, reload ])
 
 
     const prev = useCallback(( id ) => {

@@ -52,11 +52,7 @@ export default function App() {
 
     useEffect(() => {
 
-        console.log( location.pathname);
-        console.log( _routes.findIndex(elem => location.pathname.match(elem.regexp)));
-
         if( -1 === _routes.findIndex(elem => location.pathname.match(elem.regexp))) {
-            console.log( 'match fail ===================');
             history.push('/404');
         }
 

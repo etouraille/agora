@@ -75,10 +75,8 @@ const useLoadDocument = ({ id , reload }) => {
 
 
     useEffect(() => {
-        console.log(1, id );
         if (id) {
             http.get('/api/ready-for-vote/' + id).then(data => {
-                console.log(data );
                 dispatch(initReadyForVote({id: id, data: data.data}));
             }, error => {
                 console.log(error);
@@ -95,8 +93,7 @@ const useLoadDocument = ({ id , reload }) => {
     const partialForChange = [];
 
     useEffect(() => {
-        console.log( 2)
-;        leftMenus.forEach((menu) => {
+         leftMenus.forEach((menu) => {
             if( partialForChange.indexOf( menu.id ) === -1 ) {
                 partialForChange.push( menu.id );
             }
@@ -119,7 +116,6 @@ const useLoadDocument = ({ id , reload }) => {
     }, [ leftMenus.length ])
 
     useEffect(() => {
-        console.log(3);
         if( id ) {
             http.get('/api/document/' + id ).then(
                 data => {

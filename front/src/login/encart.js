@@ -128,7 +128,7 @@ const Encart = () => {
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
                 <Link className="dropdown-item"  to="/documents" onClick={evt => setSelected(!selected)}>Liste des Documents</Link>
                 <Link className="dropdown-item"  to="/document" onClick={evt => setSelected(!selected)}>Créer un document</Link>
-                <Link className="dropdown-item"  onClick={evt => unlog()}>Unlog</Link>
+                <div className="dropdown-item"  onClick={evt => unlog()}>Unlog</div>
             </div>
         </div> : <div></div> ;
 

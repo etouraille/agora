@@ -57,7 +57,7 @@ const Document = () => {
                 return errors;
             }}
         >
-            {({ isSubmitting }) => (
+            {({ isSubmitting,handleSubmit }) => (
                 <Form>
                     <div className="input-group flex-nowrap">
                         <Field type="text" name="title" className="form-control"></Field>
@@ -67,7 +67,7 @@ const Document = () => {
                         <ErrorMessage name="body" component="div"></ErrorMessage>
                         <div id="quill"></div>
                     </div>
-                    <button className="btn btn-primary" type="submit" disabled={isSubmitting} >
+                    <button className="btn btn-primary" type="submit" onClick={handleSubmit} disabled={isSubmitting} >
                         Submit
                     </button>
                 </Form>
