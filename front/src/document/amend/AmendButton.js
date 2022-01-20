@@ -8,7 +8,7 @@ import { add } from "./../../redux/slice/amendSlice";
 import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
 import { toggleAmend as toggleAmendAction } from "../../redux/slice/toggleAmend";
-
+import * as _ from 'lodash';
 const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,setClickEvent, label  }) => {
 
 
@@ -19,8 +19,6 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
     const [ range , setRange ] = useState( null );
 
     const toggleAmend = useSelector(state => state.toggleAmend.toggle);
-
-
 
     const user = useSelector( state => state.login.user );
 
@@ -33,37 +31,38 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
     }
 
     const amend = useCallback((evt ) => {
-        if (evt) evt.nativeEvent.preventDefault();
-        if( typeof onClick === 'function') {
-            //onClick(evt);
-        }
 
-        const param = { readOnly : true, toolbar : '#toolbar' };
-        let editor = QFactory.get('#editor', param );
+            if (evt) evt.nativeEvent.preventDefault();
+            if (typeof onClick === 'function') {
+                //onClick(evt);
+            }
+
+            const param = {readOnly: true, toolbar: '#toolbar'};
+            let editor = QFactory.get('#editor', param);
 
 
+            const somerange = _.cloneDeep(editor.getSelection());
 
-            const somerange = editor.getSelection();
+            window.getSelection().removeAllRanges();
 
 
             let inRange = false;
-            if( document.children.length > 0 && somerange ) {
-                document.children.forEach( object => {
-                    if( isInRange(somerange, object.link )) {
+            if (document.children.length > 0 && somerange) {
+                document.children.forEach(object => {
+                    if (isInRange(somerange, object.link)) {
                         inRange = true;
                     }
                 })
             }
 
 
-
-            if (somerange && !inRange ) {
-                setRange( somerange );
-                setBefore(editor.getContents( 0, somerange.index));
+            if (somerange && !inRange) {
+                setRange(somerange);
+                setBefore(editor.getContents(0, somerange.index));
                 setCurrent(editor.getContents(somerange.index, somerange.length));
-                setAfter( editor.getContents(somerange.index + somerange.length , editor.getLength()));
+                setAfter(editor.getContents(somerange.index + somerange.length, editor.getLength()));
                 setModalIsOpen(true);
-            } else if( somerange && inRange ) {
+            } else if (somerange && inRange) {
 
             }
 
@@ -73,13 +72,14 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
             }
              */
 
+
     }, [ document ])
 
     useEffect(() => {
         if(toggleAmend && label ==='context-menu')  {
             amend();
         }
-    }, [toggleAmend]);
+    }, [toggleAmend, document]);
 
     const onEnteredModal = () => {
         const quillBefore = new Quill('#before', {readOnly : true});
