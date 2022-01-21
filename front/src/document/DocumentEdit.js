@@ -12,6 +12,7 @@ import {initDocumentChange , changed , afterSave} from "../redux/slice/documentC
 import {useDispatch, useSelector} from "react-redux";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import history from "../utils/history";
+import useLoadDocument from "../utils/useLoadDocument";
 
 Sharedb.types.register(richText.type);
 
@@ -151,13 +152,14 @@ const DocumentEdit = () => {
         };
     }, [id ]);
 
+    const { document } = useLoadDocument({id, reload: true});
+
     useEffect(() => {
-        http.get('/api/document/' + id ).then(data => {
             const quill = new Quill('#hiddenEditor');
-            if( data.data.parent && data.data.parent.document  ) {
-                quill.setContents(JSON.parse(data.data.parent.document.body));
-                const before = quill.getContents(0, data.data.parent.link.index);
-                const after = quill.getContents(data.data.parent.link.index + data.data.parent.link.length, quill.getLength());
+            if( document.parent && document.parent.document  ) {
+                quill.setContents(JSON.parse(document.parent.document.body));
+                const before = quill.getContents(0, document.parent.link.index);
+                const after = quill.getContents(document.parent.link.index + document.parent.link.length, quill.getLength());
 
                 const beforequill = new Quill("#before", {readonly: true});
                 beforequill.setContents(before);
@@ -165,8 +167,8 @@ const DocumentEdit = () => {
                 const afterquill = new Quill("#after", {readonly: true});
                 afterquill.setContents(after);
             }
-        })
-    }, [id])
+
+    }, [id, document ])
 
 
 

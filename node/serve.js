@@ -21,7 +21,9 @@ const { getUsers } = require('./api/users');
 const { invite, uninvite,  getInvitedUsers } = require( './api/invite');
 const { inviteEmail } = require("./api/invite-email");
 const { canVote } = require('./acl/canVote');
+const { canReadyForVote } = require("./api/canReadyForVote");
 const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVote } = require('./api/vote');
+const { putRound } = require("./api/round");
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc, getSubscribedForDocument} = require('./api/subscribe')
 const { mercure } = require( './api/mercure');
@@ -36,6 +38,13 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
 
+Array.prototype.max = function() {
+    return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+    return Math.min.apply(null, this);
+};
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
@@ -65,8 +74,10 @@ app.get('/api/invited/:id', getInvitedUsers );
 
 app.post('/subscribe', subscribe);
 app.post('/signin', signIn)
+app.put('/api/ready-for-vote', canReadyForVote);
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);
+app.put('/api/round', putRound);
 app.post('/api/vote/for', canVote );
 app.post('/api/vote/for', forIt );
 app.delete('/api/vote/:id', deleteVote);

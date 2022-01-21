@@ -9,10 +9,13 @@ const { sendNotificationReadyForVote,
     removeInviteNotificationOnReadyForVote ,
     removeReadyForVoteNotificationOnVote,
     removeAllReadyForVoteNotificationOnVoteSuccessOrFail } = require('./../notification/notification')
+const {voteComplete, voteFailure} = require("../vote/voteComplete");
+const {sendNotificationNewRound, sendNotificationRoundVoteFail} = require("../notification/notification");
+const {addRound} = require("./round");
 const isReadyForVote = (id) => {
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH( d:Document)-[r:FOR_EDIT_BY]->(u:User) " +
+    const query = "MATCH(d:Document)-[r:FOR_EDIT_BY]->(u:User) " +
         "WHERE d.id = $id " +
         "RETURN r , u ";
     let result = session.run( query , {id});
@@ -21,11 +24,16 @@ const isReadyForVote = (id) => {
             let ret = [];
             let users = [];
             data.records.forEach( elem => {
-                ret.push( elem.get(0).properties.readyForVote);
+                ret.push({vote: elem.get(0).properties.readyForVote, round: elem.get(0).properties.round });
                 users.push(elem.get(1).properties.login )
             })
-            let res = ret.length === ret.reduce((a , elem ) => (elem === true ? a + 1 : a ), 0);
-            resolve( { ready : res, users });
+            let _for = ret.reduce((a, b) => ( b.vote === true ? a + 1: a ), 0);
+            let _against = ret.reduce((a, b) => ( b.vote === false ? a + 1: a ), 0);
+            let _min = ret.map(elem => elem.round).min();
+            let _max = ret.map(elem => elem.round).max();
+            let res = (_min === _max) && voteComplete(_for, _against, ret.length, 'consensus');
+            let voteFail = (_min === _max) && voteFailure(_for, _against, ret.length, 'consensus');
+            resolve( { ready : res, users, voteFail });
         }, error => {
             reject( error );
         })
@@ -35,20 +43,20 @@ const isReadyForVote = (id) => {
 const readyForVote = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
-    const { id } = req.body;
+    const { id , readyForVote } = req.body;
     const me = res.username;
 
 
     const query = '' +
-        'MATCH (d:Document)-[r:FOR_EDIT_BY]->( u:User) WHERE d.id = $id AND u.login = $me ' +
+        'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.login = $me ' +
         'OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Document) ' +
-        'SET r.readyForVote = true ' +
+        'SET r.readyForVote = $readyForVote ' +
         'RETURN r, p ';
-    let result = session.run( query , {id : id , me : me  });
+    let result = session.run( query , {id : id , me : me  , readyForVote});
     result.then( data => {
-        sendMessageToEditors(id ,{ id, user : me ,  subject : 'setReadyForVote'});
+        sendMessageToEditors(id ,{ id, user : me ,  subject : 'setReadyForVote', vote: readyForVote});
         let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
-        isReadyForVote(id).then( ( rfv ) => {
+        isReadyForVote(id).then( async ( rfv ) => {
             if( rfv.ready ) {
                 if ( parentId ) sendMessageToAll({ id : parentId, sender  : me , subject : 'reloadDocument'}, true );
                 //TODO rajouter un abonnement quand on est sur le document et le supprimer quand on en part
@@ -56,6 +64,8 @@ const readyForVote = (req , res ) => {
                 onReadyForVoteComplete(id);
                 sendNotificationReadyForVote(id, me );
                 removeInviteNotificationOnReadyForVote(id, rfv.users, me );
+            } else if(rfv.voteFail )  {
+                sendNotificationRoundVoteFail(id, me);
             }
         })
         res.json({ user : me }).end();
@@ -83,7 +93,8 @@ const getReadyForVote = ( req , res ) => {
                 ret.push({
                     user : elem.get(1).properties.login,
                     readyForVote : elem.get(0).properties.readyForVote,
-                    invitedBy : elem.get(0).properties.invited
+                    invitedBy : elem.get(0).properties.invited,
+                    round: typeof elem.get(0).properties.round.low === 'number' ? elem.get(0).properties.round.low : elem.get(0).properties.round,
                 })
             })
         }
@@ -275,6 +286,7 @@ const deleteVote = ( req, res ) => {
         driver.close();
     })
 }
+
 
 
 module.exports = {

@@ -19,6 +19,7 @@ const connection = shareDBServer.connect();
 const { stringify , Flatted } = require('flatted')
 
 const Delta = require('quill-delta');
+const {sendMessageToSubscribers, sendMessageToEditors} = require("../mercure/mercure");
 
 let ops = {};
 
@@ -27,7 +28,8 @@ const save = ( id ) => {
         const driver = getDriver();
         const session = driver.session();
         const query = "MATCH (d:Document ) WHERE d.id = $id " +
-            "SET d.body = $body";
+            "SET d.body = $body " +
+            "SET d.touched = true ";
         let result = session.run( query , { id : id , body : JSON.stringify(ops[id])});
         result.then( data => {
 
@@ -53,9 +55,9 @@ const socketDocument = (ws) => {
             const user = data.id.match(/save-(.*)---(.*)$/)[2];
             if (id && user ) {
                 readyForVote(id, user ).then(rfv => {
-                    if (rfv.isOwner &&  ! rfv.isReadyForVote ) {
+                    if (rfv.isOwner &&  ! rfv.isReadyForVote && rfv.canBeEdited ) {
                         save(id);
-
+                        sendMessageToEditors(id, {id, user, subject: 'documentTouched'});
                     }
                 })
 

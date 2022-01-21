@@ -65,7 +65,7 @@ const Invite = ({id}) => {
             id : id,
             email : email
         }).then( (data) =>{
-            dispatch(addUser({ id  : id , user : email , invitedBy : user }));
+            dispatch(addUser({ id  : id , user : email , invitedBy : user, round: data.data.round }));
             setReload(true);
         }, error => { console.log( error )})
     }, [user ])

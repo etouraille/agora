@@ -9,6 +9,15 @@ import { Provider } from 'react-redux';
 import store from "./redux/store";
 import history from "./utils/history";
 
+//useful function. min and max on array
+Array.prototype.max = function() {
+    return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+    return Math.min.apply(null, this);
+};
+
 ReactDOM.render(
 
   <Router history={history}>

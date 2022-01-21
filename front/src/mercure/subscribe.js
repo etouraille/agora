@@ -11,6 +11,7 @@ import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
 import { addNotification, removeNotification } from "../redux/slice/notificationSlice";
 import { reloadList } from "../redux/slice/reloadDocumentListSlice";
 import store from "../redux/store";
+import {setTouched} from "../redux/slice/documentSlice";
 
 class  MercureSubscribe {
 
@@ -112,7 +113,7 @@ class  MercureSubscribe {
 
             if (message.subject === "setReadyForVote") {
                 if (user !== me) {
-                    store.dispatch(setReadyForVote({id, user , readyForVote : true }));
+                    store.dispatch(setReadyForVote({id, user , readyForVote : message.vote }));
                 }
             }
             if (message.subject === "hasSubscribe") {
@@ -129,6 +130,13 @@ class  MercureSubscribe {
             }
             if( message.subject === 'reloadDocumentList' ) {
                 store.dispatch( reloadList());
+            }
+            if (message.subject === 'documentTouched') {
+                console.log( '____________________ touched ____________________');
+                store.dispatch( setTouched({id, touched : true}));
+            }
+            if (message.subject === 'documentUnTouched') {
+                store.dispatch( setTouched({id, touched : false}));
             }
         }
     }

@@ -29,7 +29,7 @@ const amend = ( req, res ) => {
                 '-[r:HAS_PARENT { index : $index , length : $length }]' +
                 '->(document)-[s:HAS_CHILDREN { index : $index , length : $length }]' +
                 '->(child)' +
-                ' MERGE (child)-[t:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(u)' +
+                ' MERGE (child)-[t:FOR_EDIT_BY { invited : $me , round : 0}]->(u)' +
                 ' RETURN child.id';
 
             let childId = uuid();

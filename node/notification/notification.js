@@ -3,6 +3,7 @@ const {sendMessage , sendMessageToSubscribers } = require('./../mercure/mercure'
 const {v4 : uuid } = require('uuid');
 const { getSubscribers } = require('./../document/subscribers');
 const { findFirstParent }= require('./../document/findParent');
+const {getEditors} = require("../vote/readyForVote");
 const query = "MATCH (u:User) , (d:Document) WHERE u.login = $user " +
     "AND d.id = $id " +
     "OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document) WHERE NOT (p)-[:HAS_PARENT]->(:Document) " +
@@ -95,6 +96,86 @@ const sendNotificationReadyForVote = ( id, me ) => {
         console.log( error);
     })
 }
+
+
+// quand j'incrémente le round j'envoie une notif : {user} A FAIT UN APPELLE AU VOTE POUR L'AMENDEMENT {DOC}, VOUS POUVEZ VOTER
+// quand je vote et que le vote est en echec : notif, le vote est un échec vous pouvez de nouveau MODFIFER [L'AMENDEMENT](DOC)
+
+
+
+const sendNotificationNewRound = ( id, me  ) => {
+    getEditors(id).then( users => {
+        users.forEach( user  => {
+            const driver = getDriver();
+            const session = driver.session();
+            const body =  me + ' a fait un appel au vote pour l\'amendement {doc}, vous pourvez voter';
+            const result = session.run( query , {
+                id,
+                user,
+                body ,
+                uuid : uuid(),
+                type : 'newRound'
+            });
+            result.then( data => {
+                if( data.records[0] ) {
+                    let notification = data.records[0].get(0).properties;
+                    let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+                    console.log( 'message send ');
+                    sendMessage(id , user,{
+                        id ,
+                        user : user,
+                        sender : me,
+                        subject : 'notification',
+                        notification,
+                        title : title,
+                    });
+                } else {
+                    console.log( 'no notif created');
+                }
+            })
+
+        })
+    },error => {
+        console.log( error);
+    })
+}
+const sendNotificationRoundVoteFail = ( id, me ) => {
+    getEditors(id).then( users => {
+        users.forEach( user  => {
+            const driver = getDriver();
+            const session = driver.session();
+            const body = 'le vote est un échec vous pouvez de nouveau modifier l\'amendement {doc}';
+            const result = session.run( query , {
+                id,
+                user,
+                body ,
+                uuid : uuid(),
+                type : 'roundVoteFail'
+            });
+            result.then( data => {
+                if( data.records[0] ) {
+                    let notification = data.records[0].get(0).properties;
+                    let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
+                    console.log( 'message send ');
+                    sendMessage(id , user,{
+                        id ,
+                        user : user,
+                        sender : me,
+                        subject : 'notification',
+                        notification,
+                        title : title,
+                    });
+                } else {
+                    console.log( 'no notif created');
+                }
+            })
+
+        })
+    },error => {
+        console.log( error);
+    })
+}
+
 
 const sendNotificationVoteFail = ( id, me ) => {
     return new Promise((resolve, reject ) => {
@@ -276,6 +357,8 @@ module.exports = {
     sendNotificationReadyForVote,
     sendNotificationVoteFail,
     sendNotificationVoteSuccess,
+    sendNotificationNewRound,
+    sendNotificationRoundVoteFail,
     removeInviteNotificationOnReadyForVote,
     removeReadyForVoteNotificationOnVote,
     removeAllReadyForVoteNotificationOnVoteSuccessOrFail

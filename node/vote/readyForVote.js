@@ -1,5 +1,6 @@
 const getDriver = require('./../neo/driver');
 const { findParent } = require( './../document/findParent');
+const {voteComplete, voteFailure} = require("./voteComplete");
 
 const readyForVote = ( id , user ) => {
 
@@ -16,6 +17,7 @@ const readyForVote = ( id , user ) => {
                 let res = {};
                 res.readyForVote = elem.get(0).properties.readyForVote;
                 res.user = elem.get(1).properties.login;
+                res.round = elem.get(0).properties.round;
                 ret.push( res );
             });
             findParent( id ).then(  parentId => {
@@ -27,9 +29,14 @@ const readyForVote = ( id , user ) => {
                     if( data.records[0 ]) {
                         hasSubscribed = true;
                     }
-                    let isReadyForVote = ret.length === ret.reduce((a, elem ) => (elem.readyForVote === true ? a + 1: a ), 0)
+                    let maxRound = ret.map(elem => elem.round).max();
+                    let minRound = ret.map( elem => elem.round ).min();
+                    let _for = ret.map( elem => elem.readyForVote).reduce((a, b) => (b === true ? a+ 1: a), 0);
+                    let _against  = ret.map( elem => elem.readyForVote).reduce((a, b) => (b === false ? a+ 1 :  a), 0);
+                    let isReadyForVote = minRound === maxRound && voteComplete(_for, _against, ret.length, 'consensus');
                     let isOwner = ret.find(elem => elem.user === user ) ? true : false;
-                    resolve({ hasSubscribed, isReadyForVote , isOwner });
+                    let canBeEdited = ((minRound === maxRound && minRound === 0) || (minRound === maxRound && voteFailure(_for, _against, ret.length, 'consensus'))) && !voteComplete(_for, _against, ret.length, 'consensus');
+                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited });
                 }, error => {
                     console.log( error);
                     reject( error )

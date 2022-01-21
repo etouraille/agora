@@ -16,7 +16,7 @@ const create = ( req, res ) => {
         'MERGE (user)-[r:CREATE]->' +
         '(document : Document {title : $title , body : $body , id : $id , created_at : localdatetime()})' +
         '-[s:CREATE_BY]->(user) ' +
-        'MERGE (document)-[p:FOR_EDIT_BY { invited : $me, readyForVote : false  }]->(user) ' +
+        'MERGE (document)-[p:FOR_EDIT_BY { invited : $me,  round : 0 }]->(user) ' +
         "MERGE (document)-[:SUBSCRIBED_BY]->(user)-[:HAS_SUBSCRIBE_TO]->(document) " +
         'RETURN document'
         const result = session.run(

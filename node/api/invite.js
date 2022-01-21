@@ -12,22 +12,32 @@ const invite = ( req, res ) => {
     const { id , email } = req.body;
 
     const driver = getDriver();
-    const session = driver.session();
-    const query = 'MATCH (user: User ) WHERE user.login = $email ' +
-        'MATCH ( document : Document ) WHERE document.id = $id ' +
-        'MERGE (document)-[r:FOR_EDIT_BY { invited : $me , readyForVote : false }]->(user)';
 
-    let result = session.run( query , {id : id , email : email, me : res.username });
-    result.then(data => {
-        sendInvite(id, email, res.username );
-        sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
-        res.json({id : id , email : email }).end();
-    }, error => {
-        res.json(500, {reason : error });
+    let query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(:User ) WHERE d.id = $id " +
+        "RETURN min(r.round) ";
+
+    const _session = driver.session();
+    _session.run(query, {id}).then(data => {
+        let minRound = data.records[0].get(0).low;
+
+        const session = driver.session();
+        query = 'MATCH (user: User ) WHERE user.login = $email ' +
+            'MATCH ( document : Document ) WHERE document.id = $id ' +
+            'MERGE (document)-[r:FOR_EDIT_BY { invited : $me , round: $minRound}]->(user)';
+
+        let result = session.run( query , {id : id , email : email, me : res.username , minRound});
+        return result.then(data => {
+            sendInvite(id, email, res.username );
+            sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
+            return res.json({id : id , email : email, round: minRound }).end();
+        }, error => {
+            res.json(500, {reason : error });
+        })
     }).finally(() => {
-        session.close();
+        _session.close();
         driver.close();
     })
+
 
 }
 

@@ -1,4 +1,7 @@
+import voteComplete from "../../utils/voteComplete";
+
 const readyForVoteSubscribedFilter = ( id ) => {
+
     return ( state ) => {
         let user = state.login.user;
         let isOwner = false;
@@ -11,7 +14,13 @@ const readyForVoteSubscribedFilter = ( id ) => {
                 isOwner = true;
             }
             if (elem) {
-                isReadyForVote = elem.data.length === elem.data.reduce((a, r) => r.readyForVote === true ? a + 1 : a, 0);
+                console.log( elem.data );
+                let _for = elem.data.reduce((a, r) => r.readyForVote === true ? a + 1 : a, 0);
+                let _against = elem.data.reduce((a, r) => r.readyForVote === false ? a + 1 : a, 0);
+                let _max = elem.data.map(elem => elem.round).max();
+                let _min = elem.data.map(elem => elem.round).min();
+                isReadyForVote = (_min === _max) && voteComplete(_for , _against, elem.data.length, 'consensus');
+                console.log( 'rfv ==================', _min, _max ,  isReadyForVote, voteComplete(_for , _against, elem.data.length, 'consensus') )
             }
             hasSubscribed = -1 !== state.subscribed.subscribed.indexOf(id);
         }

@@ -25,8 +25,14 @@ export const documentSlice = createSlice({
                 if( j>= 0 ) state[index].doc.children.splice( j, 1 );
             }
         },
+        setTouched : (state, action ) => {
+            let index = state.findIndex( elem => elem.id === action.payload.id );
+            if ( index >= 0 ) {
+                state[index].doc.document.touched = action.payload.touched;
+            }
+        }
     }
 });
 export default documentSlice.reducer
-export const { init, removeChild } = documentSlice.actions
+export const { init, removeChild, setTouched } = documentSlice.actions
 
