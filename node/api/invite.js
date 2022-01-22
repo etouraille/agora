@@ -64,7 +64,8 @@ const uninvite = ( req, res ) => {
         //document can be accepted because some other left could be accepted yet.
         isReadyForVote(id).then( ( rfv ) => {
             if( rfv.ready ) {
-                findParent(id).then(parentId => {
+                findParent(id).then(pData => {
+                    let parentId = pData.id;
                     if (parentId) sendMessageToAll({id: parentId, sender: me, subject: 'reloadDocument'}, true);
                     //TODO rajouter un abonnement quand on est sur le document et le supprimer quand on en part
                     //TODO ainsi on pourrra cibler uniquement sur ceux qui sont présnts sur le doc

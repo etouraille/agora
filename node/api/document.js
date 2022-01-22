@@ -13,11 +13,12 @@ const create = ( req, res ) => {
 
         const query = '' +
         'MATCH (user: User ) WHERE user.login = $email ' +
+        'WITH localdatetime().epochMillis as tsn , user ' +
         'MERGE (user)-[r:CREATE]->' +
-        '(document : Document {title : $title , body : $body , id : $id , created_at : localdatetime()})' +
+        '(document : Document {title : $title , body : $body , id : $id , createdAt : ts})' +
         '-[s:CREATE_BY]->(user) ' +
         'MERGE (document)-[p:FOR_EDIT_BY { invited : $me,  round : 0 }]->(user) ' +
-        "MERGE (document)-[:SUBSCRIBED_BY]->(user)-[:HAS_SUBSCRIBE_TO]->(document) " +
+        "MERGE (document)-[:SUBSCRIBED_BY]->(user)-[:HAS_SUBSCRIBE_TO, {subscribedAt: ts }]->(document) " +
         'RETURN document'
         const result = session.run(
             query,

@@ -8,10 +8,11 @@ const readyForVote = ( id , user ) => {
     const session = driver.session();
     const query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) " +
         "WHERE d.id = $id " +
-        "RETURN r, u ";
+        "RETURN r, u , d";
     const result = session.run(query, {id});
     return new Promise( (resolve, reject ) => {
         result.then( data => {
+            let createdAt = data.records[0].get(2).properties.createdAt.low;
             let ret = [];
             data.records.forEach( elem => {
                 let res = {};
@@ -20,14 +21,18 @@ const readyForVote = ( id , user ) => {
                 res.round = elem.get(0).properties.round;
                 ret.push( res );
             });
-            findParent( id ).then(  parentId => {
-                let query = "MATCH (d:Document)-[:SUBSCRIBED_BY]->(u:User)" +
-                    " WHERE d.id = $parentId AND u.login = $user RETURN d ";
+            findParent(id).then(  pData  => {
+                let parentId = pData.id
+                let query = "MATCH (d:Document)-[s:SUBSCRIBED_BY]->(u:User)" +
+                    " WHERE d.id = $parentId AND u.login = $user RETURN d, s ";
                 let result = session.run( query , {user , parentId });
                 result.then( data => {
                     let hasSubscribed = false;
+                    let subscribedAt;
                     if( data.records[0 ]) {
                         hasSubscribed = true;
+                        subscribedAt = data.records[0].get(1).properties.subscribedAt.low;
+
                     }
                     let maxRound = ret.map(elem => elem.round).max();
                     let minRound = ret.map( elem => elem.round ).min();
@@ -36,7 +41,7 @@ const readyForVote = ( id , user ) => {
                     let isReadyForVote = minRound === maxRound && voteComplete(_for, _against, ret.length, 'consensus');
                     let isOwner = ret.find(elem => elem.user === user ) ? true : false;
                     let canBeEdited = ((minRound === maxRound && minRound === 0) || (minRound === maxRound && voteFailure(_for, _against, ret.length, 'consensus'))) && !voteComplete(_for, _against, ret.length, 'consensus');
-                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited });
+                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited, subscribedIsBefore : subscribedAt <= createdAt });
                 }, error => {
                     console.log( error);
                     reject( error )

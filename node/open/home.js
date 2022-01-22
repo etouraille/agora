@@ -17,7 +17,7 @@ const home = ( req, res ) => {
     let  query = "MATCH (d:Document) " +
         "WHERE NOT (d)-[:HAS_PARENT]->(:Document) " +
         "RETURN d " +
-        "ORDER BY d.created_at ASC SKIP $skip " +
+        "ORDER BY d.createdAt ASC SKIP $skip " +
         "LIMIT $per_page ";
 
     let ret = [];

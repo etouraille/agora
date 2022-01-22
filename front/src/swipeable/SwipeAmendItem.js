@@ -5,25 +5,30 @@ import VoteModal from "../document/vote/VoteModal";
 import {useSelector} from "react-redux";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import voteFilter from "../redux/filter/voteFilter";
+import canVoteFilter from "../redux/filter/canVoteFilter";
+import canEditFilter from "../redux/filter/canEditFilter";
+import canGoToDoc from "../redux/filter/canGoToDoc";
 
 const SwipeAmendItem = ({id, elem, index , reload}) => {
 
     const [toggleModal, setToggleModal] = useState(false);
 
-    const canEdit = useSelector(readyForVoteSubscribedFilter(id));
+    const canGoDoc = useSelector(canGoToDoc(id))
 
-    const vote = useSelector(voteFilter(id));
+    const canVote = useSelector(canVoteFilter(id));
+
+    const canEdit = useSelector(canEditFilter(id));
 
     const { ref } = useSwipeable({
         onSwipedLeft : (evt) => {
-            if (canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail) {
+            if (canGoDoc) {
                 history.push('/document/' + id );
             }
-            if (canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && !vote.fail) {
+            if (canVote) {
                 //TODO maybe do some view instead of clicking
                 setToggleModal(!toggleModal);
             }
-            if( canEdit && canEdit.isOwner && ! canEdit.isReadyForVote) {
+            if( canEdit ) {
                 history.push('/documentedit/' + id );
             }
         }

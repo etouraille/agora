@@ -12,6 +12,7 @@ const { sendNotificationReadyForVote,
 const {voteComplete, voteFailure} = require("../vote/voteComplete");
 const {sendNotificationNewRound, sendNotificationRoundVoteFail} = require("../notification/notification");
 const {addRound} = require("./round");
+const {findParent} = require("../document/findParent");
 const isReadyForVote = (id) => {
     const driver = getDriver();
     const session = driver.session();
@@ -80,28 +81,48 @@ const readyForVote = (req , res ) => {
 }
 //fournit la liste des utilisteur autorisés en modification
 // et le fait qu'ils aient validé ou non le documents.
-const getReadyForVote = ( req , res ) => {
+const getReadyForVote = async ( req , res ) => {
     const id = req.params.id;
     const driver = getDriver();
     const session = driver.session();
-    const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id' +
-        ' RETURN r, u ';
+    const query = 'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id ' +
+        'RETURN r, u, d ';
+
+    const { id : parentId } = await findParent(id);
     const result = session.run( query , { id : id });
     result.then( data => {
         let ret = [];
         if( data.records.length > 0 ) {
-            data.records.forEach( (elem , index) => {
-                ret.push({
-                    user : elem.get(1).properties.login,
-                    readyForVote : elem.get(0).properties.readyForVote,
-                    invitedBy : elem.get(0).properties.invited,
-                    round: typeof elem.get(0).properties.round.low === 'number' ? elem.get(0).properties.round.low : elem.get(0).properties.round,
+            return Promise.all(data.records.map( (elem , index) => {
+                let email = elem.get(1).properties.login
+                let createdAt = elem.get(2).properties.createdAt.low;
+                const _query = "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE d.id = $parentId AND u.login = $email RETURN r";
+                const _sess = driver.session();
+                return _sess.run(_query, {parentId, email }).then((data) => {
+                    let subscribedAt = null;
+                    if (data.records[0]) {
+                       subscribedAt = data.records[0].get(0).properties.subscribedAt.low;
+                    }
+                    return {
+                        user : email,
+                        readyForVote : elem.get(0).properties.readyForVote,
+                        invitedBy : elem.get(0).properties.invited,
+                        round: typeof elem.get(0).properties.round.low === 'number' ? elem.get(0).properties.round.low : elem.get(0).properties.round,
+                        subscribedIsBefore: subscribedAt ? subscribedAt <= createdAt: false
+                    }
+                }).finally(() => {
+                    _sess.close();
                 })
-            })
+
+            }))
+        } else {
+            return [];
         }
-        return res.json( ret ).end();
+
     }, error => {
         return res.json( 500, {reason : error }).end();
+    }).then((data) => {
+        return res.json( data ).end();
     }).finally(() => {
         session.close();
         driver.close();

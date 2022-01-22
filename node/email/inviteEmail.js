@@ -9,7 +9,8 @@ const config = require('../config');
 
 const inviteEmail = ( id , email, pseudo ) => {
 
-    findParent(id).then((parentId) => {
+    findParent(id).then((pData) => {
+        let parentId = pData.id;
         const driver = getDriver();
         const session = driver.session();
         const query = 'MATCH (d: Document) WHERE d.id = $id ' +

@@ -5,7 +5,8 @@ const { contents , buildDoc } = require('./contents');
 
 const onReadyForVoteComplete = ( id ) => {
 
-    findParent(id).then( parentId =>  {
+    findParent(id).then( pData  =>  {
+        let parentId = pData.id;
         if ( parentId === id ) {
             documentGet(id).then(doc => {
                 addNewDoc(doc).then( resolve => {
@@ -21,7 +22,8 @@ const onReadyForVoteComplete = ( id ) => {
 
 const onVoteFailOrSuccess = (id) => {
     return new Promise( (resolve, reject ) => {
-        findParent(id).then( parentId => {
+        findParent(id).then( pData => {
+            let parentId = pData.id;
             contents(parentId).then(node => {
                 let data = JSON.stringify(buildDoc(node));
                 console.log(data);

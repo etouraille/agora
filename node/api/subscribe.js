@@ -8,7 +8,7 @@ const subscribeDoc = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.login = $me " +
-        "MERGE (d)-[r:SUBSCRIBED_BY]->(u)-[s:HAS_SUBSCRIBE_TO]->(d) ";
+        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : localdatetime().epochMillis }]->(u)-[s:HAS_SUBSCRIBE_TO]->(d) ";
     let result = session.run(query, {id : id , me : res.username });
 
     processSubscribe(id, res.username);

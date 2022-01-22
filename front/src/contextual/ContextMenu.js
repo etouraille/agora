@@ -11,15 +11,22 @@ import voteFilter from "../redux/filter/voteFilter";
 import docSvg from "../svg/doc.svg";
 import Vote from "../vote/Vote";
 import usePrevious from "../utils/usePrevious";
+import canVoteFilter from "../redux/filter/canVoteFilter";
+import canGoToDoc from "../redux/filter/canGoToDoc";
 const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
 
-    const canEdit = useSelector( readyForVoteSubscribedFilter(id));
 
     const vote = useSelector( voteFilter(id ));
 
     const click = useSelector((state) => state.click.click);
 
     const prevClick = usePrevious(click);
+
+    const canVote = useSelector(canVoteFilter(id));
+
+    const canEdit = useSelector(canEdit(id));
+
+    const canGoDoc = useSelector(canGoToDoc(id))
 
     useEffect(() => {
         if( click > 0 && click > prevClick && typeof setDisplay === 'function') {
@@ -73,15 +80,15 @@ const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
         <div>
             { display ? (
                 <div className="menu-container" style={{ top : y, left : x ,position : 'fixed' }}>
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote && vote.fail  ? <div className="menu-row" onClick={navigate}>
+                    { canGoDoc  ? <div className="menu-row" onClick={navigate}>
                         <span className="before"><img className="logo-small" src={arrow_right} /></span>
                         <span className="middle">Naviguer</span>
                     </div> : <></> }
-                    { canEdit && canEdit.hasSubscribed && canEdit.isReadyForVote ? <div className="menu-row" onClick={toggle}>
+                    { canVote ? <div className="menu-row" onClick={toggle}>
                         <span className="before"><img className="logo-small" src={voteSvg} /></span>
                         <span className="middle">Voter</span>
                     </div> : <></> }
-                    { canEdit && canEdit.isOwner && ! canEdit.isReadyForVote ? <div className="menu-row" onClick={edit}>
+                    { canEdit ? <div className="menu-row" onClick={edit}>
                         <span className="before"><img className="logo-small" src={editSvg} /></span>
                         <span className="middle">Modifier</span>
                     </div> : <></> }

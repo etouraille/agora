@@ -21,9 +21,9 @@ const findParent = ( id ) => {
                 let p = data.records[0].get(1) ? data.records[0].get(1).properties : null;
                 let n = data.records[0].get(2) ? data.records[0].get(2).low : 0;
                 if (n === 0) {
-                    resolve(d.id);
+                    resolve({id: d.id , _doc: d});
                 } else {
-                    resolve(p.id)
+                    resolve({id :p.id, _doc: p});
                 }
             }
         }, error => {

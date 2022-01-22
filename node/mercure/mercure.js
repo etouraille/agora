@@ -9,8 +9,8 @@ const publisherJwtKey = config.mercureToken;
 
 const sendMessage = ( id , user , message , isSubscribe = false ) => {
 
-    findParent(id).then( parentId => {
-
+    findParent(id).then( pData => {
+        let parentId = pData.id;
         const datas = {
             topic: isSubscribe ? 'http://agora.org/subscribe/' + user : 'http://agora.org/document/' + parentId + '/' + user ,
             data: JSON.stringify(message)
@@ -44,7 +44,8 @@ const sendMessage = ( id , user , message , isSubscribe = false ) => {
 
 const sendMessageToSubscribers = ( id ,message ) => {
 
-    findParent(id).then( parentId => {
+    findParent(id).then( pData => {
+        let parentId = pData.id;
         getSubscribers(id).then( users => {
             users.forEach( user => {
 
