@@ -40,8 +40,6 @@ const ReadyForVote = ({ id }) => {
 
     const _isRoundFinished = useSelector(isRoundFinished(id));
 
-    console.log( 'is round finised', _isRoundFinished);
-
     const links = useSelector( store => {
         let ret = [];
         store.readyForVote.forEach( elem => {
@@ -76,7 +74,6 @@ const ReadyForVote = ({ id }) => {
     useEffect( () => {
 
         http.get('/api/ready-for-vote/' + id ).then((data ) => {
-            console.log( data.data);
             dispatch( init( {id : id , data : data.data }));
         }, error => {
             console.log( error );
@@ -93,7 +90,7 @@ const ReadyForVote = ({ id }) => {
     return (
         <>
             <div className="padding" >
-                {_canIncreaseRound ? <>{round}<button className="btn btn-black" disabled={!_canIncreaseRound} onClick={(evt) => increaseRound(evt)}><img className="logo margin-right" src={_round} />Next Round</button></>:<></> }
+                { _canIncreaseRound ? <>{round}<button className="btn btn-black" disabled={!_canIncreaseRound} onClick={(evt) => increaseRound(evt)}><img className="logo margin-right" src={_round} />Next Round</button></>:<></> }
                 { _canVote ? <button className="btn btn-black" onClick={(evt) => setReadyForVote(evt, true)}><img className="logo margin-right" src={ok} />Pour</button> : <></> }
                 { _canVote ? <button className="btn btn-black" onClick={(evt) => setReadyForVote(evt, false)}><img className="logo margin-right" src={no} />Contre</button> : <></> }
             </div>

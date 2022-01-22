@@ -24,7 +24,7 @@ export const readyForVoteSlice = createSlice({
                     elem.data.forEach( (r, j ) => {
                         if( r.user === action.payload.user ) {
                             state[i].data[j].readyForVote = action.payload.readyForVote;
-                            state[i].data[j].round = action.payload.round;
+                            if(action.payload.round) state[i].data[j].round = action.payload.round;
                         }
                     })
                 }

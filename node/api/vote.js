@@ -56,6 +56,7 @@ const readyForVote = (req , res ) => {
     result.then( data => {
         sendMessageToEditors(id ,{ id, user : me ,  subject : 'setReadyForVote', vote: readyForVote});
         let parentId = data.records[0].get(1) ? data.records[0].get(1).properties.id : null;
+        let round = typeof data.records[0].get(0).properties.round.low === 'number' ?  data.records[0].get(0).properties.round.low :  data.records[0].get(0).properties.round;
         isReadyForVote(id).then( async ( rfv ) => {
             if( rfv.ready ) {
                 if ( parentId ) sendMessageToAll({ id : parentId, sender  : me , subject : 'reloadDocument'}, true );
@@ -68,7 +69,7 @@ const readyForVote = (req , res ) => {
                 sendNotificationRoundVoteFail(id, me);
             }
         })
-        res.json({ user : me }).end();
+        res.json({ user : me , round }).end();
     }, error => {
         console.log( error );
         res.json(500, {reason : error });

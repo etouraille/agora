@@ -13,6 +13,8 @@ import {useDispatch, useSelector} from "react-redux";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
 import history from "../utils/history";
 import useLoadDocument from "../utils/useLoadDocument";
+import canEditDocument from "../redux/filter/canEditDocument";
+import QFactory from "../quill/QFactory";
 
 Sharedb.types.register(richText.type);
 
@@ -38,6 +40,8 @@ const DocumentEdit = () => {
     const dispatch = useDispatch();
 
     const user = useSelector(state => state.login.user );
+
+    const _canEditDocument = useSelector(canEditDocument(id))
 
     const rfv = useSelector( readyForVoteSubscribedFilter(id));
 
@@ -94,8 +98,31 @@ const DocumentEdit = () => {
         }
     }, [ editor ]);
 
+    useEffect(() => {
+        if (editor) {
+            setQuillDiv(editor, !_canEditDocument);
+        }
+    }, [_canEditDocument, editor]);
+
+
+    const setQuillDiv = (quill, readOnly) => {
+        if( ! quill ) {
+            options['readOnly'] = readOnly;
+            quill = QFactory.get('#editor', options);
+            setEditor(quill);
+        } else {
+            readOnly ? quill.disable() : quill.enable();
+        }
+        return quill;
+    }
 
     useEffect(() => {
+
+        if (_canEditDocument) {
+            setQuillDiv(editor, false);
+        } else {
+            setQuillDiv(editor, true);
+        }
 
         socket.onopen = () => {
 
@@ -108,10 +135,8 @@ const DocumentEdit = () => {
             doc.subscribe( (err) => {
                 if (err) throw err;
 
-                if( ! quill ) {
-                    quill = new Quill('#editor', options);
-                    setEditor(quill);
-                }
+                quill = setQuillDiv(quill, !_canEditDocument);
+
                 /**
                  * On Initialising if data is present in server
                  * Updaing its content to editor
