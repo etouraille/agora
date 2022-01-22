@@ -20,7 +20,7 @@ const migrate = () => {
             sess.close();
         })
     }).then(() => {
-        g sconsole.log('createdAt done');
+        console.log('createdAt done');
     }).finally(() => {
         session.close();
         driver.close()
