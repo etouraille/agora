@@ -26,12 +26,10 @@ const AmendView = ({id, reload , countParent }) => {
     const { doc, document  } = useLoadDocument({id, reload : countParent });
 
     useEffect(() => {
-        console.log(1);
         setCount( count + 1 );
     }, [ countParent  ])
 
     useEffect(() => {
-        console.log(2);
         if(navigateTo) {
             history.push(navigateTo);
         }
@@ -45,7 +43,6 @@ const AmendView = ({id, reload , countParent }) => {
     const readyForVote = useSelector(readyForVoteSubscribedFilter(id));
 
     const sortedChildren = useSelector( state => {
-        console.log( doc.children );
         let data = Array.isArray(doc.children) ? [...doc.children] : [];
         let ret = data.sort((elem , elem2) => {
             return ((elem.link.index  < elem2.link.index) ? -1 : 1);
@@ -94,7 +91,6 @@ const AmendView = ({id, reload , countParent }) => {
 
 
     useEffect(() => {
-        console.log(doc);
         let nodeAndId = [];
         Quill.register('modules/clink', function(quill, options ) {
             quill.container.addEventListener('click', cb);
@@ -112,10 +108,6 @@ const AmendView = ({id, reload , countParent }) => {
             source.setContents(JSON.parse(doc.document.body));
 
             let hasSubscribed = readyForVote.hasSubscribed;
-
-            console.log(readyForVote );
-
-
 
             let content = sortedChildren[0] ? source.getContents( 0 , sortedChildren[0].link.index ): new Delta(JSON.parse(doc.document.body));
 
@@ -182,7 +174,6 @@ const AmendView = ({id, reload , countParent }) => {
             <div id="rightEditor"></div>
             <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
             { Array.from(window.document.querySelectorAll("p > a")).map((elem, index) => {
-                console.log( elem , '=================================================');
                 let id = elem.href ? idFromRoute(routeFromHref(elem.href)): null;
                 return <>{id ? <SwipeAmendItem index={index} elem={elem} id={id} reload={() => reload()}></SwipeAmendItem>: <></>}</>
             })}

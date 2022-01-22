@@ -13,6 +13,8 @@ const VoteButton = ({id}) => {
 
     const canDisplay = useSelector(canDisplayVoteFilter(id));
 
+
+
     const [ open, setOpen ] = useState(false);
 
     const toggle = (evt) => {

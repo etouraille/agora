@@ -63,7 +63,7 @@ const saveComplete = ( documentId , vote ) => {
     const session = driver.session();
     const query = "MATCH (d:Document) WHERE d.id = $id " +
         "MATCH (:User)-[r:VOTE_FOR]->(d)" +
-        "SET r.complete = localdatetime() " +
+        "SET r.complete = datetime() " +
         "SET r.forIt = $forIt " +
         "SET r.againstIt = $againstIt " +
         "SET r.abstention = $abstention " +

@@ -1,10 +1,11 @@
 const log = console.log;
+/*
 console.log = function() {
     log.apply(console, arguments);
     // Print the stack trace
     console.trace();
 };
-
+*/
 const express = require('express');
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
