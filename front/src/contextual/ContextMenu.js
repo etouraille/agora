@@ -13,6 +13,7 @@ import Vote from "../vote/Vote";
 import usePrevious from "../utils/usePrevious";
 import canVoteFilter from "../redux/filter/canVoteFilter";
 import canGoToDoc from "../redux/filter/canGoToDoc";
+import canEditFilter from "../redux/filter/canEditFilter";
 const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
 
 
@@ -24,7 +25,7 @@ const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
 
     const canVote = useSelector(canVoteFilter(id));
 
-    const canEdit = useSelector(canEdit(id));
+    const canEdit = useSelector(canEditFilter(id));
 
     const canGoDoc = useSelector(canGoToDoc(id))
 
