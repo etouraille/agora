@@ -91,6 +91,7 @@ const DocumentView = (props) => {
 
     const prev = useCallback(( id ) => {
         history.push('/document/' + document.parent.document.id );
+        dispatch(setReload({id: document.parent.document.id}))
     }, [document]);
 
     const edit = () => {

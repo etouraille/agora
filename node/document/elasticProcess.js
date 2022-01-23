@@ -30,13 +30,13 @@ const onVoteFailOrSuccess = (id) => {
                 append(parentId, data ).then( success  => {
                     console.log( 'resolve =====');
                     resolve( success );
-                }, error => {
+                }).catch( error => {
                     reject( error );
-                })
-            }, error => {
+                });
+            }).catch( error => {
                 reject( error )
             })
-        }, error => {
+        }).catch( error => {
             reject( error );
         })
     })

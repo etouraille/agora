@@ -8,7 +8,10 @@ const subscribeDoc = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.login = $me " +
-        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : timestamp() }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : timestamp() }]->(d) ";
+        "WITH d, u , timestamp() as _ts " +
+        "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBED_TO]->(d ) " +
+        "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u " +
+        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) ";
     let result = session.run(query, {id : id , me : res.username });
 
     processSubscribe(id, res.username);
@@ -50,6 +53,7 @@ const unsubscribeDoc = ( req, res ) => {
     const query = "" +
         "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User)-[s:HAS_SUBSCRIBE_TO]->(d:Document) " +
         "WHERE d.id = $id AND u.login = $me " +
+        "MERGE (d)-[:OLD_SUBSCRIBED_BY { subscribedAt: r.subscribedAt}]->(u)-[:OLD_HAS_SUBSCRIBE_TO { subscribedAt: r.subscribedAt}]->(d) " +
         "DELETE r , s ";
     let result = session.run(query, {id : id , me : res.username });
 
@@ -58,11 +62,13 @@ const unsubscribeDoc = ( req, res ) => {
         getLinkedDocuments(id).then( ids => {
             return res.json(ids).end();
         }, error => {
+            console.log( error);
             return res.status( 500).json( {reason : error }).end();
         })
 
 
     }, error => {
+        console.log(error);
         return res.json(500, {reason : error }).end();
     }).finally(() => {
         session.close();

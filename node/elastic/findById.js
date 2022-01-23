@@ -10,9 +10,11 @@ const findById = ( id ) => {
                     match: { id: id  }
                 }
             }
-        }, (err, result) => {
-            console.log(  'its', result.body.hits);
+        }).then(result => {
             resolve( result.body.hits && result.body.hits.hits[0] ? result.body.hits.hits[0]._id : null );
+        }).catch(err => {
+            reject(err);
+            console.log( 'elastic error : ' ,err);
         })
     })
 }

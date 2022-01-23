@@ -16,6 +16,7 @@ import SwipeAmendItem from "../../swipeable/SwipeAmendItem";
 
 const AmendView = ({id, reload , countParent }) => {
 
+
     const [ menus,setMenus ] = useState([]);
     const [ count , setCount ] = useState(0);
     const [ navigateTo, setNavigateTo] = useState(null);
@@ -164,7 +165,7 @@ const AmendView = ({id, reload , countParent }) => {
         }
         setMenus( nodeAndId );
 
-    }, [doc.children.length ])
+    }, [doc.children.length , readyForVote.hasSubscribed, countParent ])
 
 
     return (

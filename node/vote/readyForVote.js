@@ -12,7 +12,7 @@ const readyForVote = ( id , user ) => {
     const result = session.run(query, {id});
     return new Promise( (resolve, reject ) => {
         result.then( data => {
-            let createdAt = data.records[0].get(2).properties.createdAt.low;
+            let createdAt = data.records[0].get(2).properties.createdAt;
             let ret = [];
             data.records.forEach( elem => {
                 let res = {};
@@ -31,17 +31,17 @@ const readyForVote = ( id , user ) => {
                     let subscribedAt;
                     if( data.records[0 ]) {
                         hasSubscribed = true;
-                        subscribedAt = data.records[0].get(1).properties.subscribedAt.low;
+                        subscribedAt = data.records[0].get(1).properties.subscribedAt;
 
                     }
                     let maxRound = ret.map(elem => elem.round).max();
                     let minRound = ret.map( elem => elem.round ).min();
                     let _for = ret.map( elem => elem.readyForVote).reduce((a, b) => (b === true ? a+ 1: a), 0);
                     let _against  = ret.map( elem => elem.readyForVote).reduce((a, b) => (b === false ? a+ 1 :  a), 0);
-                    let isReadyForVote = minRound === maxRound && voteComplete(_for, _against, ret.length, 'consensus');
+                    let isReadyForVote = (minRound === maxRound && voteComplete(_for, _against, ret.length, 'consensus'));
                     let isOwner = ret.find(elem => elem.user === user ) ? true : false;
                     let canBeEdited = ((minRound === maxRound && minRound === 0) || (minRound === maxRound && voteFailure(_for, _against, ret.length, 'consensus'))) && !voteComplete(_for, _against, ret.length, 'consensus');
-                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited, subscribeIsBefore : subscribedAt <= createdAt });
+                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited, subscribeIsBefore : subscribedAt ? subscribedAt.lessThanOrEqual(createdAt) : false });
                 }, error => {
                     console.log( error);
                     reject( error )

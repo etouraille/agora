@@ -36,6 +36,8 @@ const AmendButtonBarre = () => {
         dispatch( toggleBarre({id : toggleName}));
     }
 
+
+
     return (
         <>
             { canDisplay ? <div className="barre-elem">

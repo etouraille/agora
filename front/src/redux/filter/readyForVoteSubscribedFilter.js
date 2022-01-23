@@ -25,7 +25,7 @@ const readyForVoteSubscribedFilter = ( id ) => {
                 let _max = elem.data.map(elem => elem.round).max();
                 let _min = elem.data.map(elem => elem.round).min();
                 //TODO : the last condition shouldn't be present. In here because of migration.
-                isReadyForVote = ((_min === _max) && voteComplete(_for , _against, elem.data.length, 'consensus')) || doc.parentLink === null;
+                isReadyForVote = ((_min === _max) && voteComplete(_for , _against, elem.data.length, 'consensus'));
             }
             hasSubscribed = -1 !== state.subscribed.subscribed.indexOf(id);
         }

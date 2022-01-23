@@ -40,8 +40,12 @@ const addNewUser = async (user, invitedBy) => {
         });
         //TODO add in friend indices.
     }
-    await elastic.index(params);
-    await elastic.indices.refresh({ index : 'user'})
+    try {
+        await elastic.index(params);
+        await elastic.indices.refresh({index: 'user'})
+    } catch(e) {
+        console.log(e);
+    }
 }
 
 const append = (id, data ) => {
@@ -73,6 +77,8 @@ const append = (id, data ) => {
             } else {
                 reject('no index for the current object return by find');
             }
+        }).catch(err => {
+            reject(err);
         })
     })
 }

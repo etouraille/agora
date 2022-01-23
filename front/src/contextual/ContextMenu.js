@@ -79,7 +79,7 @@ const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
 
     return (
         <div>
-            { display ? (
+            { display && !(!canGoDoc && !canVote && !canEdit) ? (
                 <div className="menu-container" style={{ top : y, left : x ,position : 'fixed' }}>
                     { canGoDoc  ? <div className="menu-row" onClick={navigate}>
                         <span className="before"><img className="logo-small" src={arrow_right} /></span>
