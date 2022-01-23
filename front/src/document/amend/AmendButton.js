@@ -9,6 +9,7 @@ import QFactory from "../../quill/QFactory";
 import junction from './../../svg/junction.svg';
 import { toggleAmend as toggleAmendAction } from "../../redux/slice/toggleAmend";
 import * as _ from 'lodash';
+import {firstChar, lastChar} from "../../utils/truncateEditor";
 const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,setClickEvent, label  }) => {
 
 
@@ -82,12 +83,14 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
     }, [toggleAmend, document]);
 
     const onEnteredModal = () => {
-        const quillBefore = new Quill('#before', {readOnly : true});
+        const quillBefore = QFactory.get('#before', {readOnly : true});
         quillBefore.setContents(before);
+        lastChar(quillBefore, 2000);
         const quill = new Quill('#current', {readOnly : true});
         quill.setContents(current);
-        const quillAfter = new Quill('#after', {readOnly : true});
+        const quillAfter = QFactory.get('#after', {readOnly : true});
         quillAfter.setContents(after);
+        firstChar(quillAfter, 2000);
     }
 
     const dispatch = useDispatch();

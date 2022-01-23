@@ -4,6 +4,7 @@ import Delta from "quill-delta";
 import {useCallback, useEffect} from "react";
 import history from "../utils/history";
 import useIsMobile from "../utils/useIsMobile";
+import {firstChar} from "../utils/truncateEditor";
 
 
 const ItemDocument = ({ index, document }) => {
@@ -14,14 +15,10 @@ const ItemDocument = ({ index, document }) => {
         let editor  = new Quill('#content_' + index , {readOnly: true});
 
         editor.setContents(document.content);
-        let length = editor.getLength();
-        let content = editor.getContents();
 
-        let delta = [];
-        let displayLength = 140;
-        delta.push({retain: displayLength})
-        delta.push({delete: length - displayLength});
-        editor.setContents(content.compose(new Delta(delta)));
+
+        firstChar(editor, 140);
+
     }, [index, document]);
 
     const navigate = useCallback((id) => {

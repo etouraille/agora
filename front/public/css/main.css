@@ -177,3 +177,7 @@ html {
     font-size: 14em;
     font-style: italic;
 }
+.after-editor {
+    position: relative;
+    top: 27px;
+}

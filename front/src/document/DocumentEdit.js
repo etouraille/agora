@@ -15,6 +15,7 @@ import history from "../utils/history";
 import useLoadDocument from "../utils/useLoadDocument";
 import canEditDocument from "../redux/filter/canEditDocument";
 import QFactory from "../quill/QFactory";
+import {firstChar, lastChar} from "../utils/truncateEditor";
 
 Sharedb.types.register(richText.type);
 
@@ -188,9 +189,11 @@ const DocumentEdit = () => {
 
                 const beforequill = new Quill("#before", {readonly: true});
                 beforequill.setContents(before);
+                lastChar(beforequill, 1500);
 
                 const afterquill = new Quill("#after", {readonly: true});
                 afterquill.setContents(after);
+                firstChar(afterquill, 1500);
             }
 
     }, [id, document ])
@@ -206,7 +209,7 @@ const DocumentEdit = () => {
                     <div id="editor"></div>
                 </div>
             </div>
-            <div id="after"></div>
+            <div id="after" className="after-editor"></div>
         </div>
     )
 }
