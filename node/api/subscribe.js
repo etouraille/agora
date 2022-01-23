@@ -8,19 +8,21 @@ const subscribeDoc = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.login = $me " +
-        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : datetime().epochMillis }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : datetime().epochMillis }]->(d) ";
+        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : timestamp() }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : timestamp() }]->(d) ";
     let result = session.run(query, {id : id , me : res.username });
 
     processSubscribe(id, res.username);
 
     sendMessageToAll({ subject : 'docSubscribe', id , user : res.username });
+    // TODO not sure it's necessary since the message are sent to the parent.
+    /*
     getLinkedDocuments(id).then( ids => {
         ids.splice(ids.indexOf(id), 1 );
         ids.forEach( childId => {
             sendMessageToAll({ subject : 'docSubscribe', id: childId , user : res.username });
         })
     })
-    //TODO should be sent with the id of all the nested documents
+     */
 
     result.then(data => {
 
@@ -50,8 +52,6 @@ const unsubscribeDoc = ( req, res ) => {
         "WHERE d.id = $id AND u.login = $me " +
         "DELETE r , s ";
     let result = session.run(query, {id : id , me : res.username });
-
-    processUnsubscribe(id, res.username );
 
     result.then(data => {
 

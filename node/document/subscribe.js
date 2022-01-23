@@ -29,7 +29,7 @@ const getLinkedDocuments = (id) => {
         })
     })
 }
-
+//TODO don't think it is still necessary since the voters are not removed any more
 const processSubscribe = (subscribedId , user ) => {
     getLinkedDocuments(subscribedId).then( ids => {
         // on regarde tout les vote concerné par ces ids
@@ -44,61 +44,8 @@ const processSubscribe = (subscribedId , user ) => {
     })
 }
 
-const processUnsubscribe = ( subscribedId , user ) => {
-    getLinkedDocuments(subscribedId).then( ids => {
-        // pour tout les ids
-        // si le vote est terminé : on ne fait rien
-        ids.forEach( id => {
-            voteIsComplete(id).then( voteComplete => {
-                if( ! voteComplete ) {
-                    const driver = getDriver();
-                    const session = driver.session();
-                    // TODO check if it is pertinant : on efface le vote
-                    // de la personne qui se désinscrit si le vote n'est pas complet
-
-                    //TODO do the vote think also in here : including the indexation. which is not present here
-                    let query = "MATCH(u:User)-[r:VOTE_FOR]->(d:Document) " +
-                        "WHERE d.id = $id AND u.login = $user " +
-                        "DELETE r";
-                    let result = session.run( query , {id, user})
-                    result.then( () => {
-                        sendMessageToSubscribers(id , {id, sender: user , subject : 'removeVoter'});
-                        voteResult(id).then( vote => {
-                            if( vote.complete && vote.fail ) {
-                                saveComplete(id , vote ).then( () => {
-                                    voteFail(id).then( () => {
-                                        sendMessageToSubscribers(id, { id, sender : user , subject : 'voteComplete', vote });
-                                    })
-                                })
-
-                            }else if ( vote.complete && vote.success ) {
-                                voteSuccess(id).then( data => {
-                                    if( data.updated ) {
-                                        sendMessageToSubscribers(data.parentId , {
-                                            id : data.parentId ,
-                                            sender : user ,
-                                            subject : 'reloadDocument'});
-                                    }
-                                    saveComplete(id , vote ).then(() => {
-                                        sendMessageToSubscribers(id, { id, sender: user , subject : 'voteComplete', vote });
-                                    })
-                                })
-                            }
-
-                        })
-                    })
-                }
-            })
-        })
-        // si le vote n'est pas terminé
-        // on recalcul le vote
-        // s'il est terminé on envoie un message de final
-        // s'il n'est pas terminé on supprime me votant
-    })
-}
 
 module.exports = {
     getLinkedDocuments,
     processSubscribe,
-    processUnsubscribe,
 }

@@ -1,11 +1,12 @@
 import readyForVoteSubscribedFilter from "./readyForVoteSubscribedFilter";
 import voteFilter from "./voteFilter";
+import subscribeIsBeforeFilter from "./subscribeIsBeforeFilter";
 
 const canDisplayVoteFilter = ( id ) => {
     return ( state ) => {
         let rfv = readyForVoteSubscribedFilter(id)(state);
-        console.log( rfv);
-        return rfv.isReadyForVote && rfv.hasSubscribed && rfv.subscribedIsBefore;
+        const sib = subscribeIsBeforeFilter(id)(state);
+        return rfv.isReadyForVote && rfv.hasSubscribed && sib;
     }
 }
 export default canDisplayVoteFilter;

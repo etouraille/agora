@@ -24,6 +24,7 @@ const { inviteEmail } = require("./api/invite-email");
 const { canVote } = require('./acl/canVote');
 const { canReadyForVote } = require("./api/canReadyForVote");
 const { readyForVote, getReadyForVote , forIt , againstIt, getVoters , deleteVote } = require('./api/vote');
+const { getSubscribeIsBefore } = require("./api/subscribeIsBefore");
 const { putRound } = require("./api/round");
 const { voteSuccessOnDocument } = require( './api/voteSuccess');
 const { subscribeDoc, unsubscribeDoc , getSubscribedDoc, getSubscribedForDocument} = require('./api/subscribe')
@@ -78,6 +79,7 @@ app.post('/signin', signIn)
 app.put('/api/ready-for-vote', canReadyForVote);
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);
+app.get('/api/subscribe-is-before/:id', getSubscribeIsBefore);
 app.put('/api/round', putRound);
 app.post('/api/vote/for', canVote );
 app.post('/api/vote/for', forIt );

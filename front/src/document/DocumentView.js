@@ -64,7 +64,6 @@ const DocumentView = (props) => {
         setEditor( quill );
         let delta = new Delta(JSON.parse(document.document.body));
 
-
         document.children.map(( object , index ) =>{
             let link = object.link;
             let res = [];

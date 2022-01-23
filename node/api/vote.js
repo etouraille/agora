@@ -108,7 +108,7 @@ const getReadyForVote = async ( req , res ) => {
                         readyForVote : elem.get(0).properties.readyForVote,
                         invitedBy : elem.get(0).properties.invited,
                         round: typeof elem.get(0).properties.round.low === 'number' ? elem.get(0).properties.round.low : elem.get(0).properties.round,
-                        subscribedIsBefore: subscribedAt ? subscribedAt <= createdAt: false
+                        subscribeIsBefore: subscribedAt ? subscribedAt <= createdAt: false
                     }
                 }).finally(() => {
                     _sess.close();

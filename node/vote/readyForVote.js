@@ -41,7 +41,7 @@ const readyForVote = ( id , user ) => {
                     let isReadyForVote = minRound === maxRound && voteComplete(_for, _against, ret.length, 'consensus');
                     let isOwner = ret.find(elem => elem.user === user ) ? true : false;
                     let canBeEdited = ((minRound === maxRound && minRound === 0) || (minRound === maxRound && voteFailure(_for, _against, ret.length, 'consensus'))) && !voteComplete(_for, _against, ret.length, 'consensus');
-                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited, subscribedIsBefore : subscribedAt <= createdAt });
+                    resolve({ hasSubscribed, isReadyForVote , isOwner, canBeEdited, subscribeIsBefore : subscribedAt <= createdAt });
                 }, error => {
                     console.log( error);
                     reject( error )

@@ -6,7 +6,7 @@ const canVote = ( req, res, next ) => {
     const user = res.username;
     readyForVote(id, user ).then(rfv => {
         voteResult( id ).then( vote => {
-            if( rfv.hasSubscribed && rfv.isReadyForVote && !vote.final && rfv.subscribedIsBefore ) {
+            if( rfv.hasSubscribed && rfv.isReadyForVote && !vote.final && rfv.subscribeIsBefore ) {
                 next();
             } else {
                 res.status( 403).json({rfv , vote }).end();

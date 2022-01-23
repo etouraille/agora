@@ -24,8 +24,8 @@ const amend = ( req, res ) => {
             return;
         } else {
 
-            let query = 'MATCH (document:Document), (u:User) WHERE document.id = $idParent AND u.login = $me' +
-                ' MERGE (child : Document {  body : $selection , id : $id, createdAt : datetime().epochMillis })' +
+            let query = 'MATCH (document:Document), (u:User) WHERE document.id = $idParent AND u.login = $me ' +
+                ' MERGE (child : Document {  body : $selection , id : $id, createdAt : timestamp() })' +
                 '-[r:HAS_PARENT { index : $index , length : $length }]' +
                 '->(document)-[s:HAS_CHILDREN { index : $index , length : $length }]' +
                 '->(child)' +

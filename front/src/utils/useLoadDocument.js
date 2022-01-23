@@ -12,6 +12,7 @@ import { init as initVote } from "../redux/slice/voteSlice";
 import { useDispatch, useSelector } from "react-redux";
 import documentFilter from "../redux/filter/documentFilter";
 import readyForVoteSubscribedFilter from "../redux/filter/readyForVoteSubscribedFilter";
+import {addSubscribeIsBefore} from "../redux/slice/subscribeIsBeforeSlice";
 
 const useLoadDocument = ({ id , reload }) => {
 
@@ -86,6 +87,9 @@ const useLoadDocument = ({ id , reload }) => {
             }, error => {
                 console.log( error);
             })
+            http.get('/api/subscribe-is-before/' + id).then(data => {
+                dispatch( addSubscribeIsBefore({id, subscribeIsBefore: data.data.subscribeIsBefore}))
+            })
         }
 
     }, [id])
@@ -107,6 +111,9 @@ const useLoadDocument = ({ id , reload }) => {
             }, error => {
                 console.log( error);
             })
+             http.get('/api/subscribe-is-before/' + menu.id).then(data => {
+                 dispatch( addSubscribeIsBefore({id: menu.id, subscribeIsBefore: data.data.subscribeIsBefore}))
+             })
         });
 
 
