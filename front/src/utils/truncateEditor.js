@@ -25,3 +25,19 @@ export const lastChar = ( editor, displayLength ) => {
     }
     editor.setContents(content.compose(new Delta(delta)));
 }
+
+export const truncateChar = (editor, start, stop ) => {
+    let length = editor.getLength();
+    let content = editor.getContents();
+    let delta = [];
+    if(start > length) {
+        start = 0;
+    }
+    if(stop > length ) {
+        stop = length;
+    }
+    delta.push({retain: 0, delete: start});
+    delta.push({retain: stop - start});
+    delta.push({delete: stop});
+    editor.setContents(content.compose(new Delta(delta)));
+}

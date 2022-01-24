@@ -14,7 +14,7 @@ import usePrevious from "../utils/usePrevious";
 import canVoteFilter from "../redux/filter/canVoteFilter";
 import canGoToDoc from "../redux/filter/canGoToDoc";
 import canEditFilter from "../redux/filter/canEditFilter";
-const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
+const ContextMenu = ({ display, evt , id, reload, setDisplay, parentId}) => {
 
 
     const vote = useSelector( voteFilter(id ));
@@ -95,7 +95,7 @@ const ContextMenu = ({ display, evt , id, reload, setDisplay}) => {
                     </div> : <></> }
                 </div>
             ) : (<></>)}
-            <VoteModal id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={_reload}></VoteModal>
+            <VoteModal id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={_reload} parentId={parentId}></VoteModal>
         </div>
     )
 }

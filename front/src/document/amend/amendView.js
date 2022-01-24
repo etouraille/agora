@@ -13,8 +13,9 @@ import idFromRoute from "../../utils/idFromRoute";
 import ContextMenu from "../../contextual/ContextMenu";
 import useLoadDocument from "../../utils/useLoadDocument";
 import SwipeAmendItem from "../../swipeable/SwipeAmendItem";
+import {lastChar, truncateChar} from "../../utils/truncateEditor";
 
-const AmendView = ({id, reload , countParent }) => {
+const AmendView = ({id, reload , countParent, childrenId }) => {
 
 
     const [ menus,setMenus ] = useState([]);
@@ -93,19 +94,22 @@ const AmendView = ({id, reload , countParent }) => {
 
     useEffect(() => {
         let nodeAndId = [];
-        Quill.register('modules/clink', function(quill, options ) {
-            quill.container.addEventListener('click', cb);
-            quill.container.addEventListener('contextmenu', cb_context);
-        });
-        if (doc.children  && window.document.querySelector('#rightEditor') ) {
+        if (!!!childrenId) {
+            Quill.register('modules/clink', function (quill, options) {
+                quill.container.addEventListener('click', cb);
+                quill.container.addEventListener('contextmenu', cb_context);
+            });
+        }
+        if (doc.children  && window.document.querySelector('#rightEditor_' + count) ) {
 
+            let options = {readOnly: true, modules : { clink : true}};
+            if(childrenId) {
+                options = {readOnly: true}
+            }
 
-
-            const righteditor = new Quill('#rightEditor', {readOnly: true, modules: {
-                clink: true
-            }});
+            const righteditor = new Quill('#rightEditor_' + count, options);
             //const righteditor = new Quill('#rightEditor', {readOnly: true });
-            const source = new Quill('#source');
+            const source = new Quill('#source_' + count );
             source.setContents(JSON.parse(doc.document.body));
 
             let hasSubscribed = readyForVote.hasSubscribed;
@@ -113,6 +117,11 @@ const AmendView = ({id, reload , countParent }) => {
             let content = sortedChildren[0] ? source.getContents( 0 , sortedChildren[0].link.index ): new Delta(JSON.parse(doc.document.body));
 
             let deltaIndex = 0;
+
+            let previousLength = 0;
+            let textLength = 0;
+            let totalLength = 0;
+
 
             sortedChildren.map( (object , i ) => {
 
@@ -123,8 +132,10 @@ const AmendView = ({id, reload , countParent }) => {
                     afterLength = sortedChildren[i+1].link.index - ( object.link.index + object.link.length );
                 }
                 const delta = new Delta(current);
-                let emptyQuill = new Quill('#emptyQuill');
+                let emptyQuill = new Quill('#emptyQuill_' + count );
                 emptyQuill.setContents(delta);
+                let length = emptyQuill.getLength();
+                let currentLength = content.length();
                 content = content.concat(delta);
                 content = content.concat(source.getContents( afterIndex, afterLength))
                 const yellow = [];
@@ -138,20 +149,31 @@ const AmendView = ({id, reload , countParent }) => {
 
                 const yellowBackground =  new Delta(yellow);
                 deltaIndex = emptyQuill.getLength() - 1 - object.link.length;
-                return yellowBackground;
-            }).forEach((delta ) => {
-                if( hasSubscribed ) {
-                    content = content.compose(delta);
+                return { delta: yellowBackground, id : object.child.id, length, currentLength };
+            }).forEach((data ) => {
+                if(hasSubscribed ) {
+                    if (childrenId === data.id) {
+                        previousLength = data.currentLength;
+                        textLength = data.length;
+                    }
+                    content = content.compose(data.delta);
+                    totalLength = content.length();
+
                 }
             })
             righteditor.setContents(content);
+            if(childrenId) {
+                truncateChar(righteditor, previousLength - Math.round((textLength)*0.3), previousLength + textLength + Math.round((textLength)*0.3));
+            }
+
+
 
 
             deltaIndex = 0;
             sortedChildren.forEach(( object ) => {
                 let current = JSON.parse( object.child.body );
                 const delta = new Delta(current);
-                let emptyQuill = new Quill('#emptyQuill');
+                let emptyQuill = new Quill('#emptyQuill_' + count );
                 emptyQuill.setContents(delta);
 
                 const [ line, index ]  = righteditor.getLeaf(object.link.index + deltaIndex + 1 );
@@ -170,13 +192,20 @@ const AmendView = ({id, reload , countParent }) => {
 
     return (
         <div>
-            <div id="source" style={{display: 'none'}}></div>
-            <div id="emptyQuill" style={{display: 'none'}}></div>
-            <div id="rightEditor"></div>
-            <ContextMenu id={_id} evt={evt} display={display} reload={() => currentReload()} setDisplay={setDisplayContext}></ContextMenu>
+            <div id={`source_${count}`} style={{display: 'none'}}></div>
+            <div id={`emptyQuill_${count}`} style={{display: 'none'}}></div>
+            <div id={`rightEditor_${count}`}></div>
+            { !childrenId ? <ContextMenu
+                    id={_id}
+                    evt={evt}
+                    display={display}
+                    reload={() => currentReload()}
+                    setDisplay={setDisplayContext}
+                    parentId={id}
+                ></ContextMenu> : <></> }
             { Array.from(window.document.querySelectorAll("p > a")).map((elem, index) => {
-                let id = elem.href ? idFromRoute(routeFromHref(elem.href)): null;
-                return <>{id ? <SwipeAmendItem index={index} elem={elem} id={id} reload={() => reload()}></SwipeAmendItem>: <></>}</>
+                let _id = elem.href ? idFromRoute(routeFromHref(elem.href)): null;
+                return <>{_id && !childrenId? <SwipeAmendItem index={index} elem={elem} id={_id} reload={() => reload()} parentId={id}></SwipeAmendItem>: <></>}</>
             })}
         </div>
 

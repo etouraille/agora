@@ -9,7 +9,7 @@ import canVoteFilter from "../redux/filter/canVoteFilter";
 import canEditFilter from "../redux/filter/canEditFilter";
 import canGoToDoc from "../redux/filter/canGoToDoc";
 
-const SwipeAmendItem = ({id, elem, index , reload}) => {
+const SwipeAmendItem = ({id, elem, index , reload, parentId}) => {
 
     const [toggleModal, setToggleModal] = useState(false);
 
@@ -38,6 +38,6 @@ const SwipeAmendItem = ({id, elem, index , reload}) => {
         ref(elem);
     })
 
-    return (<VoteModal key={index} id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={reload}></VoteModal>)
+    return (<VoteModal key={index} id={id} toggleModal={toggleModal} onChangeToggle={setToggleModal} reload={reload} parentId={parentId}></VoteModal>)
 }
 export default SwipeAmendItem;

@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import Vote from "../../vote/Vote";
 import readyForVoteSubscribedFilter from "../../redux/filter/readyForVoteSubscribedFilter";
 import Attachement from "./Attachement";
+import AmendView from "../amend/amendView";
 
-const VoteModal = ({id, toggleModal, onChangeToggle, reload }) => {
+const VoteModal = ({id, toggleModal, onChangeToggle, reload , parentId }) => {
 
     const [ open, setOpen ] = useState(false);
 
@@ -38,6 +39,9 @@ const VoteModal = ({id, toggleModal, onChangeToggle, reload }) => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div>
+                        <AmendView id={parentId} countParent={1} childrenId={id}></AmendView>
+                    </div>
                     <div>
                         <Attachement id={id}></Attachement>
                     </div>
