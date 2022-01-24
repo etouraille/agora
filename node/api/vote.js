@@ -249,13 +249,18 @@ const getVoters = ( req, res ) => {
     const query = "" +
         "MATCH (d:Document)" +
         "WHERE d.id = $id " +
-        "MATCH (d)-[r:SUBSCRIBED_BY|HAS_PARENT*1..]->(u:User) " +
-        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)]" +
+        "MATCH (d)-[r:OLD_SUBSCRIBED_BY|SUBSCRIBED_BY|HAS_PARENT*1..]->(u:User) " +
+        "WITH CASE 'OLD_SUBSCRIBED_BY' in [rel in r | type(rel)] WHEN true THEN true ELSE false END as isOld , d, u , r " +
+        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] " +
+        "OR 'OLD_SUBSCRIBED_BY' in [rel in r | type(rel)] " +
         "OPTIONAL MATCH (u)-[v:VOTE_FOR]->(d) " +
-        "RETURN u,v ";
+        "RETURN u,v, r, d, isOld ";
 
     //console.log( id );
     //console.log( query );
+    // ne peuvent voter pour le document que ceux qui ont souscrit avant la creation du doc.
+    // quand on desouscrit on peut faire changer les resultat du vote ...
+    // ne prendre en compte pour le vote que les OLD_SUBSCRIBED_BY qui on déjà voté pour le document .
 
     const result = session.run( query , {id : id })
     result.then( data => {
@@ -263,7 +268,10 @@ const getVoters = ( req, res ) => {
         data.records.forEach( elem => {
             let vote = {};
             let user = elem.get(0)?elem.get(0).properties.login:null;
-            if( user) {
+            let subscribedAt = elem.get(2).pop().properties.subscribedAt;
+            let createdAt = elem.get(3).properties.createdAt;
+            let isOld = elem.get(4);
+            if( user && subscribedAt.lessThanOrEqual(createdAt)) {
                 vote.user = user;
                 if( elem.get(1)) {
                     vote.against = elem.get(1).properties.against;
@@ -283,7 +291,8 @@ const getVoters = ( req, res ) => {
                 } else {
                     vote.against = null;
                 }
-                votes.push( vote );
+                //  on ajoute le vote de l'ancienne relation uniquement si elle a donnée lieu à un vote.
+                if(!isOld || (isOld && typeof vote.against === 'boolean')) votes.push( vote );
             }
         })
         return res.json( votes ).end();

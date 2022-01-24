@@ -11,7 +11,8 @@ const subscribeDoc = ( req, res ) => {
         "WITH d, u , timestamp() as _ts " +
         "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBED_TO]->(d ) " +
         "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u " +
-        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) ";
+        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) " +
+        "DELETE os, ohs ";
     let result = session.run(query, {id : id , me : res.username });
 
     processSubscribe(id, res.username);

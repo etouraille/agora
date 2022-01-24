@@ -3,33 +3,44 @@ const getDriver = require('./../neo/driver');
 const voteResult = (documentId ) => {
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH(u:User)-[hs:HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..]->(d:Document) " +
+    const query = "" +
+        "MATCH(u:User)-[hs:OLD_HAS_SUBSCRIBE_TO|HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..]->(d:Document) " +
+        "WITH CASE 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)]  WHEN true THEN true ELSE false END as isOld, u, hs, d " +
         "WHERE 'HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
+        "OR 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
         "AND d.id =  $id " +
         "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(d) " +
-        "RETURN u, vf ";
+        "RETURN u, vf , hs, d, isOld ";
+
+    // on prende en compte tout les vote
     let result = session.run( query , { id : documentId });
     return new Promise((resolve, reject) => {
         result.then(data => {
             let ret = [];
             let final = false;
             data.records.forEach( elem  => {
-                let vote = { against : null };
-                if( elem.get(1)) {
-                    vote.against = elem.get(1).properties.against;
-                    if( elem.get(1).properties.complete ) {
-                        final = {
-                            participants : elem.get(1).properties.participants,
-                            forIt : elem.get(1).properties.forIt,
-                            againstIt : elem.get(1).properties.againstIt,
-                            abstention : elem.get(1).properties.abstention,
-                            fail : elem.get(1).properties.fail,
-                            success : elem.get(1).properties.success,
-                            complete : elem.get(1).properties.complete,
+                console.log( elem.get(2));
+                let subscribedAt = elem.get(2).shift().properties.subscribedAt;
+                let createdAt = elem.get(3).properties.createdAt;
+                let isOld = elem.get(4);
+                if ( subscribedAt.lessThanOrEqual(createdAt)) {
+                    let vote = {against: null};
+                    if (elem.get(1)) {
+                        vote.against = elem.get(1).properties.against;
+                        if (elem.get(1).properties.complete) {
+                            final = {
+                                participants: elem.get(1).properties.participants,
+                                forIt: elem.get(1).properties.forIt,
+                                againstIt: elem.get(1).properties.againstIt,
+                                abstention: elem.get(1).properties.abstention,
+                                fail: elem.get(1).properties.fail,
+                                success: elem.get(1).properties.success,
+                                complete: elem.get(1).properties.complete,
+                            }
                         }
                     }
+                    if(!isOld && (isOld && typeof vote.against === 'boolean')) ret.push(vote);
                 }
-                ret.push( vote );
             })
             let participants = ret.length;
             let forIt = ret.reduce( ( a, elem ) => (elem.against === false ? a + 1 : a ), 0);
