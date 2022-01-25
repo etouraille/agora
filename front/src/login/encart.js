@@ -40,7 +40,7 @@ const Encart = () => {
 
     const location = useLocation();
 
-    const noPing = [/^\/$/, /\/user\/(.*)$/, /\/subsribe$/];
+    const noPing = [/^\/$/, /\/user\/(.*)$/, /\/subscribe$/];
 
     useEffect(() => {
         if( click > 0 && click > prevClick ) {
