@@ -4,10 +4,16 @@ import history from "./utils/history";
 import { useDispatch } from "react-redux";
 import { login , logout } from './redux/slice/loginSlice';
 import { Formik, Form , Field, ErrorMessage }  from "formik";
+import { GoogleLogin } from 'react-google-login';
 
 const Login = () => {
 
     const dispatch = useDispatch();
+
+    const responseGoogle = (response) => {
+        console.log(response);
+    }
+
 
     return (
     <div>
@@ -69,6 +75,13 @@ const Login = () => {
             )}
 
         </Formik>
+        <GoogleLogin
+            clientId={process.env.REACT_APP_google_key}
+            buttonText="Login"
+            onSuccess={responseGoogle}
+            onFailure={responseGoogle}
+            cookiePolicy={'single_host_origin'}
+        />
     </div>
     );
 }
