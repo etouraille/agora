@@ -10,10 +10,26 @@ const Login = () => {
 
     const dispatch = useDispatch();
 
-    const responseGoogle = (response) => {
-        console.log(response);
+    const responseGoogle = (data) => {
+        http.post('/sign-in-google', data).then( data => {
+            successLogin(data);
+        })
     }
 
+    const successLogin = (data) => {
+        if( data.data.token ) {
+            localStorage.setItem( 'token', data.data.token );
+            if(localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
+                history.push(localStorage.getItem('redirect'));
+                localStorage.setItem('redirect', null);
+            } else {
+                history.push("/documents");
+            }
+            dispatch(login({token : data.data.token , user : data.data.user}));
+        } else {
+            dispatch(logout());
+        }
+    }
 
     return (
     <div>
@@ -35,19 +51,7 @@ const Login = () => {
                 let mounted = true;
                 http.post('/signin', { username : values.email, password : values.password })
                     .then( data => {
-
-                        if( data.data.token ) {
-                            localStorage.setItem( 'token', data.data.token );
-                            if(localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
-                                history.push(localStorage.getItem('redirect'));
-                                localStorage.setItem('redirect', null);
-                            } else {
-                                history.push("/documents");
-                            }
-                            dispatch(login({token : data.data.token , user : data.data.user}));
-                        } else {
-                            dispatch(logout());
-                        }
+                        successLogin(data);
                         setSubmitting(false);
                     }).catch(error => console.log( error ));
 

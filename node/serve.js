@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser')
 const { home } = require("./open/home");
 const { ping } = require('./api/ping');
 const { signIn , subscribe , eachCheckToken } = require('./handlers')
+const { loginGmail } = require("./open/login");
 const { create, get , deleteDocument } = require('./api/document');
 const { getUser } = require("./open/user");
 const { documents } = require('./api/documents')
@@ -77,6 +78,7 @@ app.get('/api/invited/:id', getInvitedUsers );
 
 app.post('/subscribe', subscribe);
 app.post('/signin', signIn)
+app.post('/sign-in-google', loginGmail)
 app.put('/api/ready-for-vote', canReadyForVote);
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);

@@ -11,6 +11,7 @@ const config = {
     jwtExpirySeconds : process.env.jwtExpirySeconds,
     front: process.env.front,
     sendinblueApiKey: process.env.SENDINBLUE_TRANSAC,
+    googleKey : process.env.googleKey,
 }
 module.exports = config;
 

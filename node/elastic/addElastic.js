@@ -48,6 +48,14 @@ const addNewUser = async (user, invitedBy) => {
     }
 }
 
+const updateUser = async (id, user ) => {
+    let _id = await findById(id);
+    if (_id) {
+        await elastic.update({index: 'user', id: _id, body: user});
+        await elastic.indices.refresh({index: 'user'});
+    }
+}
+
 const append = (id, data ) => {
 
     return new Promise( (resolve , reject ) => {
@@ -86,5 +94,6 @@ const append = (id, data ) => {
 module.exports = {
     addNewDoc,
     addNewUser,
+    updateUser,
     append,
 }
