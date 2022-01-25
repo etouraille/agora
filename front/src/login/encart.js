@@ -54,6 +54,8 @@ const Encart = () => {
 
     useEffect(() => {
 
+        console.log( 'pathname ===============', location.pathname);
+
         if (-1 === noPing.findIndex(elem => location.pathname.match(elem))) {
 
             http.get('/api/ping').then(
