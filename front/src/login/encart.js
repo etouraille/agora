@@ -54,9 +54,11 @@ const Encart = () => {
 
     useEffect(() => {
 
-        console.log( 'pathname ===============', location.pathname);
+        console.log( 'pathname ===============', location.pathname, location.pathname.match(/^\/$/));
 
         if (-1 === noPing.findIndex(elem => location.pathname.match(elem))) {
+
+             console.log( 'not matched');
 
             http.get('/api/ping').then(
                 data => {
@@ -79,23 +81,26 @@ const Encart = () => {
     const previousSD = usePrevious(subscribedDoc);
 
     useEffect( ()=> {
-        //console.log( previousUser, subscribedDoc , _.isEqual( previousSD, subscribedDoc) )
-        if( ! _.isEqual( previousSD ? previousSD.sort() : null,  subscribedDoc ? subscribedDoc.sort(): null)) {
-            //console.log ( subscribedDoc );
-            mercure.init(user, subscribedDoc);
-            //console.log( subscribedDoc );
-            //console.log( 'init =============')
-        }
-        return () => {
-            mercure.close();
+        if( -1 === noPing.findIndex(elem => location.pathname.match(elem))) {
+            //console.log( previousUser, subscribedDoc , _.isEqual( previousSD, subscribedDoc) )
+            if (!_.isEqual(previousSD ? previousSD.sort() : null, subscribedDoc ? subscribedDoc.sort() : null)) {
+                //console.log ( subscribedDoc );
+                mercure.init(user, subscribedDoc);
+                //console.log( subscribedDoc );
+                //console.log( 'init =============')
+            }
+
+            return () => {
+                mercure.close();
+            }
         }
 
-    }, [subscribedDoc])
+    }, [subscribedDoc, location.pathname])
 
     const previousUser = usePrevious(user );
 
     useEffect(() => {
-        if( previousUser !== user ) {
+        if( previousUser !== user && -1 === noPing.findIndex(elem => location.pathname.match(elem))) {
             mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 dispatch(init({data : data.data }));
