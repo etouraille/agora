@@ -5,10 +5,10 @@ const voteResult = (documentId ) => {
     const session = driver.session();
     const query = "" +
         "MATCH(u:User)-[hs:OLD_HAS_SUBSCRIBE_TO|HAS_SUBSCRIBE_TO|HAS_CHILDREN*1..]->(d:Document) " +
-        "WITH CASE 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)]  WHEN true THEN true ELSE false END as isOld, u, hs, d " +
-        "WHERE 'HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
-        "OR 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
+        "WHERE ('HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] " +
+        "OR 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)] )" +
         "AND d.id =  $id " +
+        "WITH CASE 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)]  WHEN true THEN true ELSE false END as isOld, u, hs, d " +
         "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(d) " +
         "RETURN u, vf , hs, d, isOld ";
 
@@ -21,6 +21,7 @@ const voteResult = (documentId ) => {
             data.records.forEach( elem  => {
                 console.log( elem.get(2));
                 let subscribedAt = elem.get(2).shift().properties.subscribedAt;
+                console.log(elem.get(3).properties.id);
                 let createdAt = elem.get(3).properties.createdAt;
                 let isOld = elem.get(4);
                 if ( subscribedAt.lessThanOrEqual(createdAt)) {
@@ -39,7 +40,7 @@ const voteResult = (documentId ) => {
                             }
                         }
                     }
-                    if(!isOld && (isOld && typeof vote.against === 'boolean')) ret.push(vote);
+                    if(!isOld || (isOld && typeof vote.against === 'boolean')) ret.push(vote);
                 }
             })
             let participants = ret.length;

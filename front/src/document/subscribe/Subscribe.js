@@ -14,6 +14,8 @@ const Subscribe = ({ id , reloadFunc }) => {
 
     const subscribed = useSelector( state => {
 
+        console.log( state.documentSubscribe);
+
             let i = state.documentSubscribe.documents.findIndex( elem => elem.id === id )
             if( i >= 0) {
                 let j = state.documentSubscribe.documents[i].users.indexOf(state.login.user);

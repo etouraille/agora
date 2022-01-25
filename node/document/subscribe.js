@@ -45,7 +45,57 @@ const processSubscribe = (subscribedId , user ) => {
 }
 
 
+const processUnsubscribe = ( subscribedId , user ) => {
+    getLinkedDocuments(subscribedId).then( ids => {
+        // pour tout les ids
+        // si le vote est terminé : on ne fait rien
+        ids.forEach( id => {
+            voteIsComplete(id).then( voteComplete => {
+                console.log( 'vote complete', voteComplete);
+                if( ! voteComplete ) {
+                    const driver = getDriver();
+                    const session = driver.session();
+
+                    // TODO remove voter only if it has not voted
+                    //sendMessageToSubscribers(id , {id, sender: user , subject : 'removeVoter'});
+                    // quand le vote est
+                    voteResult(id).then( vote => {
+                        console.log( vote.complete, vote.fail, vote.success, 'vooooottteeee ==========');
+                        if( vote.complete && vote.fail ) {
+                            saveComplete(id , vote ).then( () => {
+                                voteFail(id).then( () => {
+                                    sendMessageToSubscribers(id, { id, sender : user , subject : 'voteComplete', vote });
+                                })
+                            })
+
+                        } else if ( vote.complete && vote.success ) {
+                            voteSuccess(id).then( data => {
+                                if( data.updated ) {
+                                    sendMessageToSubscribers(data.parentId , {
+                                        id : data.parentId ,
+                                        sender : user ,
+                                        subject : 'reloadDocument'});
+                                }
+                                saveComplete(id , vote ).then(() => {
+                                    sendMessageToSubscribers(id, { id, sender: user , subject : 'voteComplete', vote });
+                                })
+                            })
+                        }
+
+                    })
+
+                }
+            })
+        })
+        // si le vote n'est pas terminé
+        // on recalcul le vote
+        // s'il est terminé on envoie un message de final
+        // s'il n'est pas terminé on supprime me votant
+    })
+}
+
 module.exports = {
     getLinkedDocuments,
     processSubscribe,
+    processUnsubscribe,
 }

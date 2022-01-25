@@ -126,6 +126,7 @@ const useLoadDocument = ({ id , reload }) => {
         if( id ) {
             http.get('/api/document/' + id ).then(
                 data => {
+                    // TODO : check vote complete in this api.
                     if( data.data.parent && data.data.parent.link && data.data.parent.link.voteComplete ) {
                         history.push( '/document/' + data.data.parent.document.id );
                         return;

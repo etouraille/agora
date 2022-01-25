@@ -2,6 +2,7 @@ const getDriver = require('./../neo/driver');
 
 const {v4 : uuid } = require('uuid');
 const { documentDelete } = require('./../document/documentDelete');
+const {sendMessage} = require("../mercure/mercure");
 
 const create = ( req, res ) => {
 
@@ -10,6 +11,7 @@ const create = ( req, res ) => {
     const driver = getDriver();
     const session = driver.session();
 
+        let _uuid = uuid();
 
         const query = '' +
         'MATCH (user: User ) WHERE user.login = $email ' +
@@ -21,12 +23,13 @@ const create = ( req, res ) => {
         'RETURN document'
         const result = session.run(
             query,
-            {title : title , body : body , email: username , id : uuid(), me : username });
+            {title : title , body : body , email: username , id : _uuid, me : username });
 
         result.then( data => {
             res.json( data.records[0].get(0).properties );
             res.end();
 
+            sendMessage(_uuid, res.username, { id: _uuid, to : res.username , user : res.username , subject : 'hasSubscribe'}, true );
         }, error => {
             console.log( error );
             res.json(500, {reason : error});

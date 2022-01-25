@@ -9,8 +9,8 @@ const subscribeDoc = ( req, res ) => {
     const session = driver.session();
     const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.login = $me " +
         "WITH d, u , timestamp() as _ts " +
-        "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBED_TO]->(d ) " +
-        "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u " +
+        "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBE_TO]->(d ) " +
+        "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u , os, ohs " +
         "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) " +
         "DELETE os, ohs ";
     let result = session.run(query, {id : id , me : res.username });
@@ -48,6 +48,10 @@ const subscribeDoc = ( req, res ) => {
 // desinscription a un document
 const unsubscribeDoc = ( req, res ) => {
 
+    //TODO : When unsubscribe a doc, if some part are justed amended and there is only one subscriber
+    // the amended doc deseappear: because the vote vote is completed as fail ... because there is only one voter that has not vote
+    // so hence it is old it is not added.
+
     const { id } = req.body;
     const driver = getDriver();
     const session = driver.session();
@@ -58,7 +62,10 @@ const unsubscribeDoc = ( req, res ) => {
         "DELETE r , s ";
     let result = session.run(query, {id : id , me : res.username });
 
+
     result.then(data => {
+
+        processUnsubscribe(id, res.username);
 
         getLinkedDocuments(id).then( ids => {
             return res.json(ids).end();
@@ -77,7 +84,7 @@ const unsubscribeDoc = ( req, res ) => {
     });
     sendMessageToAll({ subject : 'docUnsubscribe', id , user : res.username});
 }
-//recupère tout les documents auquel j'ai soucrit
+//recupère tout les documents auquel j'ai soucrit et leurs enfants ..
 const getSubscribedDoc = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();

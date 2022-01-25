@@ -117,9 +117,9 @@ class  MercureSubscribe {
                 }
             }
             if (message.subject === "hasSubscribe") {
-                if (user !== me) {
-                    store.dispatch(subscribeDocument({id }));
-                }
+                console.log( 'hasSubscribe===============================', id );
+                store.dispatch(subscribeDocument({id }));
+                store.dispatch(subscribeDoc({id, user}));
             }
             if( message.subject === 'notification' ) {
                 store.dispatch( addNotification({ id, user , notification : message.notification , title : message.title }));

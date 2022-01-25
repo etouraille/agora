@@ -49,7 +49,7 @@ const DocumentView = (props) => {
     })
 
 
-    const { document, count } = useLoadDocument({id, reload })
+    const { document, count } = useLoadDocument({id, reload });
 
     const showAmended = useSelector( state => {
         let elem = state.toggleDiff.find( elem => elem.id === id );

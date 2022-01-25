@@ -96,7 +96,6 @@ const Encart = () => {
         if( previousUser !== user ) {
             mercure.init(user, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
-                //console.log( data.data );
                 dispatch(init({data : data.data }));
             }, error => {
                 console.log( error );

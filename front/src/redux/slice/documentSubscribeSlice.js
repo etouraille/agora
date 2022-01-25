@@ -29,6 +29,9 @@ export const documentSubscribeSlice = createSlice({
             if( index >= 0 ) {
                 let i = state.documents[index].users.indexOf( action.payload.user);
                 if( i < 0 ) state.documents[index].users.push( action.payload.user );
+            } else {
+                console.log( 'user addedd ', action.payload.user);
+                state.documents.push({ id: action.payload.id , users : [action.payload.user]});
             }
         },
         deleteDoc : ( state , action ) => {

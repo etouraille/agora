@@ -60,7 +60,7 @@ const putRound = ( req, res ) => {
         //}
 
         console.log(minRound, maxRound, _for, _against, _voters );
-        if (currentRound === 0 && documentTouched) {
+        if (currentRound === 0) {
             _currentRound = currentRound + 1;
         } else if (minRound === maxRound
             && minRound > 0

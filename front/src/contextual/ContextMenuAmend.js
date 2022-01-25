@@ -116,6 +116,8 @@ const ContextMenuAmend = ({ id, reload , editor}) => {
         }, 200);
     };
 
+    console.log( display, canDisplay, hasRange );
+
     return (
         <div>
             { display && canDisplay && hasRange && !isMobile ? (

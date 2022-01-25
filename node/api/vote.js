@@ -148,6 +148,8 @@ const againstIt = ( req , res ) => {
 
         sendMessageToSubscribers(id , {id, user , subject : 'voteAgainst'});
 
+        console.log('in against ==================');
+
         voteResult(id).then( vote => {
             if (vote.complete && vote.fail) {
                 // on sauvegarde le resultat du vote dans les différents VOTE_FOR.
@@ -250,9 +252,9 @@ const getVoters = ( req, res ) => {
         "MATCH (d:Document)" +
         "WHERE d.id = $id " +
         "MATCH (d)-[r:OLD_SUBSCRIBED_BY|SUBSCRIBED_BY|HAS_PARENT*1..]->(u:User) " +
+        "WHERE ('SUBSCRIBED_BY' in [rel in r | type(rel)] " +
+        "OR 'OLD_SUBSCRIBED_BY' in [rel in r | type(rel)] )" +
         "WITH CASE 'OLD_SUBSCRIBED_BY' in [rel in r | type(rel)] WHEN true THEN true ELSE false END as isOld , d, u , r " +
-        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] " +
-        "OR 'OLD_SUBSCRIBED_BY' in [rel in r | type(rel)] " +
         "OPTIONAL MATCH (u)-[v:VOTE_FOR]->(d) " +
         "RETURN u,v, r, d, isOld ";
 
@@ -271,10 +273,13 @@ const getVoters = ( req, res ) => {
             let subscribedAt = elem.get(2).pop().properties.subscribedAt;
             let createdAt = elem.get(3).properties.createdAt;
             let isOld = elem.get(4);
+            console.log( id, isOld );
             if( user && subscribedAt.lessThanOrEqual(createdAt)) {
                 vote.user = user;
+                console.log( id, isOld , vote );
                 if( elem.get(1)) {
                     vote.against = elem.get(1).properties.against;
+                    console.log( vote, isOld );
                     let r = elem.get(1).properties;
                     if( r.complete ) {
                         let final = {
