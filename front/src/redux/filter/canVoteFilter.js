@@ -11,7 +11,11 @@ const canVoteFilter = (id) => {
 
         const doc = documentFilter(id)(state);
 
+        console.log(doc);
+
         const isRoot = doc.parentLink === null;
+
+        console.log( isRoot);
 
         const vote = voteFilter(id)(state);
 
