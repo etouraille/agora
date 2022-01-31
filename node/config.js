@@ -1,8 +1,10 @@
 const dotenv = require('dotenv');
 if (process.env.ENV === 'development') {
    dotenv.config({path: __dirname + '/.env.development'});
+   console.log('dev');
 } else {
     dotenv.config({path : __dirname + '/.env.production'});
+    console.log('prod');
 }
 const config = {
     mercureEndpoint : process.env.mercureEndpoint,
