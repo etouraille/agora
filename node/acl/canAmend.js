@@ -16,7 +16,7 @@ const canAmend = ( req , res , next ) => {
     readyForVote(id, res.username ).then( rfv => {
         voteResult(id).then( vote => {
             let myVote = vote.final ? vote.final : vote;
-            can = rfv.hasSubscribed && rfv.isReadyForVote && myVote && myVote.fail;
+            can = rfv.hasSubscribed && rfv.isReadyForVote && ((myVote && myVote.fail) || !vote.hasParent);
             const driver = getDriver();
             const session = driver.session();
             if( can ) {

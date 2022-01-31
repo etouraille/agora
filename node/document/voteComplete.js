@@ -10,7 +10,8 @@ const voteResult = (documentId ) => {
         "AND d.id =  $id " +
         "WITH CASE 'OLD_HAS_SUBSCRIBE_TO' in [rel in hs | type(rel)]  WHEN true THEN true ELSE false END as isOld, u, hs, d " +
         "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(d) " +
-        "RETURN u, vf , hs, d, isOld ";
+        "OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Document) " +
+        "RETURN u, vf , hs, d, isOld , p ";
 
     // on prende en compte tout les vote
     let result = session.run( query , { id : documentId });
@@ -18,8 +19,9 @@ const voteResult = (documentId ) => {
         result.then(data => {
             let ret = [];
             let final = false;
+            let hasParent;
             data.records.forEach( elem  => {
-                console.log( elem.get(2));
+                hasParent = elem.get(5) ? true : false;
                 let subscribedAt = elem.get(2).shift().properties.subscribedAt;
                 console.log(elem.get(3).properties.id);
                 let createdAt = elem.get(3).properties.createdAt;
@@ -59,6 +61,7 @@ const voteResult = (documentId ) => {
                 success ,
                 complete,
                 final,
+                hasParent,
             })
         }, error => {
             reject( error );
