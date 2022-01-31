@@ -7,6 +7,7 @@ const canDisplayAmendFilter = ( id ) => {
         let doc = documentFilter(id)(state);
         let isRoot = doc.parentLink === null;
         let rfv = readyForVoteSubscribedFilter(id)(state);
+        console.log( rfv);
         let vote = voteFilter(id)( state );
         return rfv.isReadyForVote && rfv.hasSubscribed && ( ( vote &&  vote.fail ) || isRoot )
     }

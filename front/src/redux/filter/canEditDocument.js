@@ -9,9 +9,9 @@ const canEditDocument = (id) => {
         if(elem) {
             let _for = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === true ? a + 1: a), 0);
             let _against = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === false ? a + 1: a), 0);
-            let _minRound = elem.data.map(elem => elem.round).min();
-            let _maxRound = elem.data.map(elem => elem.round).max();
-            let myRound = elem.data.find(elem => elem.user === login).round;
+            let _minRound = elem.data.map(elem => elem?.round).min();
+            let _maxRound = elem.data.map(elem => elem?.round).max();
+            let myRound = elem.data.find(elem => elem.user === login)?.round;
             canEdit = myRound === 0 || (myRound > 0 && voteFailure(_for, _against, elem.data.length, 'consensus'));
 
         }
