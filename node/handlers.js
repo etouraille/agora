@@ -133,7 +133,13 @@ const eachCheckToken = (req , res, next ) => {
             }
 
             // Now, create a new token for the current user, with a renewed expiration time
-            const newToken = jwt.sign({ email: payload.email, id: payload.id, name: payload.name, picture: payload.picture }, jwtKey, {
+            const newToken = jwt.sign({
+                email: payload.email,
+                id: payload.id, name:
+                payload.name,
+                picture: payload.picture,
+                isGoogle: payload.isGoogle
+            }, jwtKey, {
                 algorithm: 'HS256',
                 expiresIn: parseInt(jwtExpirySeconds)
             })

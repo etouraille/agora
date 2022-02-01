@@ -14,6 +14,8 @@ const config = {
     front: process.env.front,
     sendinblueApiKey: process.env.SENDINBLUE_TRANSAC,
     googleKey : process.env.googleKey,
+    facebookSecret: process.env.facebookSecret,
+    facebookId: process.env.facebookId,
 }
 module.exports = config;
 

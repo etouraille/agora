@@ -56,7 +56,7 @@ const loginGmail = async ( req, res ) => {
                 })
             }
         })).then(id => {
-            const token = jwt.sign({email, name, id}, jwtKey, {
+            const token = jwt.sign({email, name, id, isGoogle: true},   jwtKey, {
                 algorithm: 'HS256',
                 expiresIn: parseInt(jwtExpirySeconds)
             })

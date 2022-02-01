@@ -25,8 +25,11 @@ import _routes from './route'
 import history from "./utils/history";
 import useSwipePrevious from "./swipeable/useSwipePrevious";
 
+/*global FB*/
 
 export default function App() {
+
+
 
     const dispatch = useDispatch();
 
@@ -69,6 +72,22 @@ export default function App() {
             })
 
         }
+    }, []);
+
+    //facebook
+    useEffect(() => {
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : process.env.REACT_APP_facebookId,
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v12.0'
+            });
+
+            FB.AppEvents.logPageView();
+
+        };
+
     }, []);
 
     const click = (evt) => {

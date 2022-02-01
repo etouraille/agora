@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { login , logout } from './redux/slice/loginSlice';
 import { Formik, Form , Field, ErrorMessage }  from "formik";
 import { GoogleLogin } from 'react-google-login';
+/*global FB*/
 
 const Login = () => {
 
@@ -29,6 +30,10 @@ const Login = () => {
         } else {
             dispatch(logout());
         }
+    }
+
+    const onFacebookClick = (evt) => {
+        FB.login((data) => { console.log(data)}, {scope: 'email'});
     }
 
     return (
@@ -86,7 +91,9 @@ const Login = () => {
             onFailure={responseGoogle}
             cookiePolicy={'single_host_origin'}
         />
+        <button className="btn btn-success" onClick={onFacebookClick()}>Login Facebook</button>
     </div>
+
     );
 }
 export default Login;
