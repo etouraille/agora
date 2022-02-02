@@ -78,8 +78,8 @@ app.get('/api/invited/:id', getInvitedUsers );
 
 app.post('/subscribe', subscribe);
 app.post('/signin', signIn);
-app.post('/sign-in-google', loginGmail);
-app.post('/sign-in-facebook', loginFacebook);
+app.post('/sign-in-google', (req, res) => loginGmail(req, res));
+app.post('/sign-in-facebook', (req, res) => loginFacebook(req, res));
 app.put('/api/ready-for-vote', canReadyForVote);
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);

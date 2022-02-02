@@ -26,7 +26,7 @@ const googleAuth = async (token) => {
 
 const login = async ( type ) => {
 
-    return async (req, res ) => {
+    return async function (req, res ) {
 
         const body = req.body;
         const token = body.tokenId;
