@@ -24,9 +24,9 @@ const googleAuth = async (token) => {
     return { userId: sub, email, name, picture};
 }
 
-const login = async ( type ) => {
+const login = (type) => {
 
-    return async function (req, res ) {
+    return async (req, res) => {
 
         const body = req.body;
         const token = body.tokenId;
@@ -104,7 +104,5 @@ async function getFacebookUserData(access_token) {
     return data;
 };
 
-module.exports = {
-    loginGmail: login('gamail'),
-    loginFacebook: login('facebook'),
-}
+exports.loginGmail = login('gmail');
+exports.loginFacebook = login('facebook');
