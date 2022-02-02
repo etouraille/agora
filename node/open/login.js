@@ -63,7 +63,7 @@ const login = (type) => {
                     })
                 }
             })).then(id => {
-                const token = jwt.sign({email, name, id, isGoogle: true}, jwtKey, {
+                const token = jwt.sign({email, name, id, isGoogle: type==='google', isFacebook: type==='facebook'}, jwtKey, {
                     algorithm: 'HS256',
                     expiresIn: parseInt(jwtExpirySeconds)
                 })

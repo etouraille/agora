@@ -13,6 +13,8 @@ import _ from 'lodash'
 import {initDocumentsSubscribe} from "../redux/slice/documentSubscribeSlice";
 import { GoogleLogout } from 'react-google-login';
 
+/*global FB*/
+
 function unlog() {
     window.localStorage.setItem('token', null);
     http.get('api/ping')
@@ -139,7 +141,11 @@ const Encart = () => {
                     clientId={process.env.REACT_APP_google_key}
                     buttonText="Logout"
                     onLogoutSuccess={evt => unlog()}
-                ></GoogleLogout>:<div className="dropdown-item"  onClick={evt => unlog()}>Unlog</div> }
+                ></GoogleLogout> : (jwtDecode(token).isFacebook ?
+                        <div className="dropdown-item"  onClick={evt => { FB.logout();unlog();}}>Unlog</div> :
+                        <div className="dropdown-item"  onClick={evt => unlog()}>Unlog</div>)
+                }
+
             </div>
         </div> : <div></div> ;
 

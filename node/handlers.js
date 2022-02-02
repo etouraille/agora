@@ -138,7 +138,8 @@ const eachCheckToken = (req , res, next ) => {
                 id: payload.id, name:
                 payload.name,
                 picture: payload.picture,
-                isGoogle: payload.isGoogle
+                isGoogle: payload.isGoogle,
+                isFacebook: payload.isFacebook,
             }, jwtKey, {
                 algorithm: 'HS256',
                 expiresIn: parseInt(jwtExpirySeconds)
