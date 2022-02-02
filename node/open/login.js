@@ -102,7 +102,7 @@ async function getFacebookUserData(access_token) {
     // { id, email, first_name, last_name }
     if (!data.email) throw new Error('Not a valid token');
     data.name = data.first_name + ' ' + data.last_name;
-    data.picture = data.picture.url;
+    data.picture = data.picture.data.url;
     return data;
 };
 
