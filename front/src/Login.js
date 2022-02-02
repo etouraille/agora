@@ -33,7 +33,16 @@ const Login = () => {
     }
 
     const onFacebookClick = (evt) => {
-        FB.login((data) => { console.log(data)}, {scope: 'email'});
+        FB.login((data) => {
+
+            let tokenId = data?.authResponse?.accessToken;
+            if (tokenId) {
+                http.post('/sign-in-facebook',{tokenId}).then(data => {
+                    successLogin(data);
+                })
+            }
+
+        }, {scope: 'email'});
     }
 
     return (
@@ -91,7 +100,7 @@ const Login = () => {
             onFailure={responseGoogle}
             cookiePolicy={'single_host_origin'}
         />
-        <button className="btn btn-success" onClick={onFacebookClick()}>Login Facebook</button>
+        <button className="btn btn-success" onClick={onFacebookClick}>Login Facebook</button>
     </div>
 
     );
