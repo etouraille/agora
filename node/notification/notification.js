@@ -4,7 +4,7 @@ const {v4 : uuid } = require('uuid');
 const { getSubscribers } = require('./../document/subscribers');
 const { findFirstParent }= require('./../document/findParent');
 const {getEditors} = require("../vote/readyForVote");
-const query = "MATCH (u:User) , (d:Document) WHERE u.login = $user " +
+const query = "MATCH (u:User) , (d:Document) WHERE u.id = $user " +
     "AND d.id = $id " +
     "OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document) WHERE NOT (p)-[:HAS_PARENT]->(:Document) " +
     "MERGE (u)-[:HAS_NOTIFICATION]" +
@@ -287,7 +287,7 @@ const removeInviteNotificationOnReadyForVote = ( id , users, me  ) => {
         const session = driver.session();
         const query = "" +
             "MATCH (u:User)-[:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
-            "WHERE u.login = $user AND d.id = $id AND n.type = $type " +
+            "WHERE u.id = $user AND d.id = $id AND n.type = $type " +
             "SET n.clear = true " +
             "RETURN n ";
         const result = session.run( query , { user, id , type :'invite'});
@@ -310,7 +310,7 @@ removeReadyForVoteNotificationOnVote = ( id , user ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (u:User)-[:HAS_NOTIFICATION]->(n:Notification)-[:NOTIFY_ON]->(d:Document) " +
-        "WHERE u.login = $user AND d.id = $id AND n.type = 'rfv' " +
+        "WHERE u.id = $user AND d.id = $id AND n.type = 'rfv' " +
         "SET n.clear = true " +
         "RETURN n ";
     const result = session.run( query , { id , user });
@@ -339,7 +339,7 @@ removeAllReadyForVoteNotificationOnVoteSuccessOrFail = ( id ) => {
     result.then( data => {
         data.records.forEach( elem => {
             const notification = elem.get( 0).properties;
-            const user = elem.get(1).properties.login;
+            const user = elem.get(1).properties.id;
             sendMessage( id,  user, { id,  user, notification, subject : 'removeNotification' });
         })
     }, error => {

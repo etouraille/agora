@@ -9,7 +9,7 @@ const {findParent} = require("../document/findParent");
 
 const invite = ( req, res ) => {
 
-    const { id , email } = req.body;
+    const { id , userId } = req.body;
 
     const driver = getDriver();
 
@@ -21,15 +21,15 @@ const invite = ( req, res ) => {
         let minRound = data.records[0].get(0).low;
 
         const session = driver.session();
-        query = 'MATCH (user: User ) WHERE user.login = $email ' +
+        query = 'MATCH (user: User ) WHERE user.id = $userId ' +
             'MATCH ( document : Document ) WHERE document.id = $id ' +
             'MERGE (document)-[r:FOR_EDIT_BY { invited : $me , round: $minRound}]->(user)';
 
-        let result = session.run( query , {id : id , email : email, me : res.username , minRound});
+        let result = session.run( query , {id : id , userId, me : res.userId , minRound});
         return result.then(data => {
-            sendInvite(id, email, res.username );
-            sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
-            return res.json({id : id , email : email, round: minRound }).end();
+            sendInvite(id, userId, res.email );
+            sendMessage(id, userId , { to : userId , user : res.userId , subject : 'reloadDocumentList'}, true );
+            return res.json({id : id , userId , round: minRound }).end();
         }, error => {
             res.json(500, {reason : error });
         })
@@ -43,13 +43,13 @@ const invite = ( req, res ) => {
 
 const uninvite = ( req, res ) => {
 
-    const { id , email } = req.body;
-    const me = res.username;
+    const { id , userId } = req.body;
+    const me = res.userId;
 
     const driver = getDriver();
     const session = driver.session();
     const query = 'MATCH ( document : Document )-[r:FOR_EDIT_BY]->(user:User) ' +
-        ' WHERE user.login = $email ' +
+        ' WHERE user.id = $userId ' +
         ' AND document.id = $id ' +
        // ' AND r.invited = $me ' +
         'DELETE r ';
@@ -58,7 +58,7 @@ const uninvite = ( req, res ) => {
 
 
 
-    let result = session.run( query , { id , email , me : res.username});
+    let result = session.run( query , { id , userId , me });
     result.then( data => {
         //if document is accepted do the index stuff.
         //document can be accepted because some other left could be accepted yet.
@@ -75,7 +75,7 @@ const uninvite = ( req, res ) => {
                 })
             }
         })
-        sendMessage(id, email , { to : email , user : res.username , subject : 'reloadDocumentList'}, true );
+        sendMessage(id, email , { to : userId , user : res.userId , subject : 'reloadDocumentList'}, true );
         return res.json(data).end();
     }, error => {
         return res.json(500, { reason : error }).end();
@@ -95,15 +95,17 @@ const getInvitedUsers = (req , res ) => {
          ' MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User)' +
          ' WHERE d.id = $id ' +
          ' OPTIONAL MATCH (d)-[cb:CREATE_BY]->(me:User) ' +
-         ' WHERE me.login = $me' +
+         ' WHERE me.id = $me' +
          ' RETURN u, r , cb';
-     let result = session.run( query , { id : id , me : res.username });
+     let result = session.run( query , { id : id , me : res.userId });
      result.then( (data ) => {
          let json = [];
          data.records.map( ( elem ) => {
              let ret = {};
              ret.login = elem.get(0).properties.login;
-             if( elem.get(2)) {
+             ret.id = elem.get(0).properties.id;
+             ret.name = elem.get(0).properties.name;
+            if( elem.get(2)) {
                  ret.meIsCreator = true;
              }
              json.push( ret );

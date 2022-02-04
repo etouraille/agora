@@ -14,11 +14,11 @@ const postAttach = (req, res ) => {
     const query = "" +
         "MATCH(d:Document) " +
         "WHERE d.id = $id " +
-        "MERGE (d)-[r:HAS_ATTACHMENT {by: $username}]->(a:Attachment {type: $type, link: $link, uuid : $uuid, text : $text}) " +
+        "MERGE (d)-[r:HAS_ATTACHMENT {by: $userId}]->(a:Attachment {type: $type, link: $link, uuid : $uuid, text : $text}) " +
         "RETURN r, a";
 
 
-    const result = session.run( query , {id, username: res.username, type : data.type, link: data.link, text: data.text, uuid: uuid() });
+    const result = session.run( query , {id, userId: res.userId, type : data.type, link: data.link, text: data.text, uuid: uuid() });
     result.then(data => {
         res.status(200).json({ ...data.records[0].get(0).properties, ...data.records[0].get(1).properties});
     }).finally(() => {

@@ -17,7 +17,7 @@ const Attachement = ({id}) => {
     const [text, setText] = useState('');
     const [radio, setRadio] = useState(null);
     const user = useSelector((state) => {
-        return state.login.user;
+        return state.login.userId;
     })
 
     const onUpload = (event) => {

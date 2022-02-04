@@ -40,7 +40,7 @@ const DocumentEdit = () => {
 
     const dispatch = useDispatch();
 
-    const user = useSelector(state => state.login.user );
+    const user = useSelector(state => state.login.userId );
 
     const _canEditDocument = useSelector(canEditDocument(id))
 

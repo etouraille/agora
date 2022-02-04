@@ -14,7 +14,7 @@ const getSubscribers = ( id ) => {
         result.then( data => {
             let ret = []
             data.records.forEach( elem => {
-                ret.push( elem.get(0).properties.login );
+                ret.push( elem.get(0).properties.id );
             })
             resolve( ret );
         }, error => {

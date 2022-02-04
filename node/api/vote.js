@@ -26,7 +26,7 @@ const isReadyForVote = (id) => {
             let users = [];
             data.records.forEach( elem => {
                 ret.push({vote: elem.get(0).properties.readyForVote, round: elem.get(0).properties.round });
-                users.push(elem.get(1).properties.login )
+                users.push(elem.get(1).properties.id )
             })
             let _for = ret.reduce((a, b) => ( b.vote === true ? a + 1: a ), 0);
             let _against = ret.reduce((a, b) => ( b.vote === false ? a + 1: a ), 0);
@@ -45,11 +45,11 @@ const readyForVote = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
     const { id , readyForVote } = req.body;
-    const me = res.username;
+    const me = res.userId;
 
 
     const query = '' +
-        'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.login = $me ' +
+        'MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.id = $me ' +
         'OPTIONAL MATCH (d)-[:HAS_PARENT]->(p:Document) ' +
         'SET r.readyForVote = $readyForVote ' +
         'RETURN r, p ';
@@ -96,17 +96,20 @@ const getReadyForVote = ( req , res ) => {
             let ret = [];
             if( data.records.length > 0 ) {
                 return Promise.all(data.records.map( (elem , index) => {
-                    let email = elem.get(1).properties.login
+                    let user = elem.get(1).properties.id
+                    let name = elem.get(1).properties.name;
+
                     let createdAt = elem.get(2).properties.createdAt.low;
-                    const _query = "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE d.id = $parentId AND u.login = $email RETURN r";
+                    const _query = "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE d.id = $parentId AND u.id = $user RETURN r";
                     const _sess = driver.session();
-                    return _sess.run(_query, {parentId, email }).then((data) => {
+                    return _sess.run(_query, {parentId, user }).then((data) => {
                         let subscribedAt = null;
                         if (data.records[0]) {
                            subscribedAt = data.records[0].get(0).properties.subscribedAt.low;
                         }
                         return {
-                            user : email,
+                            user,
+                            name,
                             readyForVote : elem.get(0).properties.readyForVote,
                             invitedBy : elem.get(0).properties.invited,
                             round: typeof elem.get(0).properties.round.low === 'number' ? elem.get(0).properties.round.low : elem.get(0).properties.round,
@@ -140,8 +143,8 @@ const againstIt = ( req , res ) => {
     const {id } = req.body;
     const driver = getDriver();
     const session = driver.session();
-    let user = res.username;
-    const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
+    let user = res.userId;
+    const query = "MATCH (u:User) , (d:Document) WHERE u.id = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : true}]->(d) RETURN r ";
     let result = session.run( query , { id: id  , me : user });
     result.then( data => {
@@ -193,8 +196,8 @@ const forIt = (req, res ) => {
     const { id } = req.body;
     const driver = getDriver();
     const session = driver.session();
-    let user = res.username;
-    const query = "MATCH (u:User) , (d:Document) WHERE u.login = $me AND d.id = $id " +
+    let user = res.userId;
+    const query = "MATCH (u:User) , (d:Document) WHERE u.id = $me AND d.id = $id " +
         "MERGE (u)-[r:VOTE_FOR { against : false }]->(d) RETURN r";
     let result = session.run( query , { id: id  , me : user });
     result.then( data => {
@@ -269,7 +272,7 @@ const getVoters = ( req, res ) => {
         let votes = [];
         data.records.forEach( elem => {
             let vote = {};
-            let user = elem.get(0)?elem.get(0).properties.login:null;
+            let user = elem.get(0)?elem.get(0).properties.id:null;
             let subscribedAt = elem.get(2).pop().properties.subscribedAt;
             let createdAt = elem.get(3).properties.createdAt;
             let isOld = elem.get(4);

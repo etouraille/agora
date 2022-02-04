@@ -7,16 +7,16 @@ const readyForVoteSubscribedFilter = ( id ) => {
     return ( state ) => {
 
         let doc = documentFilter(id)(state);
-        let user = state.login.user;
+        let userId = state.login.userId;
         let isOwner = false;
         let isReadyForVote = false;
         let hasSubscribed = false;
         let subscribeIsBefore = subscribeIsBeforeFilter(id)(state);
 
 
-        if( user ) {
+        if( userId ) {
             let elem = state.readyForVote.find(elem => elem.id === id);
-            if (user && elem && elem.data.find(elem => elem.user === user)) {
+            if (userId && elem && elem.data.find(elem => elem.user === userId)) {
                 isOwner = true;
             }
             if (elem) {

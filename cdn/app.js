@@ -19,7 +19,8 @@ function checkToken( req, res, next ) {
             let token = auth.match(regexp)[1];
             try {
                 payload = jwt.verify(token, publicKey);
-                res.username = payload.username;
+                res.userId = payload.userId;
+                res.email = payload.email;
             } catch (e) {
                 if (e instanceof jwt.JsonWebTokenError) {
                     return res.status(401).end();

@@ -13,7 +13,7 @@ const ReadyForVote = ({ id }) => {
 
     const dispatch = useDispatch();
 
-    const email = useSelector(state => state.login.user);
+    const userId = useSelector(state => state.login.userId);
 
     const _canVote = useSelector(canVoteForRound(id));
 
@@ -51,8 +51,8 @@ const ReadyForVote = ({ id }) => {
     })
 
     const increaseRound = (evt) => {
-        http.put('/api/round', {id, email }).then((data) => {
-            dispatch(set({id, user:email, readyForVote: null, round : data.data.round}))
+        http.put('/api/round', {id, userId }).then((data) => {
+            dispatch(set({id, user: userId, readyForVote: null, round : data.data.round}))
             if (data.data.delete) {
                 dispatch(setNullReadyForVote({id}))
 
@@ -97,7 +97,7 @@ const ReadyForVote = ({ id }) => {
             <div>
                 {links.map((elem,i ) =>{
                     return (
-                        <div className="small-font padding" key={i}>{elem.user}
+                        <div className="small-font padding" key={i}>{elem.name}
                             { elem.readyForVote === true ? <img className="logo-small margin-left" src={ok} /> : <></>}
                             { elem.readyForVote === false ? <img className="logo-small margin-left" src={no} /> : <></>}
                         </div>

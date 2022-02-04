@@ -4,7 +4,6 @@ const canReadyForVote = (req , res , next) => {
     const driver = getDriver();
     const session = driver.session();
     const { id, readyForVote } = req.body;
-    const me = res.username;
 
     // Je peux voter quand le round viens d'être incrémente ie qu'on a passé les readyForVote à null round > 0 et a la meme valeur pour tout le monde.
     const query = '' +

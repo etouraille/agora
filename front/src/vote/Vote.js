@@ -12,7 +12,7 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
 
     const dispatch = useDispatch();
 
-    const user = useSelector( state => state.login.user );
+    const userId = useSelector( state => state.login.userId );
 
     const result = useSelector( voteFilter(id));
 
@@ -36,11 +36,11 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
 
     const vote = useSelector( state => {
         let ret = null;
-        if( user ) {
+        if( userId ) {
             state.vote.forEach((elem, i) => {
                 if (elem.id === id) {
                     elem.votes.forEach((v, j) => {
-                        if (v.user === user && v.against !== null ) {
+                        if (v.user === userId && v.against !== null ) {
                             ret = !v.against;
                         }
                     })
@@ -70,9 +70,9 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
     }, [reload])
 
     const voteForIt = useCallback(() => {
-        if( id && user ) {
+        if( id && userId ) {
             http.post('/api/vote/for', {id: id}).then(data => {
-                dispatch(forIt({id: id, user: user}));
+                dispatch(forIt({id: id, user: userId}));
                 if( data.data.reload && typeof forceReload === 'function') {
                     forceReload();
                     if( data.data.parentId ) {
@@ -87,12 +87,12 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
                 console.log(error);
             })
         }
-    }, [id , user ]);
+    }, [id , userId ]);
 
     const voteAgainstIt = useCallback(() => {
-        if( id && user ) {
+        if( id && userId ) {
             http.post('/api/vote/against', {id: id}).then(data => {
-                dispatch(againstIt({id: id, user: user}));
+                dispatch(againstIt({id: id, user: userId}));
                 if( data.data.reload && typeof forceReload === 'function') {
                     forceReload();
                 }
@@ -103,7 +103,7 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
                 console.log(error);
             })
         }
-    }, [id , user ]);
+    }, [id , userId ]);
 
     const resetVote = () => {
         if( id ) {

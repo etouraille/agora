@@ -9,12 +9,14 @@ export const loginSlice = createSlice({
         login : ( state, action ) => {
             state.logged = true;
             state.token = action.payload.token;
-            state.user = action.payload.user;
+            state.email = action.payload.email;
+            state.userId = action.payload.userId;
         },
         logout : ( state) => {
             state.logged = false;
             state.token = null;
-            state.user = null;
+            state.email = null;
+            state.userId = null;
         }
     }
 });

@@ -17,10 +17,10 @@ const inviteEmail = ( req, res ) => {
             result.then(data => {
                 if (data.records[0]) {
                     // EMAIL EXISTS send notif
-                    sendInviteEmail(id, email, res.username);
+                    sendInviteEmail(id, email, res.email);
                     // send email
                 }
-                sendInviteSendinblue(id, email, res.username);
+                sendInviteSendinblue(id, email, res.email);
 
             }, error => {
                 res.json(500, {reason : error });

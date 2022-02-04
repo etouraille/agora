@@ -3,7 +3,7 @@ const { voteResult } = require( './../document/voteComplete');
 
 const canVote = ( req, res, next ) => {
     const { id }  = req.body;
-    const user = res.username;
+    const user = res.userId;
     readyForVote(id, user ).then(rfv => {
         voteResult( id ).then( vote => {
             if( rfv.hasSubscribed && rfv.isReadyForVote && vote.hasParent && !vote.final && rfv.subscribeIsBefore ) {

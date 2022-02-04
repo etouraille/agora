@@ -4,9 +4,9 @@ const getUsers = (req , res ) => {
 
     const driver = getDriver();
     const session = driver.session();
-    const query = 'MATCH (user: User ) WHERE user.login <> $me RETURN user ';
+    const query = 'MATCH (user: User ) WHERE user.id <> $me RETURN user ';
 
-    let result = session.run( query , { me : res.username });
+    let result = session.run( query , { me : res.userId });
     result.then((data ) => {
         let array = [];
         data.records.map( record  => {

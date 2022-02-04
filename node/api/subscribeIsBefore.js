@@ -1,7 +1,7 @@
 const getDriver = require('./../neo/driver');
 
 const getSubscribeIsBefore = (req, res ) => {
-    let email = res.username;
+    let userId = res.userId;
 
     let id = req.params.id;
 
@@ -10,11 +10,11 @@ const getSubscribeIsBefore = (req, res ) => {
 
     let query = " MATCH (d:Document) WHERE d.id = $id " +
         "OPTIONAL MATCH (d)-[r:HAS_PARENT|SUBSCRIBED_BY*1..]->(u:User) " +
-        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] AND u.login = $email " +
+        "WHERE 'SUBSCRIBED_BY' in [rel in r | type(rel)] AND u.id = $userId " +
         "RETURN d , r ";
 
     const ret = [];
-    session.run(query, {email, id }).then(data => {
+    session.run(query, {userId, id }).then(data => {
         if(data.records[0]) {
             let elem = data.records[0];
             let createdAt = elem.get(0).properties.createdAt;

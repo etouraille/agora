@@ -10,7 +10,7 @@ const Subscribe = ({ id , reloadFunc }) => {
 
     const dispatch = useDispatch();
 
-    let user = useSelector( state => state.login.user );
+    let user = useSelector( state => state.login.userId );
 
     const subscribed = useSelector( state => {
 
@@ -18,7 +18,7 @@ const Subscribe = ({ id , reloadFunc }) => {
 
             let i = state.documentSubscribe.documents.findIndex( elem => elem.id === id )
             if( i >= 0) {
-                let j = state.documentSubscribe.documents[i].users.indexOf(state.login.user);
+                let j = state.documentSubscribe.documents[i].users.indexOf(state.login.userId);
                 return j >= 0;
             } else {
                 return false;

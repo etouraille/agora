@@ -21,7 +21,7 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
 
     const toggleAmend = useSelector(state => state.toggleAmend.toggle);
 
-    const user = useSelector( state => state.login.user );
+    const userId = useSelector( state => state.login.userId );
 
     const isInRange = (needle , haystack ) => {
         if(needle.index < haystack.index ) {
@@ -104,7 +104,8 @@ const AmendButton = ({id , document, reload , onClick , noIcon , _clickEvent ,se
             length : range.length
         }).then(
             data => {
-                dispatch(sub({id : data.data.id , user: user }));
+                //TODO : there is no parameter user in sub.
+                dispatch(sub({id : data.data.id , userId: userId }));
                 dispatch(add({ id: id , child : data.data.id }));
                 dispatch(toggleAmendAction({from: label}));
                 reload();

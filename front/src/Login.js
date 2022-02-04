@@ -26,7 +26,7 @@ const Login = () => {
             } else {
                 history.push("/documents");
             }
-            dispatch(login({token : data.data.token , user : data.data.user}));
+            dispatch(login({token : data.data.token , userId : data.data.userId}));
         } else {
             dispatch(logout());
         }

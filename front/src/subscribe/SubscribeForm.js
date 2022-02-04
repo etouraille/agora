@@ -54,7 +54,7 @@ const SubscribeForm = () => {
                 if(data.reason ) {
                     setUserExists(true);
                 } else if( data.token ) {
-                    dispatch(login({token : data.token , user : data.email, name : data.name }));
+                    dispatch(login({token : data.token, email: data.email, userId: data.userId }));
                     localStorage.setItem('token', data.token);
                     if (localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
                         history.push(localStorage.getItem('redirect'));

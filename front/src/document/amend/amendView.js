@@ -149,7 +149,7 @@ const AmendView = ({id, reload , countParent, childrenId }) => {
 
                 const yellowBackground =  new Delta(yellow);
                 deltaIndex = emptyQuill.getLength() - 1 - object.link.length;
-                return { delta: yellowBackground, id : object.child.id, length, currentLength };
+                return { delta: yellowBackground, id : object.child.id, length : length ? length : 0 , currentLength };
             }).forEach((data ) => {
                 if(hasSubscribed ) {
                     if (childrenId === data.id) {

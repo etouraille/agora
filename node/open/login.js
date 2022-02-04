@@ -37,6 +37,7 @@ const login = (type) => {
             const driver = getDriver();
             const session = driver.session();
             let query = "MATCH (u:User) WHERE u.login = $email RETURN u ";
+            let id;
             session.run(query, {email}).then((data => {
                 if (data.records[0]) {
                     // update user
@@ -44,7 +45,7 @@ const login = (type) => {
                     let _session = driver.session();
                     return _session.run(query, {email, picture, name}).then((data) => {
                         // update user in elastic
-                        let id = data.records[0].get(0).properties.id;
+                        id = data.records[0].get(0).properties.id;
                         updateUser(id, {email, picture, name, id}).catch(() => {
                             console.log('probleme update elatic user')
                         })
@@ -54,7 +55,7 @@ const login = (type) => {
                     // add user.
                     query = "CREATE (u:User { id : $id, name : $name, picture: $picture , email: $email, isGoogle : true}) ";
                     let _session = driver.session();
-                    let id = uuid();
+                    id = uuid();
                     return _session.run(query, {id, name, picture, email}).then(() => {
                         addNewUser({id, name, picture, email}).catch(() => console.log('probleme elastic add user'));
                         return id;
@@ -71,7 +72,7 @@ const login = (type) => {
                 // here, the max age is in milliseconds, so we multiply by 1000
                 res.setHeader('token', token);
 
-                res.json(200, {email: email, token, name});
+                res.json(200, {email: email, token, name, userId: id});
             }).catch(err => {
                 console.log(err);
                 return res.status(500).json({reason: err});

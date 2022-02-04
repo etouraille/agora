@@ -40,5 +40,5 @@ export const truncateChar = (editor, start, stop ) => {
     delta.push({retain: 0, delete: start});
     delta.push({retain: Math.round(stop - start)});
     delta.push({delete: stop});
-    editor.setContents(content.compose(new Delta(delta)));
+    if (delta.length > 0) editor.setContents(content.compose(new Delta(delta)));
 }

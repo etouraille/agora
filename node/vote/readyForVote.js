@@ -17,14 +17,14 @@ const readyForVote = ( id , user ) => {
             data.records.forEach( elem => {
                 let res = {};
                 res.readyForVote = elem.get(0).properties.readyForVote;
-                res.user = elem.get(1).properties.login;
+                res.user = elem.get(1).properties.id;
                 res.round = elem.get(0).properties.round;
                 ret.push( res );
             });
             findParent(id).then(  pData  => {
                 let parentId = pData.id
                 let query = "MATCH (d:Document)-[s:SUBSCRIBED_BY]->(u:User)" +
-                    " WHERE d.id = $parentId AND u.login = $user RETURN d, s ";
+                    " WHERE d.id = $parentId AND u.id = $user RETURN d, s ";
                 let result = session.run( query , {user , parentId });
                 result.then( data => {
                     let hasSubscribed = false;
@@ -78,7 +78,7 @@ const getEditors = ( id ) => {
         result.then( data => {
             let users = [];
             data.records.forEach( elem => {
-                users.push( elem.get(0).properties.login );
+                users.push( elem.get(0).properties.id );
             })
             resolve( users );
         }, error => {

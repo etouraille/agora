@@ -5,7 +5,7 @@ const {sendMessageToEditors} = require("../mercure/mercure");
 
 const putRound = ( req, res ) => {
 
-    const { id , email } = req.body;
+    const { id , userId } = req.body;
 
     const driver = getDriver();
 
@@ -18,7 +18,7 @@ const putRound = ( req, res ) => {
     // TODO : 2 version possible soit on incrémente le round user par user et on peut editer le texte tant que le round n'est pas incrémenté
     // TODO : soit le premier qui incrémente le round l'incrémente pour tout le monde.
     // TODO : I choose here to increment round globaly.
-    let query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User ) WHERE d.id = $id AND u.login = $email " +
+    let query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User ) WHERE d.id = $id AND u.id = $userId " +
         "MATCH (d)-[ra:FOR_EDIT_BY]->(:User) " +
         "WITH max(ra.round) as _maxRound , min(ra.round) as _minRound , ra , r , d " +
         "WITH reduce(against=0, forEditBy in collect(ra) | against + CASE forEditBy.readyForVote = false WHEN true THEN 1 ELSE 0 END ) as _against,  " +
@@ -30,7 +30,7 @@ const putRound = ( req, res ) => {
 
 
     let _session = driver.session();
-    _session.run( query, {id, email }).then((data) => {
+    _session.run( query, {id, userId }).then((data) => {
         let currentRound = data.records[0].get(2).low;
         let maxRound = typeof data.records[0].get(0).low === 'number' ? data.records[0].get(0).low : parseInt(data.records[0].get(0))
         let minRound = typeof data.records[0].get(1).low === 'number' ? data.records[0].get(1).low : parseInt(data.records[0].get(1))
@@ -81,20 +81,21 @@ const putRound = ( req, res ) => {
             return res.status(405).json({reason: 'not allowed to increase round'})
         }
 
-        query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.login = $email " +
+        query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.id = $userId " +
             "SET r.round = $_currentRound REMOVE r.readyForVote  ";
         let session = driver.session();
-        return session.run(query, { id, email, _currentRound: parseInt(_currentRound)}).then((data) => {
+        return session.run(query, { id, userId, _currentRound: parseInt(_currentRound)}).then((data) => {
             if(_deleteVoteComplete) {
                 let _sess = driver.session();
                 // SEND NOTIF FOR A NEW ROUND.
-                sendNotificationNewRound(id, res.username);
+                sendNotificationNewRound(id, res.userId);
                 //return _sess.run("MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id " +
                 //    "REMOVE r.voteComplete ", {id}).then()
                 //.finally(() => _sess.close());
                 return _sess.run("MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id " +
-                    "REMOVE r.readyForVote SET r.round = $_currentRound REMOVE d.touched ", {id, _currentRound: parseInt(_currentRound)}).then(
-                    () => sendMessageToEditors(id, {id, user: res.username, subject: 'documentUnTouched'})
+                    "REMOVE r.readyForVote SET r.round = $_currentRound REMOVE d.touched ",
+                    {id, _currentRound: parseInt(_currentRound)}).then(
+                    () => sendMessageToEditors(id, {id, user: res.userId, subject: 'documentUnTouched'})
                 )
                     .finally(() => _sess.close());
             } else {

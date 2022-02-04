@@ -24,7 +24,7 @@ const amend = ( req, res ) => {
             return;
         } else {
 
-            let query = 'MATCH (document:Document), (u:User) WHERE document.id = $idParent AND u.login = $me ' +
+            let query = 'MATCH (document:Document), (u:User) WHERE document.id = $idParent AND u.id = $me ' +
                 ' MERGE (child : Document {  body : $selection , id : $id, createdAt : timestamp() })' +
                 '-[r:HAS_PARENT { index : $index , length : $length }]' +
                 '->(document)-[s:HAS_CHILDREN { index : $index , length : $length }]' +
@@ -40,16 +40,16 @@ const amend = ( req, res ) => {
                 id : childId,
                 index : index ,
                 length : length,
-                me : res.username,
+                me : res.userId,
             })
             result.then(data => {
                 let singleResult = data.records[0];
-                sendMessageToSubscribers(childId , {id : childId , user : res.username , subject : 'hasSubscribe'});
+                sendMessageToSubscribers(childId , {id : childId , user: res.userId , subject : 'hasSubscribe'});
                 if(! singleResult ) {
                     return res.json(500, {reason : 'Nothing persist'}).end();
                 } else {
 
-                    sendMessageToSubscribers(id , { id , user : res.username , subject : 'reloadDocument'});
+                    sendMessageToSubscribers(id , { id , user: res.userId, subject : 'reloadDocument'});
                     return res.json({ id : singleResult.get(0) });
                 }
             }, error => {

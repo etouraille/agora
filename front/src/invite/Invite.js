@@ -15,29 +15,30 @@ const Invite = ({id}) => {
 
     const dispatch = useDispatch();
 
-    const user = useSelector(state => state.login.user );
+    const user = useSelector(state => state.login.userId );
 
     useEffect(() => {
         let mounted = true;
         if( reload && user ) {
-            http.get('/api/invited/' + id).then(data => {
-                if( mounted ) {
-                    let isCreator = data.data.find(elem => elem.meIsCreator);
-                    if (isCreator) setCreator(true);
-                    setInvitedUsers(data.data.filter(elem => elem.login !== user).map((user) => user.login));
-                    setReload(false);
-                }
-            }, error => {
-                console.log(error);
-                setReload( false );
-            })
         }
+        http.get('/api/invited/' + id).then(data => {
+            if( mounted ) {
+                let isCreator = data.data.find(elem => elem.meIsCreator);
+                console.log( isCreator);
+                if (isCreator) setCreator(true);
+                setInvitedUsers(data.data.filter(elem => elem.id !== user));
+                setReload(false);
+            }
+        }, error => {
+            console.log(error);
+            setReload( false );
+        })
         return () => { mounted = false }
     }, [ reload , user ]);
 
     useEffect ( () => {
         //console.log('new users ', invitedUsers );
-        let newUsers = users.filter( user => !invitedUsers.includes( user ));
+        let newUsers = users.filter( user => !invitedUsers.map(elem => elem.id).includes( user ));
         //console.log( newUsers );
         setUsers(newUsers);
     }, [ invitedUsers ]);
@@ -47,7 +48,7 @@ const Invite = ({id}) => {
         let mounted = true;
         http.get('/api/users').then( (data) => {
             if( mounted ) {
-                setUsers(data.data.map((user) => user.login).filter(elem => elem !== user));
+                setUsers(data.data.filter(elem => elem.id !== user));
                 setReload(true);
             }
         }, error => {
@@ -60,24 +61,24 @@ const Invite = ({id}) => {
     }, [id])
 
 
-    const invite = useCallback((email) => {
+    const invite = useCallback((userId) => {
         http.post('/api/invite', {
-            id : id,
-            email : email
+            id,
+            userId,
         }).then( (data) =>{
-            dispatch(addUser({ id  : id , user : email , invitedBy : user, round: data.data.round }));
+            dispatch(addUser({ id  : id , user : userId , invitedBy : user, round: data.data.round }));
             setReload(true);
         }, error => { console.log( error )})
     }, [user ])
 
-    const uninvite = useCallback((email) => {
+    const uninvite = useCallback((user) => {
         http.post('/api/uninvite', {
             id : id,
-            email : email
+            userId: user.id
         }).then( (data) =>{
-            dispatch(removeUser({id : id , user : email }));
+            dispatch(removeUser({id : id , user : user.id }));
             setReload(true);
-            users.push(email );
+            users.push(user);
         }, error => { console.log( error )})
     })
 
@@ -88,15 +89,15 @@ const Invite = ({id}) => {
             <h1>Membres invités</h1>
             <ul className="list-group">
                 {invitedUsers.map((user, index ) => {
-                    return (<li className="list-group-item" key={index}>{user}
+                    return (<li className="list-group-item" key={index}>{user.name}
                         { creator ? <button className="btn btn-black float-right" onClick={() => uninvite(user)}><img className="logo-small margin-right" src={minusSvg} />Retirer</button> : <></> }
                     </li>)
                 })}
             </ul>
             <br/>
             <h1>Membres à inviter</h1>
-            <SearchApi api={`/api/search-user`} item={((elem, index) => <>{ elem.email !== user && invitedUsers.findIndex(rs => rs = elem.email ) === -1 ?  <li className="list-group-item" key={index}>{elem.name}
-                <button className="btn btn-black float-right" onClick={() => invite(elem.email)}><img className="logo-small margin-right" src={inviteSvg} />Inviter</button>
+            <SearchApi api={`/api/search-user`} item={((elem, index) => <>{ elem.id !== user && invitedUsers.findIndex(rs => rs = elem.id ) === -1 ?  <li className="list-group-item" key={index}>{elem.name}
+                <button className="btn btn-black float-right" onClick={() => invite(elem.id)}><img className="logo-small margin-right" src={inviteSvg} />Inviter</button>
             </li>: <></> }</>)}></SearchApi>
         </div>
     )

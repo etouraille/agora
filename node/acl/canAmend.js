@@ -13,7 +13,7 @@ const canAmend = ( req , res , next ) => {
     const { id, index , length } = req.body;
     let can = false;
     let needle = { index, length };
-    readyForVote(id, res.username ).then( rfv => {
+    readyForVote(id, res.userId ).then( rfv => {
         voteResult(id).then( vote => {
             let myVote = vote.final ? vote.final : vote;
             can = rfv.hasSubscribed && rfv.isReadyForVote && ((myVote && myVote.fail) || !vote.hasParent);

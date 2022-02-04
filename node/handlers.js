@@ -45,7 +45,7 @@ const subscribe = async (req , res ) => {
                     // here, the max age is in milliseconds, so we multiply by 1000
                     res.setHeader('token', token);
 
-                    res.json(200, {email: email, password: password, token, name});
+                    res.json(200, {email: email, password: password, token, name, userId: _user.id});
                     res.end();
                 }, (reason) => {
                     session.close();
@@ -97,7 +97,7 @@ const signIn = (req, res) => {
             // set the cookie as the token string, with a similar max age as the token
             // here, the max age is in milliseconds, so we multiply by 1000
             res.setHeader('token', token );
-            res.json({token : token, user : username  });
+            res.json({token : token, userId : id  });
             res.end()
             return;
         }
@@ -115,7 +115,7 @@ const eachCheckToken = (req , res, next ) => {
             let token = auth.match( regexp)[1];
             try {
                 payload = jwt.verify( token, jwtKey);
-                res.username = payload.email;
+                res.email = payload.email;
                 res.userId = payload.id;
             } catch( e ) {
                 if( e instanceof jwt.JsonWebTokenError) {
@@ -135,8 +135,8 @@ const eachCheckToken = (req , res, next ) => {
             // Now, create a new token for the current user, with a renewed expiration time
             const newToken = jwt.sign({
                 email: payload.email,
-                id: payload.id, name:
-                payload.name,
+                id: payload.id,
+                name: payload.name,
                 picture: payload.picture,
                 isGoogle: payload.isGoogle,
                 isFacebook: payload.isFacebook,

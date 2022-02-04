@@ -33,8 +33,8 @@ const Encart = () => {
         return state.login.logged
     });
 
-    const user = useSelector( state => {
-        return state.login.user;
+    const userId = useSelector( state => {
+        return state.login.userId;
     })
 
     const click = useSelector(state => state.click.click);
@@ -65,7 +65,7 @@ const Encart = () => {
 
             http.get('/api/ping').then(
                 data => {
-                    dispatch(login({token: localStorage.getItem('token'), user: data.data.user}));
+                    dispatch(login({token: localStorage.getItem('token'), userId: data.data.userId, email: data.data.email}));
                 },
                 error => {
                     dispatch(logout());
@@ -88,7 +88,7 @@ const Encart = () => {
             //console.log( previousUser, subscribedDoc , _.isEqual( previousSD, subscribedDoc) )
             if (!_.isEqual(previousSD ? previousSD.sort() : null, subscribedDoc ? subscribedDoc.sort() : null)) {
                 //console.log ( subscribedDoc );
-                mercure.init(user, subscribedDoc);
+                mercure.init(userId, subscribedDoc);
                 //console.log( subscribedDoc );
                 //console.log( 'init =============')
             }
@@ -100,11 +100,11 @@ const Encart = () => {
 
     }, [subscribedDoc, location.pathname])
 
-    const previousUser = usePrevious(user );
+    const previousUser = usePrevious(userId );
 
     useEffect(() => {
-        if( previousUser !== user && -1 === noPing.findIndex(elem => location.pathname.match(elem))) {
-            mercure.init(user, subscribedDoc );
+        if( previousUser !== userId && -1 === noPing.findIndex(elem => location.pathname.match(elem))) {
+            mercure.init(userId, subscribedDoc );
             http.get('/api/subscribed-doc').then( data => {
                 dispatch(init({data : data.data }));
             }, error => {
@@ -124,7 +124,7 @@ const Encart = () => {
         return () => {
             mercure.close();
         }
-    }, [user]);
+    }, [userId]);
 
     const Logged = () => {
 
@@ -132,7 +132,7 @@ const Encart = () => {
         <div>
             <div className="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={evt => { evt.stopPropagation();setSelected(!selected)}}>
-                { jwtDecode(token).name ? jwtDecode(token).name: jwtDecode(token).email }
+                { jwtDecode(token).name ? jwtDecode(token).name : jwtDecode(token).email }
             </div>
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
                 <Link className="dropdown-item"  to="/documents" onClick={evt => setSelected(!selected)}>Liste des Documents</Link>

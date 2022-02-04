@@ -7,17 +7,17 @@ const subscribeDoc = ( req, res ) => {
     const { id } = req.body;
     const driver = getDriver();
     const session = driver.session();
-    const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.login = $me " +
+    const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.id = $me " +
         "WITH d, u , timestamp() as _ts " +
         "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBE_TO]->(d ) " +
         "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u , os, ohs " +
         "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) " +
         "DELETE os, ohs ";
-    let result = session.run(query, {id : id , me : res.username });
+    let result = session.run(query, {id : id , me : res.userId });
 
-    processSubscribe(id, res.username);
+    processSubscribe(id, res.userId);
 
-    sendMessageToAll({ subject : 'docSubscribe', id , user : res.username });
+    sendMessageToAll({ subject : 'docSubscribe', id , user : res.userId });
     // TODO not sure it's necessary since the message are sent to the parent.
     /*
     getLinkedDocuments(id).then( ids => {
@@ -57,15 +57,15 @@ const unsubscribeDoc = ( req, res ) => {
     const session = driver.session();
     const query = "" +
         "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User)-[s:HAS_SUBSCRIBE_TO]->(d:Document) " +
-        "WHERE d.id = $id AND u.login = $me " +
+        "WHERE d.id = $id AND u.id = $me " +
         "MERGE (d)-[:OLD_SUBSCRIBED_BY { subscribedAt: r.subscribedAt}]->(u)-[:OLD_HAS_SUBSCRIBE_TO { subscribedAt: r.subscribedAt}]->(d) " +
         "DELETE r , s ";
-    let result = session.run(query, {id : id , me : res.username });
+    let result = session.run(query, {id : id , me : res.userId });
 
 
     result.then(data => {
 
-        processUnsubscribe(id, res.username);
+        processUnsubscribe(id, res.userId);
 
         getLinkedDocuments(id).then( ids => {
             return res.json(ids).end();
@@ -82,18 +82,18 @@ const unsubscribeDoc = ( req, res ) => {
         session.close();
         driver.close();
     });
-    sendMessageToAll({ subject : 'docUnsubscribe', id , user : res.username});
+    sendMessageToAll({ subject : 'docUnsubscribe', id , user : res.userId});
 }
 //recupère tout les documents auquel j'ai soucrit et leurs enfants ..
 const getSubscribedDoc = (req , res ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = " " +
-        "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.login = $me  " +
+        "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(u:User) WHERE u.id = $me  " +
         "OPTIONAL MATCH (d)-[s:HAS_CHILDREN*1..]->(c:Document) " +
         //"WHERE reduce(length=0, hasChildren in s | length + CASE NOT EXISTS (hasChildren.voteComplete) OR hasChildren.voteComplete = false WHEN true THEN 1 ELSE 0 END ) = size(s) " +
         "RETURN d , c ";
-    let result = session.run( query , {me : res.username });
+    let result = session.run( query , {me : res.userId });
     result.then( data => {
         let result = [];
         data.records.forEach( elem => {
@@ -133,7 +133,7 @@ const getSubscribedForDocument = ( req, res ) => {
         let ret = { id };
         data.records.forEach( elem => {
             let doc = elem.get(0).properties;
-            let user = elem.get(1) ? elem.get(1).properties.login : null;
+            let user = elem.get(1) ? elem.get(1).properties.id : null;
             if( ! ret.document  ) {
                 ret.document = doc;
                 ret.users = [];

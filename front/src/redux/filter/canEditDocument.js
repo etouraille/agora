@@ -2,17 +2,19 @@ import voteFailure from "../../utils/voteFailure";
 
 const canEditDocument = (id) => {
     return (state) => {
-        let login = state.login.user;
+        let userId = state.login.userId;
         let elem = state.readyForVote.find(elem => elem.id === id);
         let canEdit = false;
+        console.log( elem );
 
         if(elem) {
             let _for = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === true ? a + 1: a), 0);
             let _against = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === false ? a + 1: a), 0);
             let _minRound = elem.data.map(elem => elem?.round).min();
             let _maxRound = elem.data.map(elem => elem?.round).max();
-            let myRound = elem.data.find(elem => elem.user === login)?.round;
+            let myRound = elem.data.find(elem => elem.user === userId)?.round;
             canEdit = myRound === 0 || (myRound > 0 && voteFailure(_for, _against, elem.data.length, 'consensus'));
+            console.log('here ===========', myRound,  voteFailure(_for, _against, elem.data.length, 'consensus'));
 
         }
         return canEdit;
