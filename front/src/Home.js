@@ -11,7 +11,7 @@ const Home = () => {
     const isMobile = useIsMobile();
 
     useEffect(() => {
-        http.post('/home', {page}).then(data => {
+        http.post('/home', {page, per_page : 9}).then(data => {
             setDocuments( data.data);
         })
     }, [page])
