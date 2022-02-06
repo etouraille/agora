@@ -13,6 +13,7 @@ const deleteElastic = (id) => {
 
 const deleteUser = (id) => {
     findUserById(id).then(async _id => {
+        console.log(_id);
         if(_id) {
             await elastic.delete({id: _id});
             await elastic.indices.refresh({index: 'user'});

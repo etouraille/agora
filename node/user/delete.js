@@ -9,12 +9,15 @@ const deleteUserWithId = async (id) => {
     const query = "MATCH (u:User) WHERE u.id = $id " +
         "OPTIONAL MATCH (u)-[n:HAS_NOTIFICATION]->(:Notification) " +
         "OPTIONAL MATCH (u)-[c:CREATE]->(:Document) " +
-        "OPTIONAL MATCH (:Document)-[cb:CREATED_BY]->(u) " +
+        "OPTIONAL MATCH (u)-[vf:VOTE_FOR]->(:Document) " +
+        "OPTIONAL MATCH (:Document)-[cb:CREATE_BY]->(u) " +
+        "OPTIONAL MATCH (:Document)-[feb:FOR_EDIT_BY]->(u) " +
         "OPTIONAL MATCH (:Document)-[sb:SUBSCRIBED_BY]->(u)-[hst:HAS_SUBSCRIBE_TO]->(:Document) " +
-        "DELETE n, c , cb, sb, hst, u RETURN u.id ";
+        "OPTIONAL MATCH (:Document)-[osb:OLD_SUBSCRIBED_BY]->(u)-[ohst:OLD_HAS_SUBSCRIBE_TO]->(:Document) " +
+
+        "DELETE n, c ,  cb, sb, hst, feb, vf, osb, ohst,  u ";
 
     return session.run(query, {id}).then((data) => {
-        id = data.records[0].get(0);
         return deleteElasticUser(id);
     }).finally(() => {
         session.close();

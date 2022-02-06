@@ -75,6 +75,21 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:queel.fr"
       - "traefik.basic.port=80"
+  nginx_admin:
+    image: nginx
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+      - ./admin:/src
+    tty: true
+    working_dir: /src
+    networks:
+      - web
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:admin.queel.fr"
+      - "traefik.basic.port=80"
+
   mercure:
     image: dunglas/mercure
     tty: true

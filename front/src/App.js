@@ -1,26 +1,13 @@
-import Login from './Login';
-import SubscribeForm from './subscribe/SubscribeForm';
 import React, {useEffect} from 'react';
 import Encart from "./login/encart";
-import Document from './document/Document';
-import DocumentEdit from "./document/DocumentEdit";
-import DocumentView from "./document/DocumentView";
-import InviteNavigate from "./invite/InviteNavigate";
 import {
     Switch,
     Route,
     Link
 } from 'react-router-dom';
-import Barre from "./barre/Barre";
-import Search from "./document/search/Search";
-import _403 from "./403";
 import {useDispatch} from "react-redux";
 import {add} from "./redux/slice/clickSlice";
-import UploadFile from "./upload/UploadFile";
-import Home from "./Home";
 import { useLocation } from 'react-router-dom';
-import User from "./user/User";
-import _404 from "./404";
 import _routes from './route'
 import history from "./utils/history";
 import useSwipePrevious from "./swipeable/useSwipePrevious";
