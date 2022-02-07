@@ -13,7 +13,7 @@ const cookieParser = require('cookie-parser')
 
 const { home } = require("./open/home");
 const { ping } = require('./api/ping');
-const { signIn , subscribe , eachCheckToken } = require('./handlers')
+const { signIn , subscribe , eachCheckToken, eachCheckTokenAdmin} = require('./handlers')
 const { loginGmail, loginFacebook} = require("./open/login");
 const { create, get , deleteDocument } = require('./api/document');
 const { getUser } = require("./open/user");
@@ -60,13 +60,14 @@ app.use(function(req, res, next) {
 });
 
 app.use(eachCheckToken);
+app.use(eachCheckTokenAdmin);
 
 app.get('/', home);
 app.post('/home', home);
 app.get('/user/:id', getUser);
 app.get('/api/ping', ping );
-app.get('/api/users', getUsers);
-app.delete('/api/user/:id', deleteUser);
+app.get('/admin/users', getUsers);
+app.delete('/admin/user/:id', deleteUser);
 app.get('/api/documents', documents);
 app.post('/api/document', create);
 app.get('/api/document/:id', get);

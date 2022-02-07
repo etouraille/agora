@@ -76,30 +76,34 @@ const signIn = (req, res) => {
     const result = session.run('MATCH(u:User) WHERE u.login = $email RETURN u ', { email : username });
     result.then(value => {
         let _user = {};
-        let recordedPassword = value.records[0].get(0).properties.password;
-        let id = value.records[0].get(0).properties.id;
-        let picture = value.records[0].get(0).properties?.picture;
-        let name = value.records[0].get(0).properties?.name;
+        if (value.records[0]) {
+            let recordedPassword = value.records[0].get(0).properties.password;
+            let id = value.records[0].get(0).properties.id;
+            let picture = value.records[0].get(0).properties?.picture;
+            let name = value.records[0].get(0).properties?.name;
 
-        if (id) _user['id'] = id;
-        if (picture) _user['picture'] = picture;
-        if (name) _user['name'] = name;
-        if (username) _user['email'] = username;
+            if (id) _user['id'] = id;
+            if (picture) _user['picture'] = picture;
+            if (name) _user['name'] = name;
+            if (username) _user['email'] = username;
 
-        if( recordedPassword !== password ) {
-          res.json(401, { token : null}).end();
-          return;
+            if (recordedPassword !== password) {
+                res.json(401, {token: null}).end();
+                return;
+            } else {
+                const token = jwt.sign(_user, jwtKey, {
+                    algorithm: 'HS256',
+                    expiresIn: parseInt(jwtExpirySeconds)
+                })
+                // set the cookie as the token string, with a similar max age as the token
+                // here, the max age is in milliseconds, so we multiply by 1000
+                res.setHeader('token', token);
+                res.json({token: token, userId: id});
+                res.end()
+                return;
+            }
         } else {
-            const token = jwt.sign( _user, jwtKey, {
-                algorithm: 'HS256',
-                expiresIn: parseInt(jwtExpirySeconds)
-            })
-            // set the cookie as the token string, with a similar max age as the token
-            // here, the max age is in milliseconds, so we multiply by 1000
-            res.setHeader('token', token );
-            res.json({token : token, userId : id  });
-            res.end()
-            return;
+            return res.status(404).json({reson: 'User does not exist'});
         }
     }, reason => {
         res.json(500, {reson : reason }).end();
@@ -108,54 +112,69 @@ const signIn = (req, res) => {
 }
 const eachCheckToken = (req , res, next ) => {
 
+    const matchEmail = [/.*/];
     if( req.method !== 'OPTIONS' && req.originalUrl.match(/api/)) {
-        let auth = req.header('Authorization');
-        const regexp = /Bearer (.*)$/;
-        if(auth && auth.match(regexp) && auth.match( regexp)[1]) {
-            let token = auth.match( regexp)[1];
-            try {
-                payload = jwt.verify( token, jwtKey);
-                res.email = payload.email;
-                res.userId = payload.id;
-            } catch( e ) {
-                if( e instanceof jwt.JsonWebTokenError) {
-                    return res.status(401).end();
-                }
-            }
-            function toDateTime(secs) {
-                var t = new Date(1970, 0, 1); // Epoch
-                t.setSeconds(secs);
-                return console.log( t );
-            }
-            const nowUnixSeconds = Math.round(Number(new Date()) / 1000)
-            if (payload.exp - nowUnixSeconds < 0) {
-                return res.status(400).end()
-            }
-
-            // Now, create a new token for the current user, with a renewed expiration time
-            const newToken = jwt.sign({
-                email: payload.email,
-                id: payload.id,
-                name: payload.name,
-                picture: payload.picture,
-                isGoogle: payload.isGoogle,
-                isFacebook: payload.isFacebook,
-            }, jwtKey, {
-                algorithm: 'HS256',
-                expiresIn: parseInt(jwtExpirySeconds)
-            })
-
-
-            // Set the new token as the users `token` cookie
-            res.setHeader('token', newToken);
-            next()
-        } else {
-            return res.status(401).json( { unauthorised : true });
-        }
+        processRequest(req, res, next, matchEmail);
     } else {
         next();
     }
 
+}
+
+const eachCheckTokenAdmin = (req , res, next ) => {
+
+    const matchUser = [/edouard\.touraille@gmail\.com/, /edouard\.touralle@gmail\.com/];
+    if( req.method !== 'OPTIONS' && req.originalUrl.match(/admin/)) {
+        processRequest(req, res, next, matchUser);
+    } else {
+        next();
+    }
+
+}
+
+const processRequest = (req, res, next, matchUser) => {
+    let auth = req.header('Authorization');
+    const regexp = /Bearer (.*)$/;
+    if (auth && auth.match(regexp) && auth.match( regexp)[1]) {
+        let token = auth.match( regexp)[1];
+        try {
+            payload = jwt.verify(token, jwtKey);
+            res.email = payload.email;
+            res.userId = payload.id;
+        } catch( e ) {
+            if( e instanceof jwt.JsonWebTokenError) {
+                return res.status(401).end();
+            }
+        }
+        const nowUnixSeconds = Math.round(Number(new Date()) / 1000)
+        if (payload.exp - nowUnixSeconds < 0) {
+            return res.status(400).end()
+        }
+
+        if ( -1 === matchUser.findIndex(elem => payload.email.match(elem))) {
+            return res.status(401).end();
+        }
+
+        // Now, create a new token for the current user, with a renewed expiration time
+        const newToken = jwt.sign({
+            email: payload.email,
+            id: payload.id,
+            name: payload.name,
+            picture: payload.picture,
+            isGoogle: payload.isGoogle,
+            isFacebook: payload.isFacebook,
+        }, jwtKey, {
+            algorithm: 'HS256',
+            expiresIn: parseInt(jwtExpirySeconds)
+        })
+
+
+        // Set the new token as the users `token` cookie
+        res.setHeader('token', newToken);
+        next()
+    } else {
+        return res.status(401).json( { unauthorised : true });
+    }
 }
 
 
@@ -163,4 +182,5 @@ module.exports = {
     signIn,
     subscribe,
     eachCheckToken,
+    eachCheckTokenAdmin,
 }
