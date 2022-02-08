@@ -5,11 +5,16 @@ import Login from "./Vues/Login";
 import Encart from "./Vues/Encart";
 import history from "./utils/history";
 import Users from "./Vues/Users";
+import Document from "./Vues/Document";
 
 function App() {
 
   const connection = (evt) => {
     history.push('/login');
+  }
+
+  const document = (evt) => {
+    history.push('/documents')
   }
 
   return (
@@ -20,6 +25,9 @@ function App() {
               <li className="nav-item">
                 <a onClick={connection}>Connexion</a>
               </li>
+              <li className="nav-item">
+                <a onClick={document}>Documents</a>
+              </li>
             </ul>
             <Encart></Encart>
           </nav>
@@ -27,6 +35,7 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login></Login>}></Route>
               <Route path="/users" element={<Users></Users>}></Route>
+              <Route path="/documents" element={<Document></Document>}></Route>
             </Routes>
           </div>
         </div>

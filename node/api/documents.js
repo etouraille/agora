@@ -41,6 +41,25 @@ const documents = ( req, res ) => {
     })
 }
 
+
+const getDocuments = (req, res ) => {
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (d:Document ) WHERE NOT (d)-[:HAS_PARENT]->(:Document) RETURN d ";
+
+    session.run(query).then(data => {
+        return data.records.map(item => {
+            return item.get(0).properties;
+        })
+    }).then((ret) => {
+        return res.status(200).json(ret);
+    }).finally(() => {
+        session.close();
+        driver.close();
+    })
+}
+
 module.exports = {
     documents,
+    getDocuments,
 };

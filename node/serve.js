@@ -18,7 +18,7 @@ const { loginGmail, loginFacebook} = require("./open/login");
 const { create, get , deleteDocument } = require('./api/document');
 const { getUser } = require("./open/user");
 const { deleteUser } = require("./api/deleteUser");
-const { documents } = require('./api/documents')
+const { documents, getDocuments} = require('./api/documents')
 const { amend } = require('./api/amend');
 const { canAmend } = require('./acl/canAmend');
 const { getUsers } = require('./api/users');
@@ -69,6 +69,8 @@ app.get('/api/ping', ping );
 app.get('/admin/users', getUsers);
 app.delete('/admin/user/:id', deleteUser);
 app.get('/api/documents', documents);
+app.get('/admin/document', getDocuments);
+app.delete('/admin/document/:id', deleteDocument);
 app.post('/api/document', create);
 app.get('/api/document/:id', get);
 app.delete('/api/document/:id', deleteDocument);
