@@ -15,8 +15,33 @@ const documentDelete = ( id ) => {
         "OPTIONAL MATCH (:User)-[cre:CREATE]->(d) " +
         "OPTIONAL MATCH (d)-[sbr:SUBSCRIBED_BY]->(:User) " +
         "OPTIONAL MATCH (:User)-[sr:HAS_SUBSCRIBE_TO]->(d) " +
+        "OPTIONAL MATCH (d)-[osbr:OLD_SUBSCRIBED_BY]->(:User) " +
+        "OPTIONAL MATCH (:User)-[osr:OLD_HAS_SUBSCRIBE_TO]->(d) " +
         "OPTIONAL MATCH (:User)-[has_notif:HAS_NOTIFICATION]->(notification:Notification)-[notify_on:NOTIFY_ON]->(d)" +
-        "DELETE has_notif , notify_on, notification, pr, cr, hc, hp, ar, ar2, vr, re, cbr, cre, sbr, sr , a, a2,  d " +
+        "OPTIONAL MATCH (:Notification)-[no:NOTIFY_ON]->(d) " +
+        "OPTIONAL MATCH (d)-[ha:HAS_ATTACHMENT]->(Attachment) " +
+        "DELETE has_notif " +
+        "DELETE  notify_on " +
+        "DELETE  notification " +
+        "DELETE pr " +
+        "DELETE cr " +
+        "DELETE  hc " +
+        "DELETE hp " +
+        "DELETE ar " +
+        "DELETE  ar2 " +
+        "DELETE vr " +
+        "DELETE  re " +
+        "DELETE  cbr " +
+        "DELETE  cre " +
+        "DELETE  sbr " +
+        "DELETE sr " +
+        "DELETE  a " +
+        "DELETE  a2 " +
+        "DELETE osbr " +
+        "DELETE  osr " +
+        "DELETE no " +
+        "DELETE ha " +
+        "DELETE  d " +
         "RETURN c ";
 
     let result = session.run( query, {id});
