@@ -6,13 +6,13 @@ const Users = () => {
     const [users, setUsers ] = useState([]);
     const [count, setCount] = useState(0);
     useEffect(() => {
-        http.get('/api/users').then(data => {
+        http.get('/admin/users').then(data => {
             setUsers(data.data);
         })
     }, [count]);
 
     const deleteUser = (id) => {
-        http.delete('/api/user/' + id).then(() => {
+        http.delete('/admin/user/' + id).then(() => {
             setCount(count + 1);
         })
     }
