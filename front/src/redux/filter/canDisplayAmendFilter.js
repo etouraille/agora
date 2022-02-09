@@ -10,7 +10,7 @@ const canDisplayAmendFilter = ( id ) => {
         console.log(rfv);
         console.log(isRoot);
         let vote = voteFilter(id)( state );
-        return rfv.isReadyForVote && rfv.hasSubscribed && ( ( vote &&  vote.fail ) || isRoot )
+        return rfv.hasSubscribed && (( rfv.isReadyForVote &&  vote &&  vote.fail ) || isRoot )
     }
 }
 export default canDisplayAmendFilter;
