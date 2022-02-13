@@ -10,5 +10,10 @@ module.exports = {
     env: {
       ENV: 'production'
     }
+  },{
+    name: 'socket',
+    script: 'socket.js',
+    watch: '.',
+    args: '-f -i 1',
   }]
 };

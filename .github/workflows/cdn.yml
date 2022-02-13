@@ -30,21 +30,14 @@ jobs:
         env:
           CI: false
         run: |
-          cd node 
+          cd cdn 
           npm install
-      - name: Copy env file
-        env:
-          ENV_FILE: ${{ secrets.ENV_NODE }}
-        run: |
-          cd node 
-          echo $ENV_FILE | base64 --decode > .env.production
-
       - name: rsync deployments
         uses: burnett01/rsync-deployments@4.1
         with:
           switches: -avzr --delete
-          path: /node/
-          remote_path: ~/production/node/
+          path: /cdn/
+          remote_path: ~/production/cdn/
           remote_host: queel.fr
           remote_user: ubuntu
           remote_key: ${{ secrets.RSA_PUB }}

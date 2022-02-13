@@ -115,12 +115,12 @@ app.delete('/api/attach/:id', deleteAttach);
 //app.get('/elastic/:id', elasticRoute );
 
 
-const WebSocket = require('ws');
+//const WebSocket = require('ws');
 
 
 
-const wss = new WebSocket.Server({ port: 8080 });
+//const wss = new WebSocket.Server({ port: 8080 });
 
-wss.on('connection', socketDocument);
+//wss.on('connection', socketDocument);
 
 app.listen(8000)
