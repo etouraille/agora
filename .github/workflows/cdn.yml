@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Build back
+      - name: Build cdn
         env:
           CI: false
         run: |
@@ -41,7 +41,7 @@ jobs:
           remote_host: queel.fr
           remote_user: ubuntu
           remote_key: ${{ secrets.RSA_PUB }}
-      - name: ssh key passphrase
+      - name: up and start
         uses: appleboy/ssh-action@master
         with:
           host: queel.fr
