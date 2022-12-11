@@ -5,8 +5,7 @@ const canEditDocument = (id) => {
         let userId = state.login.userId;
         let elem = state.readyForVote.find(elem => elem.id === id);
         let canEdit = false;
-        console.log( elem );
-
+        
         if(elem) {
             let _for = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === true ? a + 1: a), 0);
             let _against = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === false ? a + 1: a), 0);
@@ -14,7 +13,7 @@ const canEditDocument = (id) => {
             let _maxRound = elem.data.map(elem => elem?.round).max();
             let myRound = elem.data.find(elem => elem.user === userId)?.round;
             canEdit = myRound === 0 || (myRound > 0 && voteFailure(_for, _against, elem.data.length, 'consensus'));
-            console.log('here ===========', myRound,  voteFailure(_for, _against, elem.data.length, 'consensus'));
+
 
         }
         return canEdit;

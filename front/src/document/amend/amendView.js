@@ -18,6 +18,8 @@ import {lastChar, truncateChar} from "../../utils/truncateEditor";
 const AmendView = ({id, reload , countParent, childrenId }) => {
 
 
+
+
     const [ menus,setMenus ] = useState([]);
     const [ count , setCount ] = useState(0);
     const [ navigateTo, setNavigateTo] = useState(null);

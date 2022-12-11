@@ -67,10 +67,10 @@ const DocumentView = (props) => {
         document.children.map(( object , index ) =>{
             let link = object.link;
             let res = [];
-            if(link.index ) {
+            if(link.index && link.length) {
                 res.push({ retain : link.index });
             }
-            res.push({ retain : link.length , attributes : { background : '#ffc107'}});
+            if(link.length) res.push({ retain : link.length , attributes : { background : '#ffc107'}});
             return new Delta(res);
 
         }).forEach((delt) => {
