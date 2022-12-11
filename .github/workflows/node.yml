@@ -56,3 +56,4 @@ jobs:
           key: ${{ secrets.RSA_PUB }}
           script: |
             cd production && docker-compose up -d && ./restart_node.sh && ./restart_cdn.sh
+            
