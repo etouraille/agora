@@ -5,7 +5,7 @@ const migrate = () => {
     const driver = getDriver();
     const session = driver.session();
 
-    let query = "MATCH (u:User) WHERE NOT EXISTS (u.id) RETURN ID(u) ";
+    let query = "MATCH (u:User) WHERE u.id IS NULL RETURN ID(u) ";
     return session.run(query).then(data => {
         if (data.records.length === 0) return null;
         return Promise.all(data.records.map(item => {

@@ -5,7 +5,7 @@ const mergeApply = (parentId , id ) => {
     const driver = getDriver();
     const session = driver.session();
     const query = "MATCH (d:Document)-[r:HAS_CHILDREN]->(c:Document) " +
-        "WHERE NOT EXISTS(r.voteComplete) OR r.voteComplete = false AND d.id = $parentId " +
+        "WHERE r.voteComplete IS NULL OR r.voteComplete = false AND d.id = $parentId " +
         "RETURN d, c , r " +
         "ORDER BY r.index ASC ";
     let result = session.run( query , {parentId });

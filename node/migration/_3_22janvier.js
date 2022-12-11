@@ -7,11 +7,11 @@ const migrate = () => {
     const session = driver.session();
 
     let query = "MATCH (d:Document) " +
-        "WHERE NOT EXISTS (d.createdAt) " +
+        "WHERE d.createdAt IS NULL " +
         "SET d.createdAt = datetime(\"2022-01-01T00:00:00.000+0100\").epochMillis ";
     return session.run(query).then(data => {
         query = "MATCH (d:Document)-[r:SUBSCRIBED_BY]->(:User)-[hst:HAS_SUBSCRIBE_TO]->(d:Document) " +
-            "WHERE NOT EXISTS (r.subscribedAt) OR NOT EXISTS (hst.subscribedAt) " +
+            "WHERE r.subscribedAt IS NULL OR hst.subscribedAt IS NULL  " +
         "SET r.subscribedAt = datetime(\"2022-01-01T00:00:00.000+0100\").epochMillis , " +
             " hst.subscribedAt = datetime(\"2022-01-01T00:00:00.000+0100\").epochMillis ";
         const sess = driver.session();

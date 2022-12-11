@@ -121,7 +121,7 @@ const voteIsComplete = (id) => {
     let session = driver.session();
     let query = "" +
         "MATCH (:User)-[r:VOTE_FOR]->(d:Document) " +
-        "WHERE d.id = $id AND EXISTS(r.complete) " +
+        "WHERE d.id = $id AND r.complete IS NOT NULL " +
         "RETURN r ";
     let result = session.run( query , {id });
     return new Promise( (resolve , reject ) => {

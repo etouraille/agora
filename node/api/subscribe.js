@@ -10,7 +10,7 @@ const subscribeDoc = ( req, res ) => {
     const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.id = $me " +
         "WITH d, u , timestamp() as _ts " +
         "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBE_TO]->(d ) " +
-        "WITH CASE EXISTS(os.subscribedAt) WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u , os, ohs " +
+        "WITH CASE os.subscribedAt IS NOT NULL WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u , os, ohs " +
         "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) " +
         "DELETE os, ohs ";
     let result = session.run(query, {id : id , me : res.userId });

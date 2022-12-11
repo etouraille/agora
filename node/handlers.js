@@ -68,6 +68,7 @@ const subscribe = async (req , res ) => {
 }
 
 const signIn = (req, res) => {
+
     // Get credentials from JSON body
     const { username, password } = req.body
 

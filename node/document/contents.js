@@ -11,7 +11,7 @@ const contents = (id) => {
         "WHERE d.id = $id " +
         "OPTIONAL MATCH (d)-[r:HAS_CHILDREN*]->(c:Document)" +
         "-[:HAS_PARENT]->(p:Document) " +
-        "WHERE reduce(length=0, hasChildren in r | length + CASE NOT EXISTS (hasChildren.voteComplete) OR hasChildren.voteComplete = false WHEN true THEN 1 ELSE 0 END ) = size(r) " +
+        "WHERE reduce(length=0, hasChildren in r | length + CASE hasChildren.voteComplete IS NULL OR hasChildren.voteComplete = false WHEN true THEN 1 ELSE 0 END ) = size(r) " +
         "RETURN d, c, p , r , size(r) ";
 
     const appendChild = ( ret , d , cd , child, parent , link ) => {

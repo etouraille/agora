@@ -7,15 +7,15 @@ if (process.env.ENV === 'development') {
     console.log('prod');
 }
 const config = {
-    mercureEndpoint : process.env.mercureEndpoint,
-    mercureToken : process.env.mercureToken,
-    jwtKey : process.env.jwtKey,
-    jwtExpirySeconds : process.env.jwtExpirySeconds,
-    front: process.env.front,
+    mercureEndpoint : process.env.MERCURE_ENDPOINT,
+    mercureToken : process.env.MERCURE_TOKEN,
+    jwtKey : process.env.JWT_KEY,
+    jwtExpirySeconds : process.env.JWT_EXPIRY_SECONDS,
+    front: process.env.FRONT,
     sendinblueApiKey: process.env.SENDINBLUE_TRANSAC,
-    googleKey : process.env.googleKey,
-    facebookSecret: process.env.facebookSecret,
-    facebookId: process.env.facebookId,
+    googleKey : process.env.GOOGLE_KEY,
+    facebookSecret: process.env.FACEBOOK_SECRET,
+    facebookId: process.env.FACEBOOK_ID,
 }
 module.exports = config;
 

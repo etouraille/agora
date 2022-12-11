@@ -52,10 +52,13 @@ const get = ( req, res ) => {
     try {
         const query = 'MATCH (document:Document) WHERE document.id = $id' +
             ' OPTIONAL MATCH (document)-[relation:HAS_CHILDREN]->(children : Document )  ' +
-            ' WHERE NOT EXISTS(relation.voteComplete) OR relation.voteComplete = false  ' +
+            ' WHERE relation.voteComplete IS NULL OR relation.voteComplete = false  ' +
             ' OPTIONAL MATCH (document)-[parentRelation:HAS_PARENT*]->(parent : Document)' +
             ' RETURN document, children, relation, parent, parentRelation , size(parentRelation) as n' +
             ' ORDER BY n ASC ';
+
+        console.log(query);
+
         let result = session.run(query, {id : id });
 
         const parseNested = ( node , depth, currentDepth, doc, link ) => {
@@ -111,6 +114,8 @@ const get = ( req, res ) => {
             session.close();
             driver.close();
         })
+    } catch (error) {
+        console.log(error);
     } finally {
 
     }

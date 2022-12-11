@@ -22,7 +22,7 @@ const canAmend = ( req , res , next ) => {
             if( can ) {
                 const query = "" +
                     "MATCH(d:Document)-[r:HAS_CHILDREN]->(c:Document) " +
-                    "WHERE d.id = $id AND ( r.voteComplete = false OR NOT EXISTS(r.voteComplete ) ) " +
+                    "WHERE d.id = $id AND ( r.voteComplete = false OR r.voteComplete IS NULL ) " +
                     "RETURN r ";
                 const result = session.run(query, {id});
                 result.then(data => {
