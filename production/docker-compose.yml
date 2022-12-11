@@ -17,8 +17,9 @@ services:
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:neo.queel.fr"
-      - "traefik.basic.port=7474"
+      - "traefik.http.routers.neo.rule=Host(`neo.queel.fr`)"
+      - "traefik.tcp.services.neo.loadbalancer.server.port=7474"
+      - "traefik.http.routers.neo.entrypoints=websecure"
   node:
     build: ./docker/node_api
     volumes:
@@ -26,14 +27,19 @@ services:
     tty: true
     networks:
       - web
+    ports:
+      - ":8000"
+      - ":8080"
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:api.queel.fr"
-      - "traefik.basic.port=8000"
-      - "traefik.ws.frontend.rule=Host:ws.queel.fr"
-      - "traefik.ws.port=8080"
-      - "traefik.ws.protocol=ws"
+      - "traefik.http.routers.node.rule=Host(`api.queel.fr`)"
+      - "traefik.http.routers.node.entrypoints=websecure"
+      - "traefik.tcp.services.node.loadbalancer.server.port=8000"
+      - "traefik.http.routers.ws.rule=Host(`ws.queel.fr`)"
+      - "traefik.tcp.services.ws.loadbalancer.server.port=8080"
+      # - "traefik.http.routers.ws.protocol=ws"
+      - "traefik.http.routers.ws.entrypoints=websecure"
     depends_on:
       - elastic
       - neo
@@ -47,11 +53,14 @@ services:
     working_dir: /src
     networks:
       - web
+    ports:
+      - ":4000"
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:cdn.queel.fr"
-      - "traefik.basic.port=4000"
+      - "traefik.http.routers.cdn1.rule=Host(`cdn.queel.fr`)"
+      - "traefik.http.routers.cdn1.entrypoints=websecure"
+
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     environment:
@@ -70,11 +79,14 @@ services:
     working_dir: /src
     networks:
       - web
+    ports:
+      - ":80"
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:queel.fr"
-      - "traefik.basic.port=80"
+      - "traefik.http.routers.front.rule=Host(`queel.fr`)"
+      - "traefik.http.routers.front.entrypoints=websecure"
+
   nginx_admin:
     image: nginx
     volumes:
@@ -84,11 +96,14 @@ services:
     working_dir: /src
     networks:
       - web
+    ports:
+      - ":80"
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:admin.queel.fr"
-      - "traefik.basic.port=80"
+      - "traefik.http.routers.admin.rule=Host(`admin.queel.fr`)"
+      - "traefik.http.routers.admin.entrypoints=websecure"
+
 
   mercure:
     image: dunglas/mercure
@@ -100,8 +115,9 @@ services:
     labels:
       - "traefik.docker.network=web"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:mercure.queel.fr"
-      - "traefik.basic.port=80"
+      - "traefik.http.routers.mercure.rule=Host(`mercure.queel.fr`)"
+      - "traefik.http.routers.mercure.entrypoints=websecure"
+
     command: /usr/bin/caddy run -config /src/Caddyfile
 
 
