@@ -5,7 +5,7 @@ const canEditDocument = (id) => {
         let userId = state.login.userId;
         let elem = state.readyForVote.find(elem => elem.id === id);
         let canEdit = false;
-        
+
         if(elem) {
             let _for = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === true ? a + 1: a), 0);
             let _against = elem.data.map(elem => elem.readyForVote).reduce((a,b)=> (b === false ? a + 1: a), 0);

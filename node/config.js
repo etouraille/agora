@@ -9,6 +9,7 @@ if (process.env.ENV === 'development') {
 const config = {
     mercureEndpoint : process.env.MERCURE_ENDPOINT,
     mercureToken : process.env.MERCURE_TOKEN,
+    mercureSubscriberToken: process.env.MERCURE_SUBSCRIBER_TOKEN,
     jwtKey : process.env.JWT_KEY,
     jwtExpirySeconds : process.env.JWT_EXPIRY_SECONDS,
     front: process.env.FRONT,

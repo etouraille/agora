@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken')
+const config = require('./../config');
 const mercure = (req, res ) => {
 
-    let token = jwt.sign({ mercure : {  subscribe : []}}, 'changeIt', {
+    let token = jwt.sign({ mercure : {  subscribe : []}}, config.mercureSubscriberToken, {
         expiresIn: 600, // Bearer expiring in one minute
         noTimestamp: true, // Do not add "issued at" information to avoid error "Token used before issued"
         algorithm: 'HS256',

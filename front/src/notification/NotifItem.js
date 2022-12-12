@@ -33,7 +33,6 @@ const NotifItem = ({ notification }) => {
     const reset = () => {
         if( type !== 'invite' && type !== 'rfv' ) {
             http.post('/api/notification/clear', {id: notifId}).then(data => {
-                console.log(data);
                 history.push( link );
                 dispatch(removeNotification({id: notifId}));
             }, error => {
