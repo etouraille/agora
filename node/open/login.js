@@ -33,7 +33,7 @@ const login = (type) => {
         //console.log( body );
 
         try {
-            let {email, name, picture} = type === 'gmail' ? await googleAuth(token) : await getFacebookUserData(token);
+            let {email, name, picture} = (type === 'gmail' ? await googleAuth(token) : await getFacebookUserData(token));
             const driver = getDriver();
             const session = driver.session();
             let query = "MATCH (u:User) WHERE u.login = $email RETURN u ";
@@ -53,7 +53,7 @@ const login = (type) => {
                     }).finally(() => _session.close());
                 } else {
                     // add user.
-                    query = "CREATE (u:User { id : $id, name : $name, picture: $picture , email: $email, isGoogle : true}) ";
+                    query = "CREATE (u:User { id : $id, name : $name, picture: $picture , login: $email, isGoogle : true}) ";
                     let _session = driver.session();
                     id = uuid();
                     return _session.run(query, {id, name, picture, email}).then(() => {
