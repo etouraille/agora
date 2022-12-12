@@ -19,7 +19,6 @@ const googleAuth = async (token) => {
         audience: config.googleKey,
     })
     const payload = ticket.getPayload();
-    console.log('payload', payload);
     const { sub, email, name, picture } = payload;
     return { userId: sub, email, name, picture};
 }

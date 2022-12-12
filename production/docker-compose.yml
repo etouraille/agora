@@ -29,17 +29,20 @@ services:
       - web
     ports:
       - ":8000"
-      - ":8080"
+      - ":8081"
     labels:
+      - "traefik.docker.lbswarm=true"
       - "traefik.docker.network=web"
       - "traefik.enable=true"
       - "traefik.http.routers.node.rule=Host(`api.${HOST}`)"
       - "traefik.http.routers.node.entrypoints=websecure"
       - "traefik.tcp.services.node.loadbalancer.server.port=8000"
       - "traefik.http.routers.ws.rule=Host(`ws.${HOST}`)"
-      - "traefik.tcp.services.ws.loadbalancer.server.port=8080"
-      # - "traefik.http.routers.ws.protocol=ws"
-      - "traefik.http.routers.ws.entrypoints=websecure"
+      - "traefik.http.services.ws.loadbalancer.server.port=8081"
+      - "traefik.http.routers.ws.tls=true"
+      - "traefik.http.routers.ws.entrypoints=ws"
+      - "traefik.http.routers.ws.tls.certresolver=dns"
+
     depends_on:
       - elastic
       - neo

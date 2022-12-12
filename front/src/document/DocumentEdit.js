@@ -131,6 +131,8 @@ const DocumentEdit = () => {
 
             const doc = connection.get('documents', id );
 
+            console.log(doc);
+
             dispatch( initDocumentChange({id}));
 
             doc.subscribe( (err) => {
