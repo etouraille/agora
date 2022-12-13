@@ -12,6 +12,7 @@ services:
       - ./neo/plugins:/plugins
     environment:
       - NEO4J_AUTH=neo4j/b1otope
+    container_name: neo-agora
   node:
 
     build: ./node
@@ -22,6 +23,7 @@ services:
       - ./../node:/src
       - ./../front:/front
     tty: true
+    container_name: api-agora
     working_dir: /src
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
