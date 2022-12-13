@@ -3,6 +3,7 @@ module.exports = {
     name: 'socket',
     script: 'socket.js',
     watch: '.',
-    args: '-f -i 1',
+    instances : "max",
+    exec_mode : "cluster"
   }]
 };
