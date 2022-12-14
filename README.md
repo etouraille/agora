@@ -4,6 +4,8 @@ Agora is a solution to edit document in a collaborative way based on amend and v
 
 it's build on neo4J, node, elastic, React and mercure
 
+the website is visble [here](https://queel.fr)
+
 ## Installation on a development mode
 
  * install docker 
