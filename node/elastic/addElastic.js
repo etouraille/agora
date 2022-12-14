@@ -6,6 +6,7 @@ const addNewDoc = ( doc ) => {
         elastic.index({
             index: 'document',
             // type: '_doc', // uncomment this line if you are using {es} ≤ 6
+            id: doc.id,
             body: {
                 title: doc.title,
                 id: doc.id,
@@ -25,6 +26,7 @@ const addNewDoc = ( doc ) => {
 const addNewUser = async (user, invitedBy) => {
     const params = {
         index: 'user',
+        id: user.id,
         body: {
             id: user.id,
             email: user.email,

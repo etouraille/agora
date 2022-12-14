@@ -128,12 +128,21 @@ const AmendView = ({id, reload , countParent, childrenId }) => {
             sortedChildren.map( (object , i ) => {
 
                 let current = JSON.parse( object.child.body );
+                console.log( current );
                 let afterIndex  = object.link.length + object.link.index;
                 let afterLength = source.getLength() - ( object.link.index + object.link.length);
                 if(sortedChildren[i+1]) {
                     afterLength = sortedChildren[i+1].link.index - ( object.link.index + object.link.length );
                 }
-                const delta = new Delta(current);
+                let delta = new Delta(current);
+                if(delta.length() === 0) {
+                    delta = new Delta({ops: [{ insert: '#void#'}]});
+                    afterIndex = 6 + object.link.index;
+                    afterLength = source.getLength() - ( object.link.index + 6);
+                    if(sortedChildren[i+1]) {
+                        afterLength = sortedChildren[i+1].link.index - ( object.link.index + 6 );
+                    }
+                }
                 let emptyQuill = new Quill('#emptyQuill_' + count );
                 emptyQuill.setContents(delta);
                 let length = emptyQuill.getLength();

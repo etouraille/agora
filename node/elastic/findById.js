@@ -11,6 +11,7 @@ const findById = ( id ) => {
                 }
             }
         }).then(result => {
+            console.log(result.body.hits.hits);
             resolve( result.body.hits && result.body.hits.hits[0] ? result.body.hits.hits[0]._id : null );
         }).catch(err => {
             reject(err);

@@ -131,12 +131,12 @@ const useLoadDocument = ({ id , reload }) => {
                         history.push( '/document/' + data.data.parent.document.id );
                         return;
                     }
-                    /*
-                    if( data.data.children === undefined ) {
-                        history.push('/403');
+
+                    if( data.data.document === undefined ) {
+                        history.push('/');
                         return;
                     }
-                     */
+
                     dispatch( initDoc({id : id, data : data.data }));
                     setCount( count + 1 );
                     let children = [];
