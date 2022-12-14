@@ -35,7 +35,7 @@ jobs:
       - name: rsync deployments
         uses: burnett01/rsync-deployments@4.1
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --omit-dir-times
           path: /cdn/
           remote_path: ~/production/cdn/
           remote_host: queel.fr
