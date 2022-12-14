@@ -71,11 +71,11 @@ export default function App() {
                 version    : 'v12.0'
             });
 
-            FB.AppEvents.logPageView();
+            //FB.AppEvents.logPageView();
 
         };
 
-    }, []);
+    }, [location]);
 
     const click = (evt) => {
         evt.preventDefault();
