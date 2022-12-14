@@ -141,7 +141,7 @@ const useLoadDocument = ({ id , reload }) => {
                     setCount( count + 1 );
                     let children = [];
 
-                    const res  = [ ...data.data.children ];
+                    const res  = Array.isArray(data.data.children ) ? [ ...data.data.children ] : [];
                     let ret = res.sort((elem , elem2) => {
                         return ((elem.link.index  < elem2.link.index) ? -1 : 1);
                     })
