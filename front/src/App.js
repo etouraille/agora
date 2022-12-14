@@ -70,12 +70,12 @@ export default function App() {
                 xfbml      : true,
                 version    : 'v12.0'
             });
-
+            console.log('init facebook');
             //FB.AppEvents.logPageView();
 
         };
 
-    }, [location]);
+    }, [location.pathname]);
 
     const click = (evt) => {
         evt.preventDefault();
