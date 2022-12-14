@@ -26,8 +26,8 @@ cp .env.example .env.development
 ```
 You need a mercure server for the application to work properly.
 The mercure server is set on remote host. the ~/agora/production permits 
-lauch this mercure server.
-you can also uses (https://mercure.rocks/docs/hub/install)[this]
+to launch this mercure server.
+you can also uses [this](https://mercure.rocks/docs/hub/install) to install it locally
 
  * install dependencies
 ```shell
@@ -40,4 +40,9 @@ npm install
 ```shell
 cd ~/agora/node
 ./start.sh
+```
+ * launch front
+```shell
+cd ~/agora/front
+npm start
 ```
