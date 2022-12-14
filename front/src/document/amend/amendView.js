@@ -128,19 +128,20 @@ const AmendView = ({id, reload , countParent, childrenId }) => {
             sortedChildren.map( (object , i ) => {
 
                 let current = JSON.parse( object.child.body );
-                console.log( current );
                 let afterIndex  = object.link.length + object.link.index;
                 let afterLength = source.getLength() - ( object.link.index + object.link.length);
                 if(sortedChildren[i+1]) {
                     afterLength = sortedChildren[i+1].link.index - ( object.link.index + object.link.length );
                 }
                 let delta = new Delta(current);
+                let isVoid = false;
                 if(delta.length() === 0) {
+                    isVoid = true;
                     delta = new Delta({ops: [{ insert: '#void#'}]});
-                    afterIndex = 6 + object.link.index;
-                    afterLength = source.getLength() - ( object.link.index + 6);
+                    afterIndex = delta.length() + object.link.index;
+                    afterLength = source.getLength() - ( object.link.index + delta.length());
                     if(sortedChildren[i+1]) {
-                        afterLength = sortedChildren[i+1].link.index - ( object.link.index + 6 );
+                        afterLength = sortedChildren[i+1].link.index - ( object.link.index + delta.length());
                     }
                 }
                 let emptyQuill = new Quill('#emptyQuill_' + count );
@@ -159,7 +160,7 @@ const AmendView = ({id, reload , countParent, childrenId }) => {
                 //if(b) yellow.push({retain : b , attributes : { background : '#ffc107' }})
 
                 const yellowBackground =  new Delta(yellow);
-                deltaIndex = emptyQuill.getLength() - 1 - object.link.length;
+                deltaIndex = emptyQuill.getLength() - 1 - (isVoid ? delta.length() : object.link.length);
                 return { delta: yellowBackground, id : object.child.id, length : length ? length : 0 , currentLength };
             }).forEach((data ) => {
                 if(hasSubscribed ) {
