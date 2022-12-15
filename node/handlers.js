@@ -172,7 +172,23 @@ const processRequest = (req, res, next, matchUser) => {
 
         // Set the new token as the users `token` cookie
         res.setHeader('token', newToken);
-        next()
+
+        const driver = getDriver();
+        const session = driver.session();
+        const query = "MATCH (u:User) WHERE u.login = $email RETURN u ";
+        session.run(query, { email: payload.email}).then(data => {
+            if(!data.records[0]) {
+                return res.status(404).json({error: 'User doesn t exist in database'});
+            } else {
+                res.user = data.records[0].get(0).properties;
+                next();
+            }
+        }).catch(error =>{
+            return res.status(500).json({error})
+        }).finally(() => {
+            session.close();
+            driver.close();
+        });
     } else {
         return res.status(401).json( { unauthorised : true });
     }

@@ -20,7 +20,7 @@ const NotifItem = ({ notification }) => {
 
     const html = () => {
 
-        if ( type === 'invite' ) {
+        if ( type === 'invite' || type === 'newRound' || type === 'roundVoteFail' ) {
             body = body.replace(regexp, '<a href="' + process.env.REACT_APP_front +'/documentedit/' + id + '">' + title + '</a>');
             link = '/documentedit/' + id;
         } else if ( type === 'rfv' || type === 'voteSuccess' || type === 'voteFail' || 'invite-email') {
@@ -29,6 +29,7 @@ const NotifItem = ({ notification }) => {
         }
         return { __html : body };
     }
+
 
     const reset = () => {
         if( type !== 'invite' && type !== 'rfv' ) {

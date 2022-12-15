@@ -4,6 +4,8 @@ const {v4 : uuid } = require('uuid');
 const { getSubscribers } = require('./../document/subscribers');
 const { findFirstParent }= require('./../document/findParent');
 const {getEditors} = require("../vote/readyForVote");
+const  config  = require("../config");
+const {sendEmail} = require("../email/email");
 const query = "MATCH (u:User) , (d:Document) WHERE u.id = $user " +
     "AND d.id = $id " +
     "OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document) WHERE NOT (p)-[:HAS_PARENT]->(:Document) " +
@@ -12,6 +14,36 @@ const query = "MATCH (u:User) , (d:Document) WHERE u.id = $user " +
 
     "RETURN n , d, p ";
 
+
+
+const sendEmailNotification = ( to, body , id , type, title ) => {
+
+    const driver = getDriver();
+    const session = driver.session();
+    const query = "MATCH (u:User) WHERE u.id = $id RETURN u ";
+    session.run(query, { id: to }).then((data) => {
+        let user = data.records[0]?.get(0).properties;
+        if( user ) {
+            const regexp = /\{doc\}/
+            if ( type === 'invite' || type === 'newRound' || type === 'roundVoteFail') {
+                body = body.replace(regexp, '<a href="' + config.front +'/documentedit/' + id + '">' + title + '</a>');
+
+            } else if ( type === 'rfv' || type === 'voteSuccess' || type === 'voteFail' || 'invite-email') {
+                body = body.replace(regexp, '<a href="' + config.front +'/document/' + id + '">' + title +'</a>');
+
+            }
+
+            const template = '<p>Vous avez reçu une notification de queel.fr</p>' +
+                '<p>' + body +'</p>' +
+                '<p>Bonne journée !</p>'
+
+            sendEmail(user.login, user.login, 'Nouvelle notification de queel.fr', template, {test: 'test'}).then();
+
+        }
+    });
+
+
+}
 
 const sendInvite = ( id, user, me ) => {
     const body = 'Vous avez été invité par ' + me + ' a compléter {doc}';
@@ -28,6 +60,7 @@ const sendInvite = ( id, user, me ) => {
             let notification = data.records[0].get(0).properties;
             let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
             sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
+            sendEmailNotification(user, body, id, 'invite', title);
         } else {
             console.log( 'no notif created');
         }
@@ -51,6 +84,7 @@ const sendInviteEmail = ( id, user, me ) => {
             let notification = data.records[0].get(0).properties;
             let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
             sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
+            sendEmailNotification(user, body, id, 'invite-email', title);
         } else {
             console.log( 'no notif created');
         }
@@ -86,6 +120,7 @@ const sendNotificationReadyForVote = ( id, me ) => {
                       notification,
                       title : title,
                   });
+                  sendEmailNotification(user, body, id, 'rfv', title);
               } else {
                   console.log( 'no notif created');
               }
@@ -129,6 +164,7 @@ const sendNotificationNewRound = ( id, me  ) => {
                         notification,
                         title : title,
                     });
+                    sendEmailNotification(user, body, id, 'newRound', title);
                 } else {
                     console.log( 'no notif created');
                 }
@@ -165,6 +201,7 @@ const sendNotificationRoundVoteFail = ( id, me ) => {
                         notification,
                         title : title,
                     });
+                    sendEmailNotification(user, body, id, 'roundVoteFail', title);
                 } else {
                     console.log( 'no notif created');
                 }
@@ -204,6 +241,7 @@ const sendNotificationVoteFail = ( id, me ) => {
                             notification ,
                             title,
                         });
+                        sendEmailNotification(user, body, id, 'voteFail', title);
 
                     } else {
                         console.log( 'no notif created');
@@ -259,6 +297,7 @@ const sendNotificationVoteSuccess = ( id, me ) => {
                                 notification,
                                 title,
                             });
+                            sendEmailNotification(user, body, newId, 'voteSuccess', title);
                         } else {
                             console.log( 'no notif created');
                         }
