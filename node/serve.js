@@ -39,6 +39,7 @@ const { clear, notificationGet } = require('./api/notification');
 const { postAttach, getAttach, deleteAttach} = require("./api/attach");
 const { searchUsers } = require("./api/searchUsers");
 const { socketDocument } = require('./socket/document');
+const {resetPassword, newPassword} = require("./api/password");
 const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -85,6 +86,8 @@ app.post('/subscribe', subscribe);
 app.post('/signin', signIn);
 app.post('/sign-in-google', (req, res) => loginGmail(req, res));
 app.post('/sign-in-facebook', (req, res) => loginFacebook(req, res));
+app.post('/reset-password', resetPassword);
+app.post('/new-password', newPassword);
 app.put('/api/ready-for-vote', canReadyForVote);
 app.put('/api/ready-for-vote', readyForVote);
 app.get('/api/ready-for-vote/:id', getReadyForVote);

@@ -43,7 +43,7 @@ const Encart = () => {
 
     const location = useLocation();
 
-    const noPing = [/^\/$/, /\/user\/(.*)$/, /\/subscribe$/];
+    const noPing = [/^\/$/, /\/user\/(.*)$/, /\/subscribe$/, /\/new-password$/, /\/reset-password$/];
 
     useEffect(() => {
         if( click > 0 && click > prevClick ) {
@@ -57,11 +57,9 @@ const Encart = () => {
 
     useEffect(() => {
 
-        console.log( 'pathname ===============', location.pathname, location.pathname.match(/^\/$/));
 
         if (-1 === noPing.findIndex(elem => location.pathname.match(elem))) {
 
-             console.log( 'not matched');
 
             http.get('/api/ping').then(
                 data => {

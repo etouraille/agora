@@ -89,6 +89,7 @@ const Login = () => {
                     <button className="btn btn-primary" type="submit" onClick={handleSubmit} disabled={isSubmitting} >
                         Submit
                     </button>
+                    <a class="btn" onClick={() => history.push('/reset-password')}>Reset password</a>
                 </Form>
             )}
 
