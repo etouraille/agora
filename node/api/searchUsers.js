@@ -16,6 +16,10 @@ const searchUsers = ( req, res ) => {
     }
     must = must.concat(notNestedMatch);
 
+    must = notNestedMatch;
+
+    console.log(must);
+
 
     if( must.length > 0 ) {
         elastic.search({
@@ -31,6 +35,7 @@ const searchUsers = ( req, res ) => {
         }).then(result => {
             return res.json(result.body.hits.hits.map(elem => elem._source)).end();
         }, error => {
+            console.log(error.meta.body.error);
             return res.status(500).json(error).end();
         })
     } else {
