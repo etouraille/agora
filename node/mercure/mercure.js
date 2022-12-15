@@ -24,7 +24,7 @@ const sendMessage = ( id , user , message , isSubscribe = false ) => {
             }
         );
 
-        console.log('endpoint ========================================', endpoint);
+        console.log('endpoint ========================================', endpoint, datas );
 
         request.post(
             {

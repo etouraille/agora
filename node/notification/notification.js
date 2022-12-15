@@ -111,7 +111,7 @@ const sendNotificationReadyForVote = ( id, me ) => {
               if( data.records[0] ) {
                   let notification = data.records[0].get(0).properties;
                   let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
-                  console.log( 'message send ');
+                  console.log( 'message send ready for vote');
                   sendMessage(id , user,{
                       id ,
                       user : user,

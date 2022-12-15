@@ -53,7 +53,7 @@ const Encart = () => {
 
     const  mercure  = new Subscribe();
 
-    const subscribedDoc = useSelector( documentSubscribeFilters);
+    const subscribedDoc = useSelector(documentSubscribeFilters);
 
     useEffect(() => {
 

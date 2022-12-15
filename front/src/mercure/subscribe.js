@@ -28,7 +28,6 @@ class  MercureSubscribe {
     }
 
     init (me, subscribedDoc ) {
-        //console.log( subscribedDoc );
         let self = this;
         const EventSource =  EventSourcePolyfill;
         http.get('/api/mercure').then( response => {
@@ -65,6 +64,7 @@ class  MercureSubscribe {
 
 
             const message = JSON.parse(data.data);
+            console.log( 'notifications ====================', message);
             let id = message.id;
             let user = message.user;
             let sender = message.sender;

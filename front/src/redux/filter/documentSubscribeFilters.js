@@ -1,6 +1,8 @@
 const documentSubscribeFilters = (state ) => {
 
-        let user = state.login.user;
+
+
+        let user = state.login.userId;
         let sub = state.documentSubscribe.documents;
         let ret = [];
         if( user ) {
