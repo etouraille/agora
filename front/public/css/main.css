@@ -181,3 +181,15 @@ html {
     position: relative;
     top: 27px;
 }
+.notif {
+    position: relative;
+    background-color: red;
+    border: 2px solid black;
+    border-radius: 20px;
+    left: 18px;
+    top: -41px;
+    width: 23px;
+    height: 26px;
+    padding-left: 3px;
+
+}

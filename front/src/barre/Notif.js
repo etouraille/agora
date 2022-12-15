@@ -27,8 +27,11 @@ const Notif = () => {
     return (
         <>
             <div className="barre-elem">
-                { notifications.length > 0  ? <img className="logo" src={notif_white} onClick={click} alt="Notificaiton"/> :
-                    <img className="logo" src={notif_black} onClick={click} alt="Notificaiton"/>
+                { notifications.length > 0  ? <>
+                        <img className="logo" src={notif_white} onClick={click} alt="Notificaiton"/>
+                        <div className="notif">{ notifications.length }</div>
+                        </>:
+                        <img className="logo" src={notif_black} onClick={click} alt="Notificaiton"/>
                 }
                 { notifications.length > 0  ? <div>
                     <ModalBarre title={`Notification`} open={open} setOpen={setOpen} content={() => <NotificationList notifications={notifications}></NotificationList>}></ModalBarre>
