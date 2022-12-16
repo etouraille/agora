@@ -5,7 +5,7 @@ import { removeNotification } from "../redux/slice/notificationSlice";
 import history from "../utils/history";
 
 
-const NotifItem = ({ notification }) => {
+const NotifItem = ({ notification , setClose}) => {
 
     const dispatch = useDispatch();
 
@@ -37,11 +37,14 @@ const NotifItem = ({ notification }) => {
             http.post('/api/notification/clear', {id: notifId}).then(data => {
                 history.push( link );
                 dispatch(removeNotification({id: notifId}));
+                setClose();
             }, error => {
                 console.log(error);
             })
         } else {
+
             history.push( link );
+            setClose()
         }
     }
 

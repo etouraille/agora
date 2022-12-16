@@ -43,7 +43,7 @@ const Notif = () => {
                         <img className="logo" src={notif_black} onClick={click} alt="Notificaiton"/>
                 }
                 { notifications.length > 0  ? <div>
-                    <ModalBarre title={`Notification`} open={open} setOpen={setOpen} content={() => <NotificationList notifications={notifications}></NotificationList>}></ModalBarre>
+                    <ModalBarre title={`Notification`} open={open} setOpen={setOpen} content={() => <NotificationList notifications={notifications} setClose={() => setOpen(false)}></NotificationList>}></ModalBarre>
 
                 </div> : <></> }
             </div>

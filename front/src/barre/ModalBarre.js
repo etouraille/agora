@@ -1,7 +1,11 @@
 import {Modal} from "react-bootstrap";
-import React from "react";
+import React, {useEffect} from "react";
 
-const ModalBarre = ({open, setOpen, content, title}) => {
+const ModalBarre = ({open, setOpen, content, title }) => {
+
+
+
+
     return (
         <>
             <Modal
