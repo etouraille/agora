@@ -8,6 +8,7 @@ import { Router } from 'react-router';
 import { Provider } from 'react-redux';
 import store from "./redux/store";
 import history from "./utils/history";
+import 'react-toastify/dist/ReactToastify.css';
 
 //useful function. min and max on array
 Array.prototype.max = function() {

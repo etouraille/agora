@@ -11,6 +11,7 @@ import { useLocation } from 'react-router-dom';
 import _routes from './route'
 import history from "./utils/history";
 import useSwipePrevious from "./swipeable/useSwipePrevious";
+import { ToastContainer } from "react-toastify";
 
 /*global FB*/
 
