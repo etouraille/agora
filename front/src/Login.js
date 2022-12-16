@@ -94,13 +94,13 @@ const Login = () => {
             )}
 
         </Formik>
-        <GoogleLogin
+        { process.env.REACT_APP_env === 'dev' ? <GoogleLogin
             clientId={process.env.REACT_APP_google_key}
             buttonText="Login"
             onSuccess={responseGoogle}
             onFailure={responseGoogle}
             cookiePolicy={'single_host_origin'}
-        />
+        /> : <></> }
         <button className="btn btn-success" onClick={onFacebookClick}>Login Facebook</button>
     </div>
 
