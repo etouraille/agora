@@ -16,7 +16,7 @@ const query = "MATCH (u:User) , (d:Document) WHERE u.id = $user " +
 
 
 
-const sendEmailNotification = ( to, body , id , type, title ) => {
+const sendEmailNotification = ( to, body , id , type, title , dontSend) => {
 
     const driver = getDriver();
     const session = driver.session();
@@ -37,7 +37,8 @@ const sendEmailNotification = ( to, body , id , type, title ) => {
                 '<p>' + body +'</p>' +
                 '<p>Bonne journée !</p>'
 
-            sendEmail(user.login, user.login, 'Nouvelle notification de queel.fr', template, {test: 'test'}).then();
+            !dontSend ? sendEmail(user.login, user.login, 'Nouvelle notification de queel.fr', template, {test: 'test'}).then()
+                .catch((error) => console.log(error)) : null;
 
         }
     });
@@ -60,7 +61,7 @@ const sendInvite = ( id, user, me ) => {
             let notification = data.records[0].get(0).properties;
             let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
             sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
-            sendEmailNotification(user, body, id, 'invite', title);
+            sendEmailNotification(user, body, id, 'invite', title , user === me );
         } else {
             console.log( 'no notif created');
         }
@@ -84,7 +85,7 @@ const sendInviteEmail = ( id, user, me ) => {
             let notification = data.records[0].get(0).properties;
             let title = data.records[0].get(2) ? data.records[0].get(2).properties.title : data.records[0].get(1).properties.title;
             sendMessage(id , user,{ id , user , sender : me , subject : 'notification', notification , title },true );
-            sendEmailNotification(user, body, id, 'invite-email', title);
+            sendEmailNotification(user, body, id, 'invite-email', title, user===me);
         } else {
             console.log( 'no notif created');
         }
@@ -120,7 +121,7 @@ const sendNotificationReadyForVote = ( id, me ) => {
                       notification,
                       title : title,
                   });
-                  sendEmailNotification(user, body, id, 'rfv', title);
+                  sendEmailNotification(user, body, id, 'rfv', title, user===me);
               } else {
                   console.log( 'no notif created');
               }
@@ -164,7 +165,7 @@ const sendNotificationNewRound = ( id, me  ) => {
                         notification,
                         title : title,
                     });
-                    sendEmailNotification(user, body, id, 'newRound', title);
+                    sendEmailNotification(user, body, id, 'newRound', title, user===me);
                 } else {
                     console.log( 'no notif created');
                 }
@@ -201,7 +202,7 @@ const sendNotificationRoundVoteFail = ( id, me ) => {
                         notification,
                         title : title,
                     });
-                    sendEmailNotification(user, body, id, 'roundVoteFail', title);
+                    sendEmailNotification(user, body, id, 'roundVoteFail', title, user===me);
                 } else {
                     console.log( 'no notif created');
                 }
@@ -241,7 +242,7 @@ const sendNotificationVoteFail = ( id, me ) => {
                             notification ,
                             title,
                         });
-                        sendEmailNotification(user, body, id, 'voteFail', title);
+                        sendEmailNotification(user, body, id, 'voteFail', title, user===me);
 
                     } else {
                         console.log( 'no notif created');
@@ -297,7 +298,7 @@ const sendNotificationVoteSuccess = ( id, me ) => {
                                 notification,
                                 title,
                             });
-                            sendEmailNotification(user, body, newId, 'voteSuccess', title);
+                            sendEmailNotification(user, body, newId, 'voteSuccess', title, user===me);
                         } else {
                             console.log( 'no notif created');
                         }
