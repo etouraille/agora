@@ -26,11 +26,6 @@ docker compose up -d
 cd node
 cp .env.example .env.development
 ```
-You need a mercure server for the application to work properly.
-The mercure server is set on remote host. the ~/agora/production permits 
-to launch this mercure server.
-you can also uses [this](https://mercure.rocks/docs/hub/install) to install it locally
-
  * install dependencies
 ```shell
 cd ~/agora/node
