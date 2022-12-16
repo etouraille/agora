@@ -23,6 +23,8 @@ services:
     tty: true
     container_name: api-agora
     working_dir: /src
+    environment:
+      - ENV=development
   socket:
 
     build: ./socket
@@ -41,6 +43,20 @@ services:
     volumes:
       - ./elastic:/usr/share/elasticsearch/data
     container_name: elastic-agora
+
+  mercure:
+    image: dunglas/mercure
+    restart: unless-stopped
+    environment:
+      # Uncomment the following line to disable HTTPS
+      SERVER_NAME: ':8081'
+    # Uncomment the following line to enable the development mode
+    command: /usr/bin/caddy run -config /src/Caddyfile.dev
+    ports:
+      - "8081:80"
+    volumes:
+      - ./mercure:/src
+    container_name: mercure
 
 
 

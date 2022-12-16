@@ -5,10 +5,10 @@ module.exports = {
     watch: '.',
     args: '-f -i 1',
     env_development: {
-      ENV: 'development'
+      "ENV": 'development'
     },
     env: {
-      ENV: 'production'
+      "ENV" :  'production'
     }
   }]
 };

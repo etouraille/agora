@@ -9,6 +9,8 @@ const publisherJwtKey = config.mercureToken;
 
 const sendMessage = ( id , user , message , isSubscribe = false ) => {
 
+    console.log('send message =====');
+
     findParent(id).then( pData => {
         let parentId = pData.id;
         const datas = {
@@ -28,7 +30,7 @@ const sendMessage = ( id , user , message , isSubscribe = false ) => {
 
         request.post(
             {
-                url: `https://${endpoint}/.well-known/mercure`,
+                url: `${endpoint}/.well-known/mercure`,
                 auth: {bearer},
                 form: datas
             },
@@ -68,7 +70,7 @@ const sendMessageToSubscribers = ( id ,message ) => {
 
                 request.post(
                     {
-                        url: `https://${endpoint}/.well-known/mercure`,
+                        url: `${endpoint}/.well-known/mercure`,
                         auth: {bearer},
                         form: datas
                     },
@@ -110,7 +112,7 @@ const sendMessageToEditors = ( id ,message ) => {
 
             request.post(
                 {
-                    url: `https://${endpoint}/.well-known/mercure`,
+                    url: `${endpoint}/.well-known/mercure`,
                     auth: {bearer},
                     form: datas
                 },
@@ -143,7 +145,7 @@ const sendMessageToAll = ( message ) => {
 
         request.post(
                 {
-                    url: `https://${endpoint}/.well-known/mercure`,
+                    url: `${endpoint}/.well-known/mercure`,
                     auth: {bearer},
                     form: datas
                 },

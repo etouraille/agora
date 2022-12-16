@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+console.log( process.env);
 if (process.env.ENV === 'development') {
    dotenv.config({path: __dirname + '/.env.development'});
    console.log('dev');
