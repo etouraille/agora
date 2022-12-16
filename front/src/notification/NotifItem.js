@@ -18,6 +18,7 @@ const NotifItem = ({ notification }) => {
     const regexp = /\{doc\}/
 
 
+
     const html = () => {
 
         if ( type === 'invite' || type === 'newRound' || type === 'roundVoteFail' ) {
@@ -45,7 +46,9 @@ const NotifItem = ({ notification }) => {
     }
 
     return (
-        <div onClick={reset} dangerouslySetInnerHTML={html()}></div>
+        <>
+            <div onClick={reset} dangerouslySetInnerHTML={html()}></div>
+        </>
     )
 }
 export default NotifItem;

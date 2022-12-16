@@ -8,6 +8,8 @@ import barreToggleFilter from "../redux/filter/barreToggleFilter";
 import Subscribe from "../document/subscribe/Subscribe";
 import NotificationList from "../notification/NotficationList";
 import ModalBarre from "./ModalBarre";
+import { toast, ToastContainer } from "react-toastify";
+import usePrevious from "../utils/usePrevious";
 
 const Notif = () => {
 
@@ -18,6 +20,13 @@ const Notif = () => {
 
     const [open, setOpen] = useState(false);
 
+    let previous = usePrevious(notifications.length)
+
+    useEffect(() => {
+        if (previous !== notifications.length && notifications.length > previous) {
+            toast.error('Nouvelle notification');
+        }
+    }, [notifications.length ])
 
     const click = (evt) => {
         evt.stopPropagation();
@@ -38,6 +47,7 @@ const Notif = () => {
 
                 </div> : <></> }
             </div>
+            <ToastContainer></ToastContainer>
         </>
     )
 }
