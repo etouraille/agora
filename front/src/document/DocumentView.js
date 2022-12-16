@@ -49,7 +49,7 @@ const DocumentView = (props) => {
     })
 
 
-    const { document, count } = useLoadDocument({id, reload });
+    const { document:_document, count } = useLoadDocument({id, reload });
 
 
     const showAmended = useSelector( state => {
@@ -58,14 +58,22 @@ const DocumentView = (props) => {
         else return false;
     })
 
+    useEffect(() => {
+        http.get('api/document-title/' + id).then((data) => {
+            if (data.data.title) {
+                document.title = data.data.title;
+            }
+        })
+    }, [id])
+
 
     useEffect(() => {
         const param = { readOnly : true, toolbar : '#toolbar' };
         let quill = QFactory.get('#editor', param );
         setEditor( quill );
-        let delta = new Delta(JSON.parse(document.document.body));
+        let delta = new Delta(JSON.parse(_document.document.body));
 
-        document.children.map(( object , index ) =>{
+        _document.children.map(( object , index ) =>{
             let link = object.link;
             let res = [];
             if(link.index && link.length) {
@@ -84,16 +92,16 @@ const DocumentView = (props) => {
 
         if( hasSubscribed ) {
             // TODO check if it is useful
-            // setMenuFunc(document, editor);
+            // setMenuFunc(_document, editor);
         }
 
-    }, [document, hasSubscribed, reload ])
+    }, [_document, hasSubscribed, reload ])
 
 
     const prev = useCallback(( id ) => {
-        history.push('/document/' + document.parent.document.id );
-        dispatch(setReload({id: document.parent.document.id}))
-    }, [document]);
+        history.push('/document/' + _document.parent.document.id );
+        dispatch(setReload({id: _document.parent.document.id}))
+    }, [_document]);
 
     const edit = () => {
         history.push('/documentedit/'+ id );
@@ -106,13 +114,13 @@ const DocumentView = (props) => {
 
     return (
         <>
-            {document.parent && document.parent.document ? <img className="logo logo-prev" src={arrow} onClick={prev}/> : <></> }
+            {_document?.parent && _document?.parent?.document ? <img className="logo logo-prev" src={arrow} onClick={prev}/> : <></> }
             <div>
                 <div style={{ display : 'none'}} id="emptyQuill"></div>
                 <div style={{ display : 'none'}} id="source"></div>
 
-                <Before document={document} id={id} count={count}></Before>
-                <h1>{document.document.title}</h1>
+                <Before document={_document} id={id} count={count}></Before>
+                <h1>{_document?.document.title}</h1>
                 <div className="row">
                     <div className="col-sm">
                         <div id="editor"></div>
@@ -131,7 +139,7 @@ const DocumentView = (props) => {
                         : <></>
                     }
                 </div>
-                <After document={document} id={id} count={count}></After>
+                <After document={_document} id={id} count={count}></After>
 
             </div>
         </>

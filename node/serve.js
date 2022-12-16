@@ -40,6 +40,7 @@ const { postAttach, getAttach, deleteAttach} = require("./api/attach");
 const { searchUsers } = require("./api/searchUsers");
 const { socketDocument } = require('./socket/document');
 const {resetPassword, newPassword} = require("./api/password");
+const {getTitle} = require("./api/title");
 const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -74,6 +75,7 @@ app.get('/admin/document', getDocuments);
 app.delete('/admin/document/:id', deleteDocument);
 app.post('/api/document', create);
 app.get('/api/document/:id', get);
+app.get('/api/document-title/:id', getTitle);
 app.delete('/api/document/:id', deleteDocument);
 app.post('/api/amend', canAmend );
 app.post('/api/amend', amend );
