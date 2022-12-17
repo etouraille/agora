@@ -55,7 +55,7 @@ const Encart = () => {
 
     const subscribedDoc = useSelector(documentSubscribeFilters);
 
-    console.log(subscribedDoc);
+
 
     useEffect(() => {
 

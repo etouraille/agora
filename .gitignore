@@ -1,3 +1,4 @@
 docker/neo
 docker/elastic/nodes
 .idea
+node/node_modules

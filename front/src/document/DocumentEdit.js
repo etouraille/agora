@@ -30,6 +30,8 @@ const DocumentEdit = () => {
 
     const socket = new WebSocket(process.env.REACT_APP_ws);
     const connection = new Sharedb.Connection(socket);
+
+
     const { id } = useParams();
     const [ editor, setEditor] = useState( null );
     const [ focusChanged , setFocusChanged ] = useState( false );
