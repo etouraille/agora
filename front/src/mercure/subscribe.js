@@ -6,7 +6,7 @@ import {useDispatch} from "react-redux";
 import {reload as reloadDocument } from "./../redux/slice/reloadDocumentSlice";
 import { addVoter, removeVoter , forIt , againstIt } from "./../redux/slice/voteSlice";
 import { reloadVote } from "./../redux/slice/reloadVoteSlice";
-import { set as setReadyForVote } from './../redux/slice/readyForVoteSlice';
+import { set as setReadyForVote} from './../redux/slice/readyForVoteSlice';
 import { sub as subscribeDocument } from './../redux/slice/subscribedSlice';
 import { addNotification, removeNotification } from "../redux/slice/notificationSlice";
 import { reloadList } from "../redux/slice/reloadDocumentListSlice";
@@ -137,6 +137,7 @@ class  MercureSubscribe {
             }
             if (message.subject === 'documentUnTouched') {
                 store.dispatch( setTouched({id, touched : false}));
+                store.dispatch( setReadyForVote({id, readyForVote: null, round: message.currentRound}));
             }
         }
     }

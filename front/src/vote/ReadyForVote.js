@@ -20,7 +20,7 @@ const ReadyForVote = ({ id }) => {
     const _canIncreaseRound = useSelector(canIncreaseRound(id));
 
     const { ready, round } = useSelector(store => {
-        const user = store.login.user;
+        const user = store.login.userId;
         let readyForVote = false;
         let round = 0;
         if( user ) {

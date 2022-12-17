@@ -6,6 +6,7 @@ const canVoteForRound = (id) => {
             let min = elem.data.map(elem => elem.round).min();
             let max = elem.data.map(elem => elem.round).max();
             let countReadyForVote = elem.data.reduce((a,b) => (b.readyForVote === true || b.readyForVote === false ? a + 1 : a), 0);
+            console.log(min, max, countReadyForVote, elem.data.length);
             canVote = min === max && min > 0 && countReadyForVote < elem.data.length;
         }
         return canVote;

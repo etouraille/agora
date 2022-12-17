@@ -9,6 +9,8 @@ const putRound = ( req, res ) => {
 
     const driver = getDriver();
 
+    console.log(id);
+
     // je peux editer le texte quand le round = 0 pour moi ou que le round > 0 pour moi et que le vote est complet mais en échec
     // je peux incrémenter le round quand je peux editer le text et que le document a été modifié
     // je peux voter quand le round vient d'être incrémenté et qu'on a passs les readyForVote à null round meme valeur pour tout le monde et round > 0
@@ -19,27 +21,37 @@ const putRound = ( req, res ) => {
     // TODO : soit le premier qui incrémente le round l'incrémente pour tout le monde.
     // TODO : I choose here to increment round globaly.
     let query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User ) WHERE d.id = $id AND u.id = $userId " +
-        "MATCH (d)-[ra:FOR_EDIT_BY]->(:User) " +
-        "WITH max(ra.round) as _maxRound , min(ra.round) as _minRound , ra , r , d " +
+        "OPTIONAL MATCH (d)-[ra:FOR_EDIT_BY]->(v:User) " +
+        " WITH count(ra) as _count, d, r, u, ra , collect(ra) as _ras " +
+        "WITH max(ra.round) as _maxRound , min(ra.round) as _minRound,  _count , ra , r , d , _ras " +
         "WITH reduce(against=0, forEditBy in collect(ra) | against + CASE forEditBy.readyForVote = false WHEN true THEN 1 ELSE 0 END ) as _against,  " +
         "reduce(for=0, forEditBy in collect(ra) | for + CASE forEditBy.readyForVote = true WHEN true THEN 1 ELSE 0 END ) as _for," +
         "reduce(minRound=0, forEditBy in collect(ra) | minRound + CASE forEditBy.rank = _minRound  WHEN true THEN 1 ELSE 0 END ) as _countMinRound," +
         "reduce(maxRound=0, forEditBy in collect(ra) | maxRound + CASE forEditBy.rank = _maxRound  WHEN true THEN 1 ELSE 0 END ) as _countMaxRound, " +
-        " _maxRound, _minRound , r , ra , d " +
-        "RETURN _maxRound, _minRound, r.round, _against, _for, _countMaxRound, _countMinRound , count(ra) , d";
+        " _maxRound, _minRound , r , ra , d , _count , _ras " +
+        "RETURN _maxRound, _minRound, r.round, _against, _for, _countMaxRound, _countMinRound , count(_ras) , d";
+
+    query = "MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id AND u.id = $userId " +
+        "MATCH (d)-[ra:FOR_EDIT_BY]->(:User) " +
+        "RETURN d, ra , r";
+
 
 
     let _session = driver.session();
-    _session.run( query, {id, userId }).then((data) => {
-        let currentRound = data.records[0].get(2).low;
-        let maxRound = typeof data.records[0].get(0).low === 'number' ? data.records[0].get(0).low : parseInt(data.records[0].get(0))
-        let minRound = typeof data.records[0].get(1).low === 'number' ? data.records[0].get(1).low : parseInt(data.records[0].get(1))
-        let _against = data.records[0].get(3).low;
-        let _for = data.records[0].get(4).low;
-        let countMaxRound = data.records[0].get(5).low;
-        let countMinRound = data.records[0].get(6).low;
-        let _voters = data.records[0].get(7).low
-        let documentTouched = data.records[0].get(8).properties.touched;
+
+    _session.run(query, {id, userId}).then(data => {
+        let ra = [];
+        data.records.forEach(elem => {
+            ra.push(elem.get(1).properties);
+        })
+        let currentRound = typeof data.records[0].get(2).low === 'number' ? data.records[0].get(2).low : parseInt(data.records[0].get(2));
+        let maxRound = ra.map(elem => typeof elem.round.low === 'number' ? elem.round.low : parseInt(elem.round)).max();
+        let minRound = ra.map(elem => typeof elem.round.low === 'number' ? elem.round.low : parseInt(elem.round)).min();
+        let _against = ra.reduce((a, elem) => (elem.readyForVote === false ? a + 1 : a), 0);
+        let _for = ra.reduce((a, elem) => (elem.readyForVote === true ? a + 1 : a), 0);
+        let _voters = ra.length;
+        let documentTouched = data.records[0].get(0).properties.touched;
+
 
         // on increment le round si
         // ( minRound == maxRound et le vote n'est pas complet et tout le monde a voté _for + _against === countMaxRoudn + countMinRound)
@@ -59,7 +71,7 @@ const putRound = ( req, res ) => {
         //    return res.status(500).json({reason: 'Database corrupted'});
         //}
 
-        console.log(minRound, maxRound, _for, _against, _voters );
+        console.log(minRound, maxRound, _for, _against, _voters , voteFailure(_for, _against, _voters  , _type ));
         if (currentRound === 0) {
             _currentRound = currentRound + 1;
         } else if (minRound === maxRound
@@ -95,7 +107,7 @@ const putRound = ( req, res ) => {
                 return _sess.run("MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id " +
                     "REMOVE r.readyForVote SET r.round = $_currentRound REMOVE d.touched ",
                     {id, _currentRound: parseInt(_currentRound)}).then(
-                    () => sendMessageToEditors(id, {id, user: res.userId, subject: 'documentUnTouched'})
+                    () => sendMessageToEditors(id, {id, user: res.userId, subject: 'documentUnTouched', currentRound: parseInt(_currentRound)})
                 )
                     .finally(() => _sess.close());
             } else {
@@ -105,6 +117,9 @@ const putRound = ( req, res ) => {
             res.status(200).json({ round: _currentRound, delete: _deleteVoteComplete});
         }).finally(() => session.close());
 
+    }).catch(error => {
+        console.log(error);
+        res.status(500).json({error});
     }).finally(() => {
         _session.close();
         driver.close();
