@@ -48,7 +48,7 @@ jobs:
           remote_host: queel.fr
           remote_user: ubuntu
           remote_key: ${{ secrets.RSA_PUB }}
-      - name: ssh key passphrase
+      - name: restart
         uses: appleboy/ssh-action@master
         with:
           host: queel.fr
@@ -57,3 +57,4 @@ jobs:
           script: |
             cd production && docker compose up -d && ./restart_node.sh && ./restart_cdn.sh
             
+
