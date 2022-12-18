@@ -5,7 +5,7 @@ const { v4 : uuid } = require('uuid')
 const {addNewUser} = require("./elastic/addElastic");
 const jwtKey = config.jwtKey
 const jwtExpirySeconds = config.jwtExpirySeconds;
-
+const bcrypt = require('bcrypt');
 const subscribe = async (req , res ) => {
 
     const { email, password , name } = req.body;
@@ -21,6 +21,7 @@ const subscribe = async (req , res ) => {
 
                 const _user = {email, password, name, id: uuid()};
 
+                _user.password = bcrypt.hashSync(_user.password, 10);
 
                 const result = session.run('CREATE (u:User { login : $email, password : $password , name: $name , id : $id }) RETURN u ',
                     _user
@@ -67,7 +68,7 @@ const subscribe = async (req , res ) => {
 
 }
 
-const signIn = (req, res) => {
+const signIn = async (req, res) => {
 
     // Get credentials from JSON body
     const { username, password } = req.body
@@ -88,7 +89,10 @@ const signIn = (req, res) => {
             if (name) _user['name'] = name;
             if (username) _user['email'] = username;
 
-            if (recordedPassword !== password) {
+            console.log(recordedPassword);
+            console.log(bcrypt.hashSync(password, 10))
+
+            if (!bcrypt.compareSync(password,recordedPassword)) {
                 res.json(401, {token: null}).end();
                 return;
             } else {

@@ -2,6 +2,7 @@ const getDriver = require('./../neo/driver');
 const {v4 : uuid } = require('uuid');
 const {sendEmail} = require("../email/email");
 const config = require("../config");
+const bcrypt = require('bcrypt');
 const resetPassword = (req, res) => {
     const driver = getDriver();
     const session = driver.session();
@@ -63,7 +64,7 @@ const newPassword = ( req, res ) => {
             if(data.records[0]) {
 
                 const query2 = "MATCH(u:User) WHERE u.token = $token SET u.password = $password SET u.token = '' RETURN u ";
-                return session.run( query2, {token, password}).then(() => {
+                return session.run( query2, {token, password: bcrypt.hashSync(password, 10) }).then(() => {
                     res.json({ success: true});
                 });
 
