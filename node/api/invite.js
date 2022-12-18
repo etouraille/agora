@@ -18,7 +18,7 @@ const invite = ( req, res ) => {
 
     const _session = driver.session();
     _session.run(query, {id}).then(data => {
-        let minRound = data.records[0].get(0).low;
+        let minRound = typeof data.records[0].get(0).low === 'number'? data.records[0].get(0).low : parseInt(data.records[0].get(0));
 
         const session = driver.session();
         query = 'MATCH (user: User ) WHERE user.id = $userId ' +
