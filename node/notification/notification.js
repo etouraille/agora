@@ -46,8 +46,8 @@ const sendEmailNotification = ( to, body , id , type, title , dontSend) => {
 
 }
 
-const sendInvite = ( id, user, me ) => {
-    const body = 'Vous avez été invité par ' + me + ' a compléter {doc}';
+const sendInvite = ( id, user, me, _user ) => {
+    const body = 'Vous avez été invité par ' + _user.name  + ' a compléter {doc}';
     const driver = getDriver();
     const session = driver.session();
     const result = session.run( query , {
@@ -70,8 +70,8 @@ const sendInvite = ( id, user, me ) => {
     })
 }
 
-const sendInviteEmail = ( id, user, me ) => {
-    const body = 'Vous avez été invité par ' + me + ' à participer à {doc}';
+const sendInviteEmail = ( id, user, me , _user) => {
+    const body = 'Vous avez été invité par ' + _user.name + ' à participer à {doc}';
     const driver = getDriver();
     const session = driver.session();
     const result = session.run( query , {
@@ -139,12 +139,12 @@ const sendNotificationReadyForVote = ( id, me ) => {
 
 
 
-const sendNotificationNewRound = ( id, me  ) => {
+const sendNotificationNewRound = ( id, me , _user ) => {
     getEditors(id).then( users => {
         users.forEach( user  => {
             const driver = getDriver();
             const session = driver.session();
-            const body =  me + ' a fait un appel au vote pour l\'amendement {doc}, vous pourvez voter';
+            const body = _user.name + ' a fait un appel au vote pour l\'amendement {doc}, vous pourvez voter';
             const result = session.run( query , {
                 id,
                 user,

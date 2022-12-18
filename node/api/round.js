@@ -100,7 +100,7 @@ const putRound = ( req, res ) => {
             if(_deleteVoteComplete) {
                 let _sess = driver.session();
                 // SEND NOTIF FOR A NEW ROUND.
-                sendNotificationNewRound(id, res.userId);
+                sendNotificationNewRound(id, res.userId, res._user);
                 //return _sess.run("MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User) WHERE d.id = $id " +
                 //    "REMOVE r.voteComplete ", {id}).then()
                 //.finally(() => _sess.close());

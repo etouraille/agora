@@ -180,7 +180,7 @@ const processRequest = (req, res, next, matchUser) => {
             if(!data.records[0]) {
                 return res.status(404).json({error: 'User doesn t exist in database'});
             } else {
-                res.user = data.records[0].get(0).properties;
+                res._user = data.records[0].get(0).properties;
                 next();
             }
         }).catch(error =>{

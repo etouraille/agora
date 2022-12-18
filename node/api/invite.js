@@ -27,7 +27,7 @@ const invite = ( req, res ) => {
 
         let result = session.run( query , {id : id , userId, me : res.userId , minRound});
         return result.then(data => {
-            sendInvite(id, userId, res.email );
+            sendInvite(id, userId, res.email , res._user);
             sendMessage(id, userId , { to : userId , user : res.userId , subject : 'reloadDocumentList'}, true );
             return res.json({id : id , userId , round: minRound }).end();
         }, error => {
