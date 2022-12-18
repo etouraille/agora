@@ -37,7 +37,10 @@ const sendEmailNotification = ( to, body , id , type, title , dontSend) => {
                 '<p>' + body +'</p>' +
                 '<p>Bonne journée !</p>'
 
-            !dontSend ? sendEmail(user.login, user.login, 'Nouvelle notification de queel.fr', template, {test: 'test'}).then()
+            !dontSend ? sendEmail(user.login, user.login, 'Nouvelle notification de queel.fr', template, {test: 'test'}).then((data) => {
+                console.log( 'Email sent =======');
+                console.log(data)
+            })
                 .catch((error) => console.log(error)) : null;
 
         }
