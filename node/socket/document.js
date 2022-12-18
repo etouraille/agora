@@ -55,6 +55,7 @@ const socketDocument = (ws) => {
             const user = data.id.match(/save-(.*)---(.*)$/)[2];
             if (id && user ) {
                 readyForVote(id, user ).then(rfv => {
+                    console.log(rfv);
                     if (rfv.isOwner &&  ! rfv.isReadyForVote && rfv.canBeEdited ) {
                         save(id);
                         sendMessageToEditors(id, {id, user, subject: 'documentTouched'});

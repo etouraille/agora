@@ -1,4 +1,4 @@
-const canVoteForRound = (id) => {
+const   canVoteForRound = (id) => {
     return (state) => {
         let elem = state.readyForVote.find( elem => elem.id === id);
         let canVote = false;

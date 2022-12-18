@@ -44,7 +44,7 @@ const putRound = ( req, res ) => {
         data.records.forEach(elem => {
             ra.push(elem.get(1).properties);
         })
-        let currentRound = typeof data.records[0].get(2).low === 'number' ? data.records[0].get(2).low : parseInt(data.records[0].get(2));
+        let currentRound = typeof data.records[0].get(2).properties.round.low === 'number' ? data.records[0].get(2).properties.round.low : parseInt(data.records[0].get(2).properties.round);
         let maxRound = ra.map(elem => typeof elem.round.low === 'number' ? elem.round.low : parseInt(elem.round)).max();
         let minRound = ra.map(elem => typeof elem.round.low === 'number' ? elem.round.low : parseInt(elem.round)).min();
         let _against = ra.reduce((a, elem) => (elem.readyForVote === false ? a + 1 : a), 0);
@@ -52,7 +52,7 @@ const putRound = ( req, res ) => {
         let _voters = ra.length;
         let documentTouched = data.records[0].get(0).properties.touched;
 
-
+        console.log(data.records[0].get(2));
         // on increment le round si
         // ( minRound == maxRound et le vote n'est pas complet et tout le monde a voté _for + _against === countMaxRoudn + countMinRound)
         // dans ce cas on efface tout les vote.

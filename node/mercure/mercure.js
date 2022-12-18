@@ -95,6 +95,8 @@ const sendMessageToEditors = ( id ,message ) => {
 
             console.log( message );
 
+            console.log( 'editors ====', user );
+
             const datas = {
                 topic: 'http://agora.org/subscribe/' + user,
                 data: JSON.stringify(message)

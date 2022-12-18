@@ -22,6 +22,7 @@ export const readyForVoteSlice = createSlice({
             state.forEach((elem, i ) => {
                 if(elem.id === action.payload.id ) {
                     elem.data.forEach( (r, j ) => {
+                        console.log( r.user, action.payload.user);
                         if( r.user === action.payload.user ) {
                             state[i].data[j].readyForVote = action.payload.readyForVote;
                             if(action.payload.round) state[i].data[j].round = action.payload.round;
@@ -35,6 +36,16 @@ export const readyForVoteSlice = createSlice({
                 if(elem.id === action.payload.id ) {
                     elem.data.forEach( (r, j ) => {
                         state[i].data[j].readyForVote = null;
+                    })
+                }
+            })
+        },
+        setNullReadyForVoteAndRound: ( state, action ) => {
+            state.forEach((elem, i ) => {
+                if(elem.id === action.payload.id ) {
+                    elem.data.forEach( (r, j ) => {
+                        state[i].data[j].readyForVote = null;
+                        state[i].data[j].round = action.payload.round;
                     })
                 }
             })
@@ -82,5 +93,5 @@ export const readyForVoteSlice = createSlice({
     }
 });
 export default readyForVoteSlice.reducer
-export const { init , set , addUser, removeUser, setNullReadyForVote } = readyForVoteSlice.actions
+export const { init , set , addUser, removeUser, setNullReadyForVote , setNullReadyForVoteAndRound } = readyForVoteSlice.actions
 
