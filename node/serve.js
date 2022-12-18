@@ -69,6 +69,7 @@ app.post('/home', home);
 app.get('/user/:id', getUser);
 app.get('/api/ping', ping );
 app.get('/admin/users', getUsers);
+app.get('/api/users', getUsers);
 app.delete('/admin/user/:id', deleteUser);
 app.get('/api/documents', documents);
 app.get('/admin/document', getDocuments);

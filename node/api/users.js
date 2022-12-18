@@ -16,6 +16,7 @@ const getUsers = (req , res ) => {
         })
         return res.json(array).end();
     }, error => {
+        console.log(error);
         return res.json(500, {reason : error });
     }).finally(() => {
         session.close();
