@@ -35,6 +35,8 @@ const Login = () => {
     const onFacebookClick = (evt) => {
         FB.login((data) => {
 
+            console.log(data);
+
             let tokenId = data?.authResponse?.accessToken;
             if (tokenId) {
                 http.post('/sign-in-facebook',{tokenId}).then(data => {
@@ -89,7 +91,7 @@ const Login = () => {
                     <button className="btn btn-primary" type="submit" onClick={handleSubmit} disabled={isSubmitting} >
                         Submit
                     </button>
-                    <a class="btn" onClick={() => history.push('/reset-password')}>Reset password</a>
+                    <a className="btn" onClick={() => history.push('/reset-password')}>Reset password</a>
                 </Form>
             )}
 

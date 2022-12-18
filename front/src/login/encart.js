@@ -112,6 +112,8 @@ const Encart = () => {
             })
             http.get('/api/notification').then( data => {
                 dispatch( initNotification({data : data.data }));
+            }, error => {
+                console.log(error);
             })
             http.get('/api/documents').then(
                 data => {

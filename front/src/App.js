@@ -23,6 +23,8 @@ export default function App() {
 
     const location = useLocation();
 
+    console.log( location.pathname);
+
     const { ref } = useSwipePrevious();
 
     useEffect(() => {
@@ -64,7 +66,8 @@ export default function App() {
 
     //facebook
     useEffect(() => {
-        window.fbAsyncInit = function() {
+        console.log('init');
+        //window.fbAsyncInit = function() {
             FB.init({
                 appId      : process.env.REACT_APP_facebookId,
                 cookie     : true,
@@ -74,7 +77,7 @@ export default function App() {
             console.log('init facebook');
             //FB.AppEvents.logPageView();
 
-        };
+        //};
 
     }, [location.pathname]);
 
