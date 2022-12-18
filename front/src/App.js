@@ -67,7 +67,7 @@ export default function App() {
     //facebook
     useEffect(() => {
         console.log('init');
-        //window.fbAsyncInit = function() {
+        window.fbAsyncInit = function() {
             FB.init({
                 appId      : process.env.REACT_APP_facebookId,
                 cookie     : true,
@@ -77,7 +77,7 @@ export default function App() {
             console.log('init facebook');
             //FB.AppEvents.logPageView();
 
-        //};
+        };
 
     }, [location.pathname]);
 
