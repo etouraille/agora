@@ -96,7 +96,7 @@ const Invite = ({id}) => {
             </ul>
             <br/>
             <h1>Membres à inviter</h1>
-            <SearchApi api={`/api/search-user`} item={((elem, index) => <>{ elem.id !== user && invitedUsers.findIndex(rs => rs = elem.id ) === -1 ?  <li className="list-group-item" key={index}>{elem.name}
+            <SearchApi api={`/api/search-user`} item={((elem, index) => <>{ elem.id !== user && invitedUsers.findIndex(rs => rs === elem.id ) === -1 ?  <li className="list-group-item" key={index}>{elem.name}
                 <button className="btn btn-black float-right" onClick={() => invite(elem.id)}><img className="logo-small margin-right" src={inviteSvg} />Inviter</button>
             </li>: <></> }</>)}></SearchApi>
         </div>
