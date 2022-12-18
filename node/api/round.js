@@ -111,7 +111,14 @@ const putRound = ( req, res ) => {
                 )
                     .finally(() => _sess.close());
             } else {
-                return null;
+                let _sess = driver.session();
+                sendNotificationNewRound(id, res.userId, res._user);
+
+                return _sess.run('MATCH (d:Document)-[r:FOR_EDIT_BY]->(u:User ) WHERE d.id = $id ' +
+                    ' SET r.round = $_currentRound REMOVE d.touched ',
+                    {id, _currentRound: parseInt(_currentRound)}).then(
+                    () => sendMessageToEditors(id, {id, user: res.userId, subject: 'documentUnTouched', currentRound: parseInt(_currentRound)})
+                )
             }
         }).then(() => {
             res.status(200).json({ round: _currentRound, delete: _deleteVoteComplete});
