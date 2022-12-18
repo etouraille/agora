@@ -22,6 +22,8 @@ const inviteEmail = ( req, res ) => {
                 }
                 sendInviteSendinblue(id, email, res.email);
 
+                res.json({success: true});
+
             }, error => {
                 res.json(500, {reason : error });
             }).finally(() => {
@@ -29,6 +31,8 @@ const inviteEmail = ( req, res ) => {
                 driver.close();
             })
         })
+    } else {
+        res.json({success: false});
     }
 
 
