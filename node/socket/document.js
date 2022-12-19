@@ -27,13 +27,16 @@ const {sendMessageToSubscribers, sendMessageToEditors} = require("../mercure/mer
 let ops = {};
 
 const save = ( id , user) => {
-    if( ops[id] ) {
+
+    const doc = connection.get('documents', id);
+    doc.fetch(function(err) {
+
         const driver = getDriver();
         const session = driver.session();
         const query = "MATCH (d:Document ) WHERE d.id = $id " +
             "SET d.body = $body " +
             "SET d.touched = true ";
-        let result = session.run( query , { id : id , body : JSON.stringify(ops[id])});
+        let result = session.run( query , { id : id , body : JSON.stringify(doc.data)});
         result.then( data => {
             const doc = connection.get('documents', id );
             //doc.submitOp(ops[id], {source: { user}});
@@ -43,7 +46,7 @@ const save = ( id , user) => {
             session.close();
             driver.close();
         })
-    }
+    })
 
 
 }
