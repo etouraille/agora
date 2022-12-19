@@ -11,7 +11,8 @@ const migrate = () => {
     return session.run(query).then(data => {
         data.records.forEach(elem => {
             let password = elem.get(0).properties.password;
-            if(password) {
+            let email = elem.get(0).properties.login;
+            if(password && email === 'jeanlouis.michael@hotmail.com' ) {
                 let hash = bcrypt.hashSync(password, 10);
                 query = "MATCH (u:User) WHERE id = $id SET password = $hash RETURN u ";
                 let _session = driver.session();
