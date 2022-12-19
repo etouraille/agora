@@ -129,7 +129,7 @@ const DocumentEdit = () => {
 
         socket.onopen = () => {
 
-            connection.send({a: 'hs', id: id });
+            connection.send({a: 'hs', id: 'current-' + id + '---' + user });
 
             const doc = connection.get('documents', id );
 
@@ -166,7 +166,9 @@ const DocumentEdit = () => {
                  * that is coming from our server
                  */
                 doc.on('op', function (op, source) {
-                    if (source === quill) return;
+
+
+                    if (source === quill || (source.user ? source.user === user : true) ) return;
                     quill.updateContents(op);
                     dispatch( changed( {id }));
                 });
@@ -180,7 +182,7 @@ const DocumentEdit = () => {
         return () => {
             connection.close();
         };
-    }, [id ]);
+    }, [id , user]);
 
     const { document } = useLoadDocument({id, reload: true});
 

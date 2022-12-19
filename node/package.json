@@ -24,6 +24,7 @@
     "request": "^2.88.2",
     "rich-text": "^4.1.0",
     "sharedb": "^1.5.2",
+    "sharedb-mongo": "^2.0.0",
     "sib-api-v3-sdk": "^8.2.1",
     "uuid": "^8.3.1",
     "ws": "^7.4.1"

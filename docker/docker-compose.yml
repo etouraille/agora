@@ -58,5 +58,10 @@ services:
       - ./mercure:/src
     container_name: mercure
 
+  mongo:
+    image: mongo:4.4.0
+    ports:
+      - "27017:27017"
+    container_name: mongo-agora
 
 
