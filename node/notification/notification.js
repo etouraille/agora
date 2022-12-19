@@ -50,6 +50,7 @@ const sendEmailNotification = ( to, body , id , type, title , dontSend) => {
 }
 
 const sendInvite = ( id, user, me, _user ) => {
+    if(user === me ) return;
     const body = 'Vous avez été invité par ' + _user.name  + ' a compléter {doc}';
     const driver = getDriver();
     const session = driver.session();
@@ -74,6 +75,7 @@ const sendInvite = ( id, user, me, _user ) => {
 }
 
 const sendInviteEmail = ( id, user, me , _user) => {
+    if(user === me) return;
     const body = 'Vous avez été invité par ' + _user.name + ' à participer à {doc}';
     const driver = getDriver();
     const session = driver.session();
@@ -98,9 +100,11 @@ const sendInviteEmail = ( id, user, me , _user) => {
 }
 
 
-const sendNotificationReadyForVote = ( id, me ) => {
+const sendNotificationReadyForVote = ( id, me , user) => {
+
     getSubscribers(id).then( users => {
         users.forEach( user  => {
+          if (user === me) return;
           const driver = getDriver();
           const session = driver.session();
           const body = 'Vous êtes invité a voter pour {doc} ';
@@ -142,9 +146,11 @@ const sendNotificationReadyForVote = ( id, me ) => {
 
 
 
-const sendNotificationNewRound = ( id, me , _user ) => {
+const sendNotificationNewRound = ( id, me,  _user ) => {
+
     getEditors(id).then( users => {
         users.forEach( user  => {
+            if(user === me) return;
             const driver = getDriver();
             const session = driver.session();
             const body = _user.name + ' a fait un appel au vote pour l\'amendement {doc}, vous pourvez voter';
@@ -179,9 +185,10 @@ const sendNotificationNewRound = ( id, me , _user ) => {
         console.log( error);
     })
 }
-const sendNotificationRoundVoteFail = ( id, me ) => {
+const sendNotificationRoundVoteFail = ( id, me) => {
     getEditors(id).then( users => {
         users.forEach( user  => {
+            if(user === me) return;
             const driver = getDriver();
             const session = driver.session();
             const body = 'le vote est un échec vous pouvez de nouveau modifier l\'amendement {doc}';
@@ -222,6 +229,7 @@ const sendNotificationVoteFail = ( id, me ) => {
     return new Promise((resolve, reject ) => {
         getSubscribers(id).then( users => {
             users.forEach( (user, index )  => {
+                if (user === me) return;
                 const driver = getDriver();
                 const session = driver.session();
                 const body = "les participant on voté contre , vous pouver amender {doc}";
@@ -270,6 +278,7 @@ const sendNotificationVoteSuccess = ( id, me ) => {
         getSubscribers(id).then( users => {
             findFirstParent(id).then( parentId => {
                 users.forEach( (user, index )  => {
+                    if (user === me) return;
                     const driver = getDriver();
                     const session = driver.session();
                     let newId;
