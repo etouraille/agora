@@ -28,8 +28,8 @@ Sharedb.types.register(richText.type);
 
 const DocumentEdit = () => {
 
-    const socket = new WebSocket(process.env.REACT_APP_ws);
-    const connection = new Sharedb.Connection(socket);
+
+
 
 
     const { id } = useParams();
@@ -74,22 +74,31 @@ const DocumentEdit = () => {
     }, [id , rfv ]);
 
     useEffect(() => {
+        const socket = new WebSocket(process.env.REACT_APP_ws);
+        const connection = new Sharedb.Connection(socket);
         if( forSave && connection ) {
             socket.onopen = () => {
                 connection.send({a: 'hs', id: 'save-' + id + '---' + user });
                 dispatch(afterSave({id}));
             }
         }
-    }, [forSave , connection , id , socket])
+        return () => {
+            connection.close();
+            socket.close();
+        }
+    }, [forSave , id])
 
     useEffect(() => {
+        const socket = new WebSocket(process.env.REACT_APP_ws);
+        const connection = new Sharedb.Connection(socket);
         if( focusChanged && connection ) {
             socket.onopen = () => {
                 connection.send({a: 'hs', id: 'save-' + id + '---' + user });
                 dispatch(afterSave({id}));
             }
         }
-    }, [focusChanged , connection, id , socket ])
+        return () => {connection.close();  socket.close()}
+    }, [focusChanged , id ])
 
 
     useEffect(() => {
@@ -120,6 +129,8 @@ const DocumentEdit = () => {
     }
 
     useEffect(() => {
+        const socket = new WebSocket(process.env.REACT_APP_ws);
+        const connection = new Sharedb.Connection(socket);
 
         if (_canEditDocument) {
             setQuillDiv(editor, false);
@@ -146,6 +157,7 @@ const DocumentEdit = () => {
                  * On Initialising if data is present in server
                  * Updaing its content to editor
                  */
+                console.log(doc.data);
                 if( doc.data ) {
                     quill.setContents(doc.data.ops);
                 }
@@ -168,7 +180,7 @@ const DocumentEdit = () => {
                 doc.on('op', function (op, source) {
 
 
-                    if (source === quill || (source.user ? source.user === user : true) ) return;
+                    if (source === quill ) return;
                     quill.updateContents(op);
                     dispatch( changed( {id }));
                 });
@@ -181,6 +193,7 @@ const DocumentEdit = () => {
         }
         return () => {
             connection.close();
+            socket.close();
         };
     }, [id , user]);
 
