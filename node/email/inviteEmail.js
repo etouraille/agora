@@ -8,7 +8,7 @@ const {sendEmail} = require("./email");
 
 
 
-const inviteEmail = ( id , email, pseudo ) => {
+const inviteEmail = ( id , email, pseudo, user  ) => {
 
     findParent(id).then((pData) => {
         let parentId = pData.id;
@@ -32,7 +32,7 @@ const inviteEmail = ( id , email, pseudo ) => {
                     "<H3>abonnez vous au document et commencez.</h3> \n" +
                     "\n" +
                     "<h1>Bonne Contribution !</h1>";
-                let params =  {pseudo ,title, link: config.front + '/document/' + id };
+                let params =  {pseudo: user.name ,title, link: config.front + '/document/' + id };
 
                 return sendEmail(email,email, subject, template, params)
 

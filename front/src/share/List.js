@@ -69,7 +69,7 @@ const List = ({id}) => (
                         )}
                     />
                     <div>
-                        <button type="submit" onClick={(evt) => {evt.stopPropagation();handleSubmit()}}>Submit</button>
+                        <button type="button" onClick={(evt) => {evt.stopPropagation();handleSubmit()}}>Submit</button>
                     </div>
                 </Form>
             )}

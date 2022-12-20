@@ -79,6 +79,21 @@ export default function App() {
 
         };
 
+        return () => {
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : process.env.REACT_APP_facebookId,
+                    cookie     : true,
+                    xfbml      : true,
+                    version    : 'v12.0'
+                });
+                console.log('init facebook');
+                //FB.AppEvents.logPageView();
+
+            };
+
+        }
+
     }, [location.pathname]);
 
     const click = (evt) => {

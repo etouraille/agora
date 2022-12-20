@@ -20,7 +20,7 @@ const inviteEmail = ( req, res ) => {
                     sendInviteEmail(id, email, res.email, res._user);
                     // send email
                 }
-                sendInviteSendinblue(id, email, res.email);
+                sendInviteSendinblue(id, email, res.email, res._user);
 
                 res.json({success: true});
 

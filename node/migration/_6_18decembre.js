@@ -12,11 +12,12 @@ const migrate = () => {
         data.records.forEach(elem => {
             let password = elem.get(0).properties.password;
             let email = elem.get(0).properties.login;
-            if(password && email === 'jeanlouis.michael@hotmail.com' ) {
+            let id = elem.get(0).properties.id;
+            if(password) {
                 let hash = bcrypt.hashSync(password, 10);
-                query = "MATCH (u:User) WHERE id = $id SET password = $hash RETURN u ";
+                query = "MATCH (u:User) WHERE u.id = $id SET u.password = $hash RETURN u ";
                 let _session = driver.session();
-                _session.run(query, {id: elem.get(0).id, hash}).then();
+                _session.run(query, {id, hash}).then();
             }
         })
     }).finally(() => {
