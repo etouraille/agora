@@ -314,24 +314,46 @@ const getVoters = ( req, res ) => {
 }
 
 const deleteVote = ( req, res ) => {
+
+
+    let canDelete = true;
+
     const id = req.params.id;
     const driver = getDriver();
-    const session = driver.session();
-    const query = "MATCH (:User)-[r:VOTE_FOR]->( d:Document ) " +
-        "WHERE d.id = $id " +
-        "OPTIONAL MATCH (d)-[r1:HAS_PARENT]->(p:Document)-[r2:HAS_CHILDREN]->(d) " +
-        "REMOVE r1.voteComplete " +
-        "REMOVE r2.voteComplete " +
-        "DELETE r ";
-    let result = session.run( query , { id });
-    result.then( data => {
-        return res.json({ok : true }).end();
-    },error => {
-        return res.status(500).json( {reason  : error }).end();
-    }).finally( () => {
-        session.close();
-        driver.close();
-    })
+
+    let _query = "MATCH (d:Document) WHERE d.id = $id " +
+        " OPTIONAL MATCH (d)-[:CREATE_BY]->(s:User) WHERE s.id = $userId" +
+        " OPTIONAL MATCH (d)-[:HAS_PARENT*1..]->(p:Document)-[:CREATE_BY]->(u:User) WHERE NOT (p)-[:HAS_PARENT]->(:Document) AND u.id = $userId " +
+        " RETURN s, u ";
+
+    const _session = driver.session();
+    _session.run(_query, {id, userId: res.userId}).then(data => {
+        let elem = data.records[0];
+        if (!elem) {
+            canDelete = false;
+            res.status(401).json({reason: 'Unauthorized'});
+        } else {
+            const session = driver.session();
+            const query = "MATCH (:User)-[r:VOTE_FOR]->( d:Document ) " +
+                "WHERE d.id = $id " +
+                "OPTIONAL MATCH (d)-[r1:HAS_PARENT]->(p:Document)-[r2:HAS_CHILDREN]->(d) " +
+                "REMOVE r1.voteComplete " +
+                "REMOVE r2.voteComplete " +
+                "DELETE r ";
+            let result = session.run( query , { id });
+            result.then( data => {
+                return res.json({ok : true }).end();
+            },error => {
+                return res.status(500).json( {reason  : error }).end();
+            }).finally( () => {
+                session.close();
+                driver.close();
+            })
+        }
+
+    }).finally(() => _session.close());
+
+
 }
 
 

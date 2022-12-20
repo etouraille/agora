@@ -122,7 +122,6 @@ const Vote = ({ id , forceReload , onMouseEnter, onMouseLeave}) => {
                 <button className="btn btn-black" onClick={voteForIt}><img className="logo-small" src={yes}/>Pour</button>
                 <button className="btn btn-black margin-left" onClick={voteAgainstIt}><img className="logo-small" src={no}/>Contre</button>
             </div>: vote !== null ? <div style={{width: '100px'}}>J'ai voté { vote  ? <strong>Pour<img className="logo-small margin-left" src={yes}></img></strong> : <strong>Contre<img className="logo-small margin-left" src={no}></img></strong>}</div>: <></>  }
-            <div><button className="btn btn-sm btn-danger" onClick={resetVote}>Reset</button></div>
             { result !== null && (result.final || result.complete)? <div>
                 { result.success ? <div>Resultat :<img className="logo"src={yes}></img></div> : <div>Résultat : <img className="logo" src={no}></img></div>}
                 <div className="small-font"> Pour :
