@@ -96,7 +96,7 @@ const Login = () => {
             )}
 
         </Formik>
-        { process.env.REACT_APP_env === 'dev' ? <GoogleLogin
+        { process.env.REACT_APP_env ? <GoogleLogin
             clientId={process.env.REACT_APP_google_key}
             buttonText="Login"
             onSuccess={responseGoogle}
