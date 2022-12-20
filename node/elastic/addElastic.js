@@ -31,6 +31,7 @@ const addNewUser = async (user, invitedBy) => {
             id: user.id,
             email: user.email,
             name: user.name,
+            picture: user.picture,
             friends : []
         }
     };
@@ -51,9 +52,10 @@ const addNewUser = async (user, invitedBy) => {
 }
 
 const updateUser = async (id, user ) => {
-    let _id = await findById(id);
+    let _id = await findById(id, 'user');
+    console.log(_id, 'ELASTIC USER ID', user);
     if (_id) {
-        await elastic.update({index: 'user', id: _id, body: user});
+        await elastic.update({index: 'user', id: _id, body: { doc: user }});
         await elastic.indices.refresh({index: 'user'});
     }
 }

@@ -1,10 +1,10 @@
 const elastic = require( './search');
 
-const findById = ( id ) => {
+const findById = ( id , index  = 'document') => {
 
     return new Promise( (resolve , reject ) => {
         elastic.search({
-            index: 'document',
+            index: index,
             body: {
                 query: {
                     match: { id: id  }

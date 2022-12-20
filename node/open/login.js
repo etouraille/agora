@@ -45,8 +45,8 @@ const login = (type) => {
                     return _session.run(query, {email, picture, name}).then((data) => {
                         // update user in elastic
                         id = data.records[0].get(0).properties.id;
-                        updateUser(id, {email, picture, name, id}).catch(() => {
-                            console.log('probleme update elatic user')
+                        updateUser(id, {email, picture, name, id}).catch((error) => {
+                            console.log('probleme update elatic user', error.meta.body.error);
                         })
                         return id;
                     }).finally(() => _session.close());
