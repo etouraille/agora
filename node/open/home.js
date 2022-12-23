@@ -15,7 +15,7 @@ const home = ( req, res ) => {
     const session = driver.session();
 
     let  query = "MATCH (d:Document) " +
-        "WHERE NOT (d)-[:HAS_PARENT]->(:Document) " +
+        "WHERE NOT (d)-[:HAS_PARENT]->(:Document) AND ( d.private = false OR d.private IS NULL )" +
         "RETURN d " +
         "ORDER BY d.createdAt, d.title ASC SKIP $skip " +
         "LIMIT $per_page ";

@@ -1,8 +1,28 @@
-import React from "react";
+import React, {useState} from "react";
 import {Formik, Form, Field, FieldArray, ErrorMessage} from "formik";
 import http from "../http/http";
+import inviteSvg from "../svg/invite.svg";
+import SearchApi from "../search/SearchApi";
+import Search from "../utils/search";
 
-const List = ({id}) => (
+const List = ({id}) => {
+
+    const [ users, setUsers ] = useState([]);
+
+    const changeUser = (data, index) => {
+        let _users = users;
+        _users[index] = data;
+        setUsers(_users);
+    }
+
+    const removeUser = (evt, helper, index ) => {
+        evt.stopPropagation();
+        helper.remove(index);
+        users.splice(index, 1);
+        setUsers(users);
+    }
+
+    return (
     <>
     <div>
         <Formik
@@ -10,11 +30,11 @@ const List = ({id}) => (
             validate={values => {
                 const errors = {};
                 console.log( errors);
-                values.friends.forEach((email,index) => {
-                  if(!email) {
+                users.forEach((user,index) => {
+                  if(!user) {
                       errors['emails.' + index ] = 'Required';
-                  } else if (
-                      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)
+                  } else if (user.isUser === false &&
+                      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(user.value)
                   ) {
                       errors['emails.' + index ] = 'Invalid email address';
                   }
@@ -25,7 +45,7 @@ const List = ({id}) => (
             onReset={() =>{}}
             onSubmit={(values , { setSubmitting , resetForm })=> {
                 console.log('submit ====');
-                http.post('/api/invite-to-contribute', {emails: values.friends, id})
+                http.post('/api/invite-to-contribute', {users, id})
                     .then(data => {
                         // todo erase email and close window
                         setSubmitting(false);
@@ -42,11 +62,12 @@ const List = ({id}) => (
                                 {values.friends && values.friends.length > 0 ? (
                                     values.friends.map((friend, index) => (
                                         <div key={index}>
-                                            <Field name={`friends.${index}`} onClick={evt => evt.stopPropagation()}/>
+                                            <Search id={`friends.${index}`} onChange={(data) => changeUser(data, index)}></Search>
+
                                             <ErrorMessage name={`emails.${index}`} component="div"></ErrorMessage>
                                             <button
                                                 type="button"
-                                                onClick={(evt) => {evt.stopPropagation();arrayHelpers.remove(index)}} // remove a friend from the list
+                                                onClick={(evt) => {removeUser(evt, arrayHelpers, index)}} // remove a friend from the list
                                             >
                                                 -
                                             </button>
@@ -76,6 +97,6 @@ const List = ({id}) => (
         </Formik>
     </div>
     </>
-);
+)};
 
 export default List;

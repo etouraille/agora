@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { Formik, Form , ErrorMessage, Field } from 'formik'
 import http from "../http/http";
 import Quill from 'quill';
@@ -6,12 +6,21 @@ import history from "../utils/history";
 import { sub } from "../redux/slice/subscribedSlice";
 import {useDispatch} from "react-redux";
 import {reloadList} from "../redux/slice/reloadDocumentListSlice";
+import {FormCheck, FormGroup} from "react-bootstrap";
 
 const Document = () => {
 
-    const [body , setBody ] = useState([]);
 
+
+    const [body , setBody ] = useState([]);
+    const [ checked, setChecked ] = useState(false);
     const dispatch = useDispatch();
+
+    const handleChange = (value) =>  {
+        setTimeout(() => {
+            setChecked(!checked);
+        })
+    };
 
     useEffect(() => {
         const quill = new Quill('#quill', {
@@ -30,10 +39,12 @@ const Document = () => {
     }, [])
 
     return (
+        <>
         <Formik
-            initialValues={{ title : ''}}
+            initialValues={{ title : '', private: false}}
             onSubmit={( values , {setSubmitting}) => {
                 values['body'] = JSON.stringify(body);
+                values['private'] = checked;
                 http.post('/api/document', values).then((data) => {
                     history.push('/documentedit/' + data.data.id);
                     dispatch(sub({id : data.data.id }));
@@ -44,6 +55,8 @@ const Document = () => {
                     console.log(error);
                     setSubmitting(false);
                 })
+
+
             }}
             validate={ (values  )=> {
                 let errors = {};
@@ -57,24 +70,28 @@ const Document = () => {
                 return errors;
             }}
         >
-            {({ isSubmitting,handleSubmit }) => (
-                <Form>
+            {({ isSubmitting,values, handleSubmit, setFieldValue, errors }) => (
+                <form>
+
                     <div className="input-group flex-nowrap">
-                        <Field type="text" name="title" className="form-control"></Field>
-                        <ErrorMessage name="title" component="div"></ErrorMessage>
+                        <Field type="text" name="title" className="form-control" />
+                        <ErrorMessage name="title" component="div" />
+                    </div>
+                    <div>
+                        <label>Private</label>
+                        <input type="checkbox" name="private" label="Private" checked={checked} onChange={handleChange}/>
                     </div>
                     <div className="form-group">
-                        <ErrorMessage name="body" component="div"></ErrorMessage>
+                        <ErrorMessage name="body" component="div" />
                         <div id="quill"></div>
                     </div>
-                    <button className="btn btn-primary" type="submit" onClick={handleSubmit} disabled={isSubmitting} >
+                    <button className="btn btn-primary" type="submit" onClick={handleSubmit}  disabled={isSubmitting} >
                         Submit
                     </button>
-                </Form>
+                </form>
             )}
         </Formik>
-
-
+        </>
     )
 }
 

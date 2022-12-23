@@ -1,6 +1,7 @@
 import history from "../utils/history";
 import { logout } from "../redux/slice/loginSlice";
 import store from "../redux/store";
+import Cookies from 'universal-cookie';
 const axios = require('axios').default;
 
 
@@ -18,6 +19,12 @@ http.interceptors.request.use((config) => {
     let token = localStorage.getItem('token');
     if( token ) {
         config['headers']['Authorization'] = 'Bearer ' + token;
+    }
+    let cookie = new Cookies();
+    let subscribeToken = cookie.get('subscribeToken');
+    console.log(subscribeToken);
+    if(subscribeToken) {
+        config['headers']['SubscribeToken'] = subscribeToken;
     }
 
     return config;

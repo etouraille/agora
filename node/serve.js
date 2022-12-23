@@ -41,6 +41,7 @@ const { searchUsers } = require("./api/searchUsers");
 const { socketDocument } = require('./socket/document');
 const {resetPassword, newPassword} = require("./api/password");
 const {getTitle} = require("./api/title");
+const {processInvited} = require("./subscribe/processInvited");
 const app = express()
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -55,7 +56,7 @@ Array.prototype.min = function() {
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, SubscribeToken");
     res.header("Access-Control-Expose-Headers", "token");
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
@@ -85,10 +86,17 @@ app.post('/api/uninvite', uninvite );
 
 app.get('/api/invited/:id', getInvitedUsers );
 
+app.post('/subscribe', processInvited);
 app.post('/subscribe', subscribe);
+
 app.post('/signin', signIn);
+
+app.post('/sign-in-google', processInvited);
 app.post('/sign-in-google', (req, res) => loginGmail(req, res));
+
+app.post('/sign-in-facebook', processInvited);
 app.post('/sign-in-facebook', (req, res) => loginFacebook(req, res));
+
 app.post('/reset-password', resetPassword);
 app.post('/new-password', newPassword);
 app.put('/api/ready-for-vote', canReadyForVote);

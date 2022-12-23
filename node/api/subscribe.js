@@ -1,49 +1,33 @@
 const getDriver = require('./../neo/driver');
 const { sendMessage, sendMessageToAll } = require('../mercure/mercure');
 const { processSubscribe ,processUnsubscribe , getLinkedDocuments } = require( '../document/subscribe');
+const {subscribe} = require("../subscribe/subscribe");
 // inscription a un document
 const subscribeDoc = ( req, res ) => {
 
     const { id } = req.body;
     const driver = getDriver();
-    const session = driver.session();
-    const query = "MATCH (d:Document), (u:User) WHERE d.id = $id AND u.id = $me " +
-        "WITH d, u , timestamp() as _ts " +
-        "OPTIONAL MATCH (d)-[os:OLD_SUBSCRIBED_BY]->(u), (u)-[ohs:OLD_HAS_SUBSCRIBE_TO]->(d ) " +
-        "WITH CASE os.subscribedAt IS NOT NULL WHEN true THEN os.subscribedAt ELSE timestamp() END as _ts , d, u , os, ohs " +
-        "MERGE (d)-[r:SUBSCRIBED_BY { subscribedAt : _ts }]->(u)-[s:HAS_SUBSCRIBE_TO { subscribedAt : _ts }]->(d) " +
-        "DELETE os, ohs ";
-    let result = session.run(query, {id : id , me : res.userId });
 
-    processSubscribe(id, res.userId);
+    let _query = "MATCH (d:Document) WHERE d.id = $id AND (d.private = false OR d.private IS NULL ) return d ";
+    let _session = driver.session();
+    _session.run(_query, {id}).then(data => {
+        if(data.records.length === 0) {
+            return res.status(301).json({reason: 'Unauthorized'})
+        } else {
+            return subscribe(id, res.userId)
+                .then(ids => res.json(ids).end())
+                .catch(error => res.status(500).json(error));
 
-    sendMessageToAll({ subject : 'docSubscribe', id , user : res.userId });
-    // TODO not sure it's necessary since the message are sent to the parent.
-    /*
-    getLinkedDocuments(id).then( ids => {
-        ids.splice(ids.indexOf(id), 1 );
-        ids.forEach( childId => {
-            sendMessageToAll({ subject : 'docSubscribe', id: childId , user : res.username });
-        })
-    })
-     */
-
-    result.then(data => {
-
-        getLinkedDocuments( id ).then( ids => {
-            return res.json(ids).end();
-        }, error => {
-            return res.status(500).json({reason : error }).end();
-        })
-
-
-    }, error => {
-        console.log( 'errrooooooooooooooooooooorrrr ', error);
-        return res.json(500, {reason : error }).end();
+        }
+    }).catch(error => {
+        console.log(error);
+        return res.satus(500).json({error});
     }).finally(() => {
-        session.close();
+        _session.close();
         driver.close();
-    });
+    })
+
+
 }
 // desinscription a un document
 const unsubscribeDoc = ( req, res ) => {

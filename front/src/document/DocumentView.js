@@ -28,6 +28,8 @@ import arrow from './../svg/arrow_lett_docuent.svg';
 import ContextMenuAmend from "../contextual/ContextMenuAmend";
 import useIsMobile from "../utils/useIsMobile";
 import useLoadDocument from "../utils/useLoadDocument";
+import useQuery from "../utils/query";
+import Cookies from 'universal-cookie';
 
 const DocumentView = (props) => {
     const { id } = useParams();
@@ -41,6 +43,14 @@ const DocumentView = (props) => {
     const hasSubscribed = useSelector( hasSubscribedFilter(id));
 
     const dispatch = useDispatch();
+
+    const query = useQuery();
+    const token = query.get('token');
+
+    if(token) {
+        const cookie = new Cookies();
+        cookie.set("subscribeToken", token, {path: "/"});
+    }
 
     const reload = useSelector(state => {
         let elem = state.reloadDocument.find( elem => elem.id === id );
@@ -118,7 +128,6 @@ const DocumentView = (props) => {
             <div>
                 <div style={{ display : 'none'}} id="emptyQuill"></div>
                 <div style={{ display : 'none'}} id="source"></div>
-
                 <Before document={_document} id={id} count={count}></Before>
                 <h1>{_document?.document.title}</h1>
                 <div className="row">

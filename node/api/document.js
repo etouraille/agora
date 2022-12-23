@@ -7,7 +7,7 @@ const {sendMessage} = require("../mercure/mercure");
 const create = ( req, res ) => {
 
     const userId = res.userId;
-    const { title, body } = req.body;
+    const { title, body , private } = req.body;
     const driver = getDriver();
     const session = driver.session();
 
@@ -16,14 +16,14 @@ const create = ( req, res ) => {
         const query = '' +
         'MATCH (user: User ) WHERE user.id = $userId ' +
         'MERGE (user)-[r:CREATE]->' +
-        '(document : Document {title : $title , body : $body , id : $id , createdAt : timestamp()})' +
+        '(document : Document {title : $title , body : $body , id : $id , createdAt : timestamp(), private : $private })' +
         '-[s:CREATE_BY]->(user) ' +
         'MERGE (document)-[p:FOR_EDIT_BY { invited : $me,  round : 0 }]->(user) ' +
         "MERGE (document)-[:SUBSCRIBED_BY {subscribedAt: timestamp() }]->(user)-[:HAS_SUBSCRIBE_TO {subscribedAt: timestamp() }]->(document) " +
         'RETURN document'
         const result = session.run(
             query,
-            {title : title , body : body , userId , id : _uuid, me : userId });
+            {title : title , body : body , userId , id : _uuid, me : userId , private });
 
         result.then( data => {
             res.json( data.records[0].get(0).properties );

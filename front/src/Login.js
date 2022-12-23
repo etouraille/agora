@@ -5,6 +5,10 @@ import { useDispatch } from "react-redux";
 import { login , logout } from './redux/slice/loginSlice';
 import { Formik, Form , Field, ErrorMessage }  from "formik";
 import { GoogleLogin } from 'react-google-login';
+import {sub} from "./redux/slice/subscribedSlice";
+import {subscribeDoc} from "./redux/slice/documentSubscribeSlice";
+import {reload} from "./redux/slice/reloadDocumentSlice";
+import {reloadList} from "./redux/slice/reloadDocumentListSlice";
 /*global FB*/
 
 const Login = () => {
@@ -27,6 +31,20 @@ const Login = () => {
                 history.push("/documents");
             }
             dispatch(login({token : data.data.token , userId : data.data.userId}));
+            if (data.data.documentId) {
+                let id = data.data.documentId;
+                let ids = data.data.ids;
+                let user = data.data.userId;
+                dispatch( sub({ id : id }))
+                ids.forEach( childrenId  => {
+                    dispatch( sub({ id : childrenId }))
+
+                })
+                // subscribe associé au document.
+                dispatch( subscribeDoc({id , user }))
+                dispatch(reload({id}));
+                dispatch( reloadList());
+            }
         } else {
             dispatch(logout());
         }

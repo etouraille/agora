@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const jwtKey = config.jwtKey
 const jwtExpirySeconds = config.jwtExpirySeconds;
 const axios = require('axios');
+const {subscribeDoc} = require("../api/subscribe");
+const {subscribe} = require("../subscribe/subscribe");
 
 
 const googleAuth = async (token) => {
@@ -71,7 +73,11 @@ const login = (type) => {
                 // here, the max age is in milliseconds, so we multiply by 1000
                 res.setHeader('token', token);
 
-                res.json(200, {email: email, token, name, userId: id});
+                if(res.documentToSubscribe) {
+                    return subscribe(res.documentToSubscribe, id).then(ids => res.json({email, token, name, userId: id , ids, documentId: res.documentToSubscribe }));
+                } else {
+                    return res.json(200, {email: email, token, name, userId: id});
+                }
             }).catch(err => {
                 console.log(err);
                 return res.status(500).json({reason: err});

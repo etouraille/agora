@@ -52,11 +52,9 @@ const DocumentList = ({ onClick }) => {
             { documents.map((doc, index ) => {
               return (
                   <li key={index}>
-                    <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>
-                      {doc.document.title}
+                      {doc?.document?.title}
+                      <Link onClick={toggle} to={'/document/' + doc?.id }>Display</Link>
 
-                      <Link onClick={toggle} to={'/document/' + doc.id }>Display</Link>
-                    <button className="btn btn-sm btn-danger" onClick={() => deleteDocument(doc.id)}>Delete</button>
                   </li>
               )
             })}

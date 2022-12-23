@@ -3,7 +3,11 @@ import Email from '../validation/Mail';
 import history from "../utils/history";
 import {login} from "../redux/slice/loginSlice";
 import {useDispatch} from "react-redux";
-
+import {sub} from "../redux/slice/subscribedSlice";
+import {subscribeDoc} from "../redux/slice/documentSubscribeSlice";
+import {reload} from "../redux/slice/reloadDocumentSlice";
+import {reloadList} from "../redux/slice/reloadDocumentListSlice";
+import http from "../http/http";
 const SubscribeForm = () => {
 
     const dispatch = useDispatch();
@@ -43,27 +47,35 @@ const SubscribeForm = () => {
     }
 
     const submit = () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email , password : pwd , name})
-        };
-        fetch(process.env.REACT_APP_api + 'subscribe', requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                if(data.reason ) {
-                    setUserExists(true);
-                } else if( data.token ) {
-                    dispatch(login({token : data.token, email: data.email, userId: data.userId }));
-                    localStorage.setItem('token', data.token);
-                    if (localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
-                        history.push(localStorage.getItem('redirect'));
-                        localStorage.setItem('redirect', null);
-                    } else {
-                        history.push('/documents');
-                    }
+        http.post('subscribe', { email: email , password : pwd , name}).then(data => {
+            if(data.data.reason ) {
+                setUserExists(true);
+            } else if( data.data.token ) {
+                dispatch(login({token : data.data.token, email: data.data.email, userId: data.data.userId }));
+                if(data.data.documentId) {
+                    let id = data.data.documentId;
+                    let ids = data.data.ids;
+                    let user = data.data.userId;
+                    dispatch( sub({ id : id }))
+                    ids.forEach( childrenId  => {
+                        dispatch( sub({ id : childrenId }))
+
+                    })
+                    // subscribe associé au document.
+                    dispatch( subscribeDoc({id , user }))
+                    dispatch(reload({id}));
+                    dispatch( reloadList());
                 }
-            });
+                localStorage.setItem('token', data.data.token);
+                if (localStorage.getItem('redirect') && localStorage.getItem('redirect') !== 'null') {
+                    history.push(localStorage.getItem('redirect'));
+                    localStorage.setItem('redirect', null);
+                } else {
+                    history.push('/documents');
+                }
+            }
+        })
+
     }
 
 

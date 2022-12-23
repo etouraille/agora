@@ -19,7 +19,9 @@ const SubscribeBarre = () => {
 
     const doc = useSelector(documentFilter(id));
 
-    const canDisplay = doc.parentLink === null;
+    console.log(doc);
+
+    const canDisplay = doc.parentLink === null && (typeof doc.document.private === 'boolean' ? doc.document.private === false : true );
 
     const toggle = (evt) => {
         evt.stopPropagation();

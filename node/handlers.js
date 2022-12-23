@@ -6,6 +6,7 @@ const {addNewUser} = require("./elastic/addElastic");
 const jwtKey = config.jwtKey
 const jwtExpirySeconds = config.jwtExpirySeconds;
 const bcrypt = require('bcrypt');
+const {subscribe: subscribeDoc} = require('./subscribe/subscribe')
 const subscribe = async (req , res ) => {
 
     const { email, password , name } = req.body;
@@ -46,8 +47,13 @@ const subscribe = async (req , res ) => {
                     // here, the max age is in milliseconds, so we multiply by 1000
                     res.setHeader('token', token);
 
-                    res.json(200, {email: email, password: password, token, name, userId: _user.id});
-                    res.end();
+                    if(res.documentToSubscribe) {
+                        return subscribeDoc(res.documentToSubscribe, _user.id)
+                            .then(ids => res.json({email, password, token, name, userId: _user.id, ids, documentId: res.documentToSubscribe}));
+                    } else {
+                        res.json(200, {email: email, password: password, token, name, userId: _user.id});
+                        res.end();
+                    }
                 }, (reason) => {
                     session.close();
                     driver.close();
