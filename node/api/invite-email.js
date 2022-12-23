@@ -5,6 +5,7 @@ const {sendInviteEmail} = require("../notification/notification");
 const {inviteEmail : sendInviteSendinblue} = require('../email/inviteEmail');
 const {subscribeDoc} = require("./subscribe");
 const {v4 : uuid } = require('uuid');
+const {subscribe} = require("../subscribe/subscribe");
 
 const inviteEmail = ( req, res ) => {
 
@@ -26,6 +27,8 @@ const inviteEmail = ( req, res ) => {
                         sendInviteEmail(id, idOrEmail, res.email, res._user);
                         // send email
                         sendInviteSendinblue(id, idOrEmail, res.email, res._user);
+                        let user = data.records[0].get(0).properties.id;
+                        subscribe(id, user).then();
 
                     } else {
                         let token = uuid();
@@ -51,8 +54,8 @@ const inviteEmail = ( req, res ) => {
                 let result = session.run(query, {id: idOrEmail}).then(data => {
                     let email = data.records[0].get(0).properties.login;
                     sendInviteSendinblue(id, email, res.email, res._user);
-                    res.userId = idOrEmail;
-                    subscribeDoc({ body: {id}}, res);
+                    subscribe(id, idOrEmail).then();
+                    res.json({ success: true});
                 })
             }
         })
