@@ -17,6 +17,8 @@ const DocumentList = ({ onClick }) => {
         return state.documentSubscribe.documents;
     })
 
+    console.log( documents );
+
     useEffect(() => {
             http.get('/api/documents').then(
                 data => {
@@ -52,7 +54,8 @@ const DocumentList = ({ onClick }) => {
             { documents.map((doc, index ) => {
               return (
                   <li key={index}>
-                      {doc?.document?.title}
+                      <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>
+                        {doc?.document?.title}
                       <Link onClick={toggle} to={'/document/' + doc?.id }>Display</Link>
 
                   </li>
