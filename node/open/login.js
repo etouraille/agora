@@ -17,7 +17,7 @@ const googleAuth = async (token) => {
     console.log( token );
 
     const ticket = await client.verifyIdToken({
-        idToken: token.credential,
+        idToken: token,
         audience: config.googleKey,
     })
     const payload = ticket.getPayload();

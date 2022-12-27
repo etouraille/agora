@@ -11,7 +11,7 @@ import Subscribe from "./../mercure/subscribe";
 import documentSubscribeFilters from "../redux/filter/documentSubscribeFilters";
 import _ from 'lodash'
 import {initDocumentsSubscribe} from "../redux/slice/documentSubscribeSlice";
-import { GoogleLogout } from 'react-google-login';
+import { UnlogGoogle } from '@etouraille/react-google-login';
 
 /*global FB*/
 
@@ -139,11 +139,11 @@ const Encart = () => {
             <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink" style={{ display : selected ? 'inline' : 'none'}}>
                 <Link className="dropdown-item"  to="/documents" onClick={evt => setSelected(!selected)}>Liste des Documents</Link>
                 <Link className="dropdown-item"  to="/document" onClick={evt => setSelected(!selected)}>Créer un document</Link>
-                { jwtDecode(token).isGoogle ? <GoogleLogout
+                { jwtDecode(token).isGoogle ? <UnlogGoogle
                     clientId={process.env.REACT_APP_google_key}
-                    buttonText="Logout"
-                    onLogoutSuccess={evt => unlog()}
-                ></GoogleLogout> : (jwtDecode(token).isFacebook ?
+                    content={(unlog) => <a className="dropdown-item" onClick={unlog}>Déconnexion</a>}
+                    onSuccess={evt => unlog()}
+                 /> : (jwtDecode(token).isFacebook ?
                         <div className="dropdown-item"  onClick={evt => { FB.logout();unlog();}}>Unlog</div> :
                         <div className="dropdown-item"  onClick={evt => unlog()}>Unlog</div>)
                 }
