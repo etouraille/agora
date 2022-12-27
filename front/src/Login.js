@@ -4,11 +4,11 @@ import history from "./utils/history";
 import { useDispatch } from "react-redux";
 import { login , logout } from './redux/slice/loginSlice';
 import { Formik, Form , Field, ErrorMessage }  from "formik";
-import { GoogleLogin } from 'react-google-login';
 import {sub} from "./redux/slice/subscribedSlice";
 import {subscribeDoc} from "./redux/slice/documentSubscribeSlice";
 import {reload} from "./redux/slice/reloadDocumentSlice";
 import {reloadList} from "./redux/slice/reloadDocumentListSlice";
+import { Login as GoogleLogin} from '@etouraille/react-google-login';
 /*global FB*/
 
 const Login = () => {
@@ -16,7 +16,7 @@ const Login = () => {
     const dispatch = useDispatch();
 
     const responseGoogle = (data) => {
-        http.post('/sign-in-google', data).then( data => {
+        http.post('/sign-in-google', {tokenId: data.credential}).then( data => {
             successLogin(data);
         })
     }
@@ -115,11 +115,9 @@ const Login = () => {
 
         </Formik>
         <GoogleLogin
-            clientId={process.env.REACT_APP_google_key}
-            buttonText="Login"
+            client_id={process.env.REACT_APP_google_key}
             onSuccess={responseGoogle}
             onFailure={responseGoogle}
-            cookiePolicy={'single_host_origin'}
         />
         <button className="btn btn-success" onClick={onFacebookClick}>Login Facebook</button>
     </div>

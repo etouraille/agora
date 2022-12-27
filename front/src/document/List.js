@@ -54,7 +54,7 @@ const DocumentList = ({ onClick }) => {
             { documents.map((doc, index ) => {
               return (
                   <li key={index}>
-                      <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>
+                      {!doc.document.private ? <Subscribe id={doc.id} reloadFunc={reloadFunc}></Subscribe>: <></>}
                         {doc?.document?.title}
                       <Link onClick={toggle} to={'/document/' + doc?.id }>Display</Link>
 
@@ -64,5 +64,4 @@ const DocumentList = ({ onClick }) => {
         </ul>
     )
 }
-
 export default DocumentList;
