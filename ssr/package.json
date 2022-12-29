@@ -1,0 +1,15 @@
+{
+  "name": "ssr",
+  "version": "1.0.0",
+  "description": "Ssr webserver",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^19.4.1"
+  }
+}

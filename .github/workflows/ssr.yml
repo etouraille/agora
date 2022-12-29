@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: ssr
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 12.x ] # We will deploy with only one version of node
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build cdn
+        env:
+          CI: false
+        run: |
+          cd ssr 
+          npm install
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --delete --omit-dir-times
+          path: /ssr/
+          remote_path: ~/production/ssr/
+          remote_host: queel.fr
+          remote_user: ubuntu
+          remote_key: ${{ secrets.RSA_PUB }}
+      - name: up and start
+        uses: appleboy/ssh-action@master
+        with:
+          host: queel.fr
+          username: ubuntu
+          key: ${{ secrets.RSA_PUB }}
+          script: |
+            cd production && ./restart_ssr.sh
