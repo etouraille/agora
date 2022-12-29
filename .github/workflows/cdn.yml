@@ -48,4 +48,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.RSA_PUB }}
           script: |
-            cd production && docker compose up -d && ./restart_node.sh && ./restart_cdn.sh
+            cd production && docker compose up -d && ./restart_node.sh && ./restart_cdn.sh && ./restart_ssr.sh
