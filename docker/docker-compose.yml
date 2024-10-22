@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   neo:
-    image: neo4j:latest
+    image: neo4j:3.5.35
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -51,7 +51,7 @@ services:
       # Uncomment the following line to disable HTTPS
       SERVER_NAME: ':8081'
     # Uncomment the following line to enable the development mode
-    command: /usr/bin/caddy run -config /src/Caddyfile.dev
+    command: /usr/bin/caddy run --adapter caddyfile --config /src/Caddyfile.dev
     ports:
       - "8081:80"
     volumes:
