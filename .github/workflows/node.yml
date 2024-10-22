@@ -55,6 +55,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.RSA_PUB }}
           script: |
-            cd agora/production && docker compose up -d && ./restart_node.sh && ./restart_cdn.sh && ./restart_ssr.sh
+            cd agora/production && docker compose up -d && ./restart_node.sh && ./restart_cdn.sh
             
 
