@@ -49,3 +49,4 @@ jobs:
           key: ${{ secrets.RSA_PUB }}
           script: |
             cd agora/production && ./restart_ssr.sh
+
